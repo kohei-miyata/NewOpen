@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { getStores } from "@/lib/db";
+import { getStores, getComingSoonStores } from "@/lib/db";
 import { getLatLngFromIp } from "@/lib/geolocation";
 import StoreCard from "@/components/StoreCard";
 import PageHeader from "@/components/PageHeader";
@@ -13,20 +13,30 @@ export const CATEGORIES: Category[] = [
 export default async function StoresPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area?: string; category?: string }>;
+  searchParams: Promise<{ area?: string; category?: string; filter?: string }>;
 }) {
   const sp = await searchParams;
   const areaQuery = sp.area?.trim() ?? "";
   const categoryFilter = sp.category ?? "";
+  const filterParam = sp.filter ?? "";
 
   const headersList = await headers();
   const ip =
     headersList.get("x-forwarded-for")?.split(",")[0].trim() ??
     headersList.get("x-real-ip") ??
     null;
-  const userLatLng = await getLatLngFromIp(ip);
 
-  let stores = await getStores(userLatLng);
+  const userLatLng = filterParam === "coming_soon"
+    ? undefined
+    : await getLatLngFromIp(ip);
+
+  const [normalStores, comingSoonStores] = await Promise.all([
+    filterParam === "coming_soon" ? Promise.resolve([]) : getStores(userLatLng),
+    filterParam === "coming_soon" ? getComingSoonStores() : Promise.resolve([]),
+  ]);
+
+  // coming_soon フィルターの場合はまもなくオープン、そうでなければ通常店舗
+  let stores = filterParam === "coming_soon" ? comingSoonStores : normalStores;
 
   if (areaQuery) {
     const q = areaQuery.toLowerCase();
@@ -39,11 +49,13 @@ export default async function StoresPage({
     stores = stores.filter((s) => s.category === categoryFilter);
   }
 
+  const title = filterParam === "coming_soon" ? "まもなくオープン" : "新規オープン一覧";
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <PageHeader
-          title="新規オープン一覧"
+          title={title}
           description={`${stores.length}件のお店`}
         />
 
@@ -51,6 +63,7 @@ export default async function StoresPage({
           categories={CATEGORIES}
           currentArea={areaQuery}
           currentCategory={categoryFilter}
+          currentFilter={filterParam}
         />
 
         {stores.length === 0 ? (

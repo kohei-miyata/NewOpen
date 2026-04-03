@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { getStores, getRankedStores, getCoupons } from "@/lib/db";
+import { getStores, getRankedStores, getCoupons, getComingSoonStores } from "@/lib/db";
 import StoreCard from "@/components/StoreCard";
 import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 
 export default async function Home() {
-  const [allStores, ranked, coupons] = await Promise.all([
+  const [allStores, ranked, coupons, comingSoon] = await Promise.all([
     getStores(),
     getRankedStores(),
     getCoupons(),
+    getComingSoonStores(),
   ]);
 
   const recentStores = allStores.slice(0, 4);
@@ -42,6 +43,23 @@ export default async function Home() {
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-12">
         {/* 最近見たお店 */}
         <RecentlyViewedSection />
+
+        {/* まもなくオープン */}
+        {comingSoon.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">まもなくオープン</h2>
+              <Link href="/stores?filter=coming_soon" className="text-sm text-orange-500 hover:underline">
+                すべて見る →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {comingSoon.slice(0, 4).map((store) => (
+                <StoreCard key={store.id} store={store} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 最新オープン */}
         <section>

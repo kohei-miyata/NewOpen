@@ -8,6 +8,7 @@ const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
 const INPUT_ERROR = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 export default function SignupForm({ serverError }: { serverError?: string }) {
+  const [role, setRole] = useState<"user" | "owner">("user");
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -54,6 +55,28 @@ export default function SignupForm({ serverError }: { serverError?: string }) {
       {serverError && (
         <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
       )}
+
+      {/* ロール選択 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">登録区分</label>
+        <div className="flex gap-2">
+          {(["user", "owner"] as const).map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setRole(r)}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                role === r
+                  ? "bg-orange-500 text-white border-orange-500"
+                  : "bg-white text-gray-600 border-gray-300 hover:border-orange-400"
+              }`}
+            >
+              {r === "user" ? "一般ユーザー" : "オーナー"}
+            </button>
+          ))}
+        </div>
+        <input type="hidden" name="role" value={role} />
+      </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">メールアドレス</label>

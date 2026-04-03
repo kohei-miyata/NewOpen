@@ -25,7 +25,6 @@ export interface Store {
   openDate: string;
   description: string;
   imageUrl: string;
-  rating: number;
   views: number;
   likes: number;
   tags: string[];

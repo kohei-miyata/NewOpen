@@ -8,24 +8,31 @@ interface Props {
   categories: Category[];
   currentArea: string;
   currentCategory: string;
+  currentFilter: string;
 }
 
-export default function StoresFilter({ categories, currentArea, currentCategory }: Props) {
+export default function StoresFilter({ categories, currentArea, currentCategory, currentFilter }: Props) {
   const router = useRouter();
   const [area, setArea] = useState(currentArea);
   const formRef = useRef<HTMLFormElement>(null);
 
-  function buildUrl(newArea: string, newCategory: string) {
+  function buildUrl(newArea: string, newCategory: string, newFilter: string) {
     const params = new URLSearchParams();
     if (newArea.trim()) params.set("area", newArea.trim());
     if (newCategory) params.set("category", newCategory);
+    if (newFilter) params.set("filter", newFilter);
     const qs = params.toString();
     return `/stores${qs ? `?${qs}` : ""}`;
   }
 
   function handleCategoryClick(cat: string) {
     const next = currentCategory === cat ? "" : cat;
-    router.push(buildUrl(area, next));
+    router.push(buildUrl(area, next, currentFilter));
+  }
+
+  function handleFilterToggle() {
+    const next = currentFilter === "coming_soon" ? "" : "coming_soon";
+    router.push(buildUrl(area, currentCategory, next));
   }
 
   function handleReset() {
@@ -33,13 +40,15 @@ export default function StoresFilter({ categories, currentArea, currentCategory 
     router.push("/stores");
   }
 
+  const hasFilter = !!(currentArea || currentCategory || currentFilter);
+
   return (
     <form
       ref={formRef}
       className="mb-6 space-y-3"
       onSubmit={(e) => {
         e.preventDefault();
-        router.push(buildUrl(area, currentCategory));
+        router.push(buildUrl(area, currentCategory, currentFilter));
       }}
     >
       {/* エリア検索バー */}
@@ -56,7 +65,7 @@ export default function StoresFilter({ categories, currentArea, currentCategory 
         >
           検索
         </button>
-        {(currentArea || currentCategory) && (
+        {hasFilter && (
           <button
             type="button"
             onClick={handleReset}
@@ -67,11 +76,12 @@ export default function StoresFilter({ categories, currentArea, currentCategory 
         )}
       </div>
 
-      {/* カテゴリボタン */}
+      {/* フィルターボタン群 */}
       <div className="flex gap-2 flex-wrap">
+        {/* すべて */}
         <button
           type="button"
-          onClick={() => handleCategoryClick("")}
+          onClick={() => router.push(buildUrl(area, "", currentFilter))}
           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             !currentCategory
               ? "bg-orange-500 text-white"
@@ -80,6 +90,21 @@ export default function StoresFilter({ categories, currentArea, currentCategory 
         >
           すべて
         </button>
+
+        {/* まもなくオープン */}
+        <button
+          type="button"
+          onClick={handleFilterToggle}
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            currentFilter === "coming_soon"
+              ? "bg-blue-500 text-white"
+              : "bg-white border border-gray-200 text-gray-700 hover:border-blue-400 hover:text-blue-500"
+          }`}
+        >
+          🗓 まもなくオープン
+        </button>
+
+        {/* カテゴリ */}
         {categories.map((cat) => (
           <button
             key={cat}
@@ -95,6 +120,27 @@ export default function StoresFilter({ categories, currentArea, currentCategory 
           </button>
         ))}
       </div>
+
+      {/* アクティブフィルター表示 */}
+      {(currentFilter === "coming_soon" || currentCategory || currentArea) && (
+        <div className="flex gap-2 flex-wrap text-xs">
+          {currentFilter === "coming_soon" && (
+            <span className="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full">
+              まもなくオープン（30日以内）
+            </span>
+          )}
+          {currentCategory && (
+            <span className="bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full">
+              {currentCategory}
+            </span>
+          )}
+          {currentArea && (
+            <span className="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-full">
+              エリア: {currentArea}
+            </span>
+          )}
+        </div>
+      )}
     </form>
   );
 }

@@ -19,7 +19,6 @@ function toStore(row: any): Store {
     openDate: row.open_date,
     description: row.description ?? "",
     imageUrl: row.image_url ?? "",
-    rating: Number(row.rating),
     views: Number(row.views),
     likes: Number(row.likes),
     tags: Array.isArray(row.tags) ? row.tags : [],
@@ -48,9 +47,11 @@ function toCoupon(row: any): Coupon {
 }
 
 export async function getStores(userLatLng?: LatLng): Promise<Store[]> {
+  const today = new Date().toISOString().split("T")[0];
   const { data, error } = await getSupabaseClient()
     .from("stores")
     .select("*")
+    .lte("open_date", today)
     .order("open_date", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -87,9 +88,11 @@ export async function getStoreById(id: string): Promise<Store | undefined> {
 }
 
 export async function getRankedStores(): Promise<Store[]> {
+  const today = new Date().toISOString().split("T")[0];
   const { data, error } = await getSupabaseClient()
     .from("stores")
     .select("*")
+    .lte("open_date", today)
     .order("likes", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -107,7 +110,7 @@ export async function getCoupons(): Promise<Coupon[]> {
 }
 
 export async function createStore(
-  payload: Omit<Store, "id" | "views" | "likes" | "rating">
+  payload: Omit<Store, "id" | "views" | "likes"> & { ownerId?: string }
 ): Promise<Store> {
   const { data, error } = await getSupabaseClient()
     .from("stores")
@@ -124,10 +127,66 @@ export async function createStore(
       photos: payload.photos,
       tags: payload.tags,
       sns_links: payload.snsLinks,
-      rating: 0,
+      owner_id: payload.ownerId ?? null,
       views: 0,
       likes: 0,
     })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return toStore(data);
+}
+
+export async function getComingSoonStores(): Promise<Store[]> {
+  const today = new Date().toISOString().split("T")[0];
+  const in30 = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const { data, error } = await getSupabaseClient()
+    .from("stores")
+    .select("*")
+    .gt("open_date", today)
+    .lte("open_date", in30)
+    .order("open_date", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(toStore);
+}
+
+export async function getOwnerStores(ownerId: string): Promise<Store[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("stores")
+    .select("*")
+    .eq("owner_id", ownerId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(toStore);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function updateStore(
+  id: string,
+  payload: Partial<Omit<Store, "id" | "views" | "likes">>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client?: any
+): Promise<Store> {
+  const db = client ?? getSupabaseClient();
+  const updates: Record<string, unknown> = {};
+  if (payload.name !== undefined)        updates.name        = payload.name;
+  if (payload.category !== undefined)    updates.category    = payload.category;
+  if (payload.address !== undefined)     updates.address     = payload.address;
+  if (payload.openDate !== undefined)    updates.open_date   = payload.openDate;
+  if (payload.description !== undefined) updates.description = payload.description;
+  if (payload.imageUrl !== undefined)    updates.image_url   = payload.imageUrl;
+  if (payload.hoursText !== undefined)   updates.hours_text  = payload.hoursText;
+  if (payload.photos !== undefined)      updates.photos      = payload.photos;
+  if (payload.tags !== undefined)        updates.tags        = payload.tags;
+  if (payload.snsLinks !== undefined)    updates.sns_links   = payload.snsLinks;
+
+  const { data, error } = await db
+    .from("stores")
+    .update(updates)
+    .eq("id", id)
     .select()
     .single();
 

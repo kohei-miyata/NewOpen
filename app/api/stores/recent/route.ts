@@ -23,7 +23,6 @@ export async function GET(req: Request) {
     openDate: row.open_date,
     description: row.description ?? "",
     imageUrl: row.image_url ?? "",
-    rating: Number(row.rating),
     views: Number(row.views),
     likes: Number(row.likes),
     tags: Array.isArray(row.tags) ? row.tags : [],

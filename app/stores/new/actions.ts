@@ -2,9 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { createStore } from "@/lib/db";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { Category, SnsLinks } from "@/types";
 
 export async function registerStore(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   const name = formData.get("name") as string;
   const category = formData.get("category") as Category;
   const address = formData.get("address") as string;
@@ -51,6 +55,7 @@ export async function registerStore(formData: FormData) {
     photos,
     tags,
     snsLinks: Object.keys(snsLinks).length > 0 ? snsLinks : null,
+    ownerId: user?.id,
   });
 
   redirect(`/stores/${store.id}`);

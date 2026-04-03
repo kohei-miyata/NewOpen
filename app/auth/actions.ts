@@ -16,12 +16,16 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const role = (formData.get("role") as string) === "owner" ? "owner" : "user";
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback` },
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      data: { role },
+    },
   });
   if (error) redirect(`/auth/signup?error=${encodeURIComponent(error.message)}`);
   redirect("/auth/signup?success=1");

@@ -18,7 +18,7 @@ export default function StoreCard({ store, rank }: Props) {
         <div className="relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={store.imageUrl}
+            src={store.imageUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80"}
             alt={store.name}
             className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -43,12 +43,7 @@ export default function StoreCard({ store, rank }: Props) {
           <p className="text-xs text-gray-500 mt-0.5">{store.address}</p>
           <p className="text-sm text-gray-600 mt-2 line-clamp-2">{store.description}</p>
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-            <span>
-              ★ <span className="font-semibold text-gray-700">{store.rating}</span>
-            </span>
-            <span>
-              {store.likes.toLocaleString()} いいね
-            </span>
+            <span>{store.likes.toLocaleString()} いいね</span>
             <span>オープン {store.openDate}</span>
           </div>
         </div>

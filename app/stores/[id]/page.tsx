@@ -78,7 +78,6 @@ export default async function StoreDetailPage({ params }: Props) {
             <p className="text-sm text-gray-500 mt-1">{store.address}</p>
           </div>
           <div className="text-right shrink-0">
-            <div className="text-xl font-bold text-yellow-500">★ {store.rating}</div>
             <div className="text-sm text-gray-500">
               <ViewTracker storeId={store.id} initialViews={store.views} />
             </div>
