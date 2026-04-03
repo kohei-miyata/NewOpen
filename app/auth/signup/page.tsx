@@ -1,0 +1,45 @@
+import Link from "next/link";
+import SignupForm from "@/components/SignupForm";
+
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; success?: string }>;
+}) {
+  const sp = await searchParams;
+
+  if (sp.success) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="text-4xl mb-4">✉️</div>
+          <h2 className="text-lg font-bold text-gray-900">確認メールを送信しました</h2>
+          <p className="text-sm text-gray-500 mt-2">メールのリンクをクリックして登録を完了してください。</p>
+          <Link href="/auth/login" className="inline-block mt-6 text-orange-500 hover:underline text-sm">
+            ログインページへ →
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-50 min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <Link href="/" className="text-2xl font-extrabold text-orange-500">NewOpen</Link>
+          <p className="text-sm text-gray-500 mt-1">新規登録</p>
+        </div>
+
+        <SignupForm serverError={sp.error} />
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          すでにアカウントをお持ちの方は{" "}
+          <Link href="/auth/login" className="text-orange-500 hover:underline font-medium">
+            ログイン
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
