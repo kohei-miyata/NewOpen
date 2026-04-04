@@ -4,11 +4,11 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
-  if (!file) return NextResponse.json({ error: "No file" }, { status: 400 });
+  if (!file) return NextResponse.json({ error: "ファイルが選択されていません" }, { status: 400 });
 
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${user.id}/${Date.now()}.${ext}`;
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   if (error) {
     console.error("[upload] storage error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "画像のアップロードに失敗しました。もう一度お試しください" }, { status: 500 });
   }
 
   const { data: { publicUrl } } = supabase.storage
