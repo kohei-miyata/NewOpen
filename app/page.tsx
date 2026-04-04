@@ -39,10 +39,10 @@ export default async function Home() {
             🎉 新規オープン情報プラットフォーム
           </span>
           <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight drop-shadow-sm flex items-center justify-center gap-3">
-            <svg width="56" height="56" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="16" cy="16" r="16" fill="white" fillOpacity="0.25"/>
-              <circle cx="16" cy="16" r="14" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
-              <text x="16" y="22" textAnchor="middle" fontFamily="'Arial Black', Arial, sans-serif" fontWeight="900" fontSize="20" fill="white" letterSpacing="-1">N</text>
+            <svg width="72" height="72" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="20" fill="white" fillOpacity="0.25"/>
+              <circle cx="20" cy="20" r="17" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
+              <text x="20" y="27" textAnchor="middle" dominantBaseline="auto" fontFamily="'Arial Black', Arial, sans-serif" fontWeight="900" fontSize="24" fill="white">N</text>
             </svg>
             EW OPEN
           </h1>
