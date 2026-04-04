@@ -1,12 +1,18 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { banUser, unbanUser } from "./actions";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
 
 export default async function AdminPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.app_metadata?.role !== "admin") redirect("/");
+
   const admin = createSupabaseAdminClient();
   const db = getSupabaseClient();
 
