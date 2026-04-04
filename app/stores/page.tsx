@@ -1,10 +1,16 @@
 import { headers } from "next/headers";
+import type { Metadata } from "next";
 import { getStores, getComingSoonStores } from "@/lib/db";
 import { getLatLngFromIp } from "@/lib/geolocation";
 import StoreCard from "@/components/StoreCard";
 import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
 import type { Category } from "@/types";
+
+export const metadata: Metadata = {
+  title: "新規オープン一覧",
+  description: "全国の新規オープン店舗一覧。エリア・カテゴリ別に絞り込んで最新のお店情報を探せます。",
+};
 
 const CATEGORIES: Category[] = [
   "レストラン","カフェ","スイーツ","居酒屋","ラーメン","美容院","ジム","ショップ","その他",

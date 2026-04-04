@@ -35,10 +35,17 @@ function parseStoreFormData(formData: FormData) {
   if (tiktok)    snsLinks.tiktok    = tiktok;
   if (line)      snsLinks.line      = line;
 
+  const twitterPostUrl  = (formData.get("post_twitter_url")   as string)?.trim() || null;
+  const instagramPostUrl = (formData.get("post_instagram_url") as string)?.trim() || null;
+  const tiktokPostUrl   = (formData.get("post_tiktok_url")    as string)?.trim() || null;
+
   return {
     name, category, address, openDate, description, hoursText, imageUrl,
     photos, tags,
     snsLinks: Object.keys(snsLinks).length > 0 ? snsLinks : null,
+    twitterPostUrl,
+    instagramPostUrl,
+    tiktokPostUrl,
   };
 }
 

@@ -1,15 +1,39 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getStoreById, getUserLikedStoreIds } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import LikeButton from "@/components/LikeButton";
 import ViewTracker from "@/components/ViewTracker";
 import MapWrapper from "@/components/MapWrapper";
 import RecentlyViewedSaver from "@/components/RecentlyViewedSaver";
+import SnsPostEmbed from "@/components/SnsPostEmbed";
 import type { SnsLinks } from "@/types";
 
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const store = await getStoreById(id);
+  if (!store) return { title: "店舗が見つかりません | NewOpen" };
+  return {
+    title: `${store.name} | NewOpen`,
+    description: store.description,
+    openGraph: {
+      title: store.name,
+      description: store.description,
+      images: store.imageUrl ? [{ url: store.imageUrl }] : [],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: store.name,
+      description: store.description,
+      images: store.imageUrl ? [store.imageUrl] : [],
+    },
+  };
 }
 
 const SNS_META: { key: keyof SnsLinks; label: string; icon: string; color: string }[] = [
@@ -135,6 +159,13 @@ export default async function StoreDetailPage({ params }: Props) {
             isLoggedIn={!!user}
           />
         </div>
+
+        {/* SNS 埋め込み */}
+        <SnsPostEmbed
+          twitterPostUrl={store.twitterPostUrl}
+          instagramPostUrl={store.instagramPostUrl}
+          tiktokPostUrl={store.tiktokPostUrl}
+        />
 
         {/* 地図 */}
         {store.lat != null && store.lng != null && (

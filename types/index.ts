@@ -33,6 +33,9 @@ export interface Store {
   hoursText: string | null;
   photos: string[];
   snsLinks: SnsLinks | null;
+  twitterPostUrl: string | null;
+  instagramPostUrl: string | null;
+  tiktokPostUrl: string | null;
 }
 
 export interface Coupon {

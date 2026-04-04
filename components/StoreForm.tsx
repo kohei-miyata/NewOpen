@@ -197,6 +197,25 @@ export default function StoreForm({ serverError }: { serverError?: string }) {
         </div>
       </div>
 
+      {/* SNS 最新投稿 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">SNS最新投稿（埋め込み表示）</label>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <img src="/icons/x.png" alt="" className="w-5 h-5 shrink-0" />
+            <input name="post_twitter_url" placeholder="X (Twitter) 投稿URL 例: https://x.com/user/status/..." className={`${INPUT_NORMAL} flex-1`} />
+          </div>
+          <div className="flex items-center gap-2">
+            <img src="/icons/instagram.svg" alt="" className="w-5 h-5 shrink-0" />
+            <input name="post_instagram_url" placeholder="Instagram 投稿URL 例: https://www.instagram.com/p/..." className={`${INPUT_NORMAL} flex-1`} />
+          </div>
+          <div className="flex items-center gap-2">
+            <img src="/icons/tiktok.png" alt="" className="w-5 h-5 shrink-0" />
+            <input name="post_tiktok_url" placeholder="TikTok 投稿URL 例: https://www.tiktok.com/@user/video/..." className={`${INPUT_NORMAL} flex-1`} />
+          </div>
+        </div>
+      </div>
+
       <button
         type="submit"
         className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors"

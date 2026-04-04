@@ -1,5 +1,16 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getStores, getRankedStores, getCoupons, getComingSoonStores } from "@/lib/db";
+
+export const metadata: Metadata = {
+  title: "NewOpen | あなたの街の新規オープン情報",
+  description: "新規オープン店舗をいち早くチェック。レストラン・カフェ・スイーツ・美容院など、あなたの街の最新オープン情報をお届けします。",
+  openGraph: {
+    title: "NewOpen | あなたの街の新規オープン情報",
+    description: "新規オープン店舗をいち早くチェック。あなたの街の最新オープン情報をお届けします。",
+    type: "website",
+  },
+};
 import StoreCard from "@/components/StoreCard";
 import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";

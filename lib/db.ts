@@ -27,6 +27,9 @@ function toStore(row: any): Store {
     hoursText: row.hours_text ?? null,
     photos: Array.isArray(row.photos) ? row.photos : [],
     snsLinks: row.sns_links ?? null,
+    twitterPostUrl: row.twitter_post_url ?? null,
+    instagramPostUrl: row.instagram_post_url ?? null,
+    tiktokPostUrl: row.tiktok_post_url ?? null,
   };
 }
 
@@ -127,6 +130,9 @@ export async function createStore(
       photos: payload.photos,
       tags: payload.tags,
       sns_links: payload.snsLinks,
+      twitter_post_url: payload.twitterPostUrl ?? null,
+      instagram_post_url: payload.instagramPostUrl ?? null,
+      tiktok_post_url: payload.tiktokPostUrl ?? null,
       owner_id: payload.ownerId ?? null,
       views: 0,
       likes: 0,
@@ -181,7 +187,10 @@ export async function updateStore(
   if (payload.hoursText !== undefined)   updates.hours_text  = payload.hoursText;
   if (payload.photos !== undefined)      updates.photos      = payload.photos;
   if (payload.tags !== undefined)        updates.tags        = payload.tags;
-  if (payload.snsLinks !== undefined)    updates.sns_links   = payload.snsLinks;
+  if (payload.snsLinks !== undefined)        updates.sns_links         = payload.snsLinks;
+  if (payload.twitterPostUrl !== undefined)  updates.twitter_post_url  = payload.twitterPostUrl;
+  if (payload.instagramPostUrl !== undefined) updates.instagram_post_url = payload.instagramPostUrl;
+  if (payload.tiktokPostUrl !== undefined)   updates.tiktok_post_url   = payload.tiktokPostUrl;
 
   const { data, error } = await db
     .from("stores")
