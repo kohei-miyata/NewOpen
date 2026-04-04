@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getUserLikedStoreIds, getStoreById } from "@/lib/db";
 import StoreCard from "@/components/StoreCard";
+import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 
 export default async function MypagePage() {
   const supabase = await createSupabaseServerClient();
@@ -51,13 +52,7 @@ export default async function MypagePage() {
         </section>
 
         {/* 最近見たお店はクライアント側で localStorage から表示 */}
-        <section>
-          <h2 className="text-lg font-bold text-gray-800 mb-2">最近見たお店</h2>
-          <p className="text-sm text-gray-400">
-            <Link href="/" className="text-orange-500 hover:underline">ホームページ</Link>
-            でご確認いただけます。
-          </p>
-        </section>
+        <RecentlyViewedSection />
       </div>
     </div>
   );

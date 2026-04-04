@@ -2,6 +2,7 @@ import { getCoupons, getUsedCouponIds } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import CouponCard from "@/components/CouponCard";
 import PageHeader from "@/components/PageHeader";
+import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 
 export default async function CouponsPage() {
   const supabase = await createSupabaseServerClient();
@@ -21,6 +22,10 @@ export default async function CouponsPage() {
           {coupons.map((coupon) => (
             <CouponCard key={coupon.id} coupon={coupon} isUsed={usedCouponIds.has(coupon.id)} isLoggedIn={!!user} />
           ))}
+        </div>
+
+        <div className="mt-14">
+          <RecentlyViewedSection />
         </div>
       </div>
     </div>

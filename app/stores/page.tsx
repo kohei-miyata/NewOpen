@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
 import StoresWithLocation from "@/components/StoresWithLocation";
 import StoreCard from "@/components/StoreCard";
+import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import type { Category } from "@/types";
 
 export const metadata: Metadata = {
@@ -73,6 +74,10 @@ export default async function StoresPage({
             ))}
           </div>
         )}
+
+        <div className="mt-14">
+          <RecentlyViewedSection />
+        </div>
       </div>
     </div>
   );

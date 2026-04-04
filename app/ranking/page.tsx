@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getRankedStores } from "@/lib/db";
 import StoreCard from "@/components/StoreCard";
 import PageHeader from "@/components/PageHeader";
+import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 
@@ -56,6 +57,10 @@ export default async function RankingPage() {
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-14">
+          <RecentlyViewedSection />
         </div>
       </div>
     </div>
