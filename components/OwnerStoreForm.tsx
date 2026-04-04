@@ -26,9 +26,10 @@ interface Props {
   action: (formData: FormData) => Promise<void>;
   defaultValues?: Partial<Store>;
   submitLabel?: string;
+  serverError?: string;
 }
 
-export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する" }: Props) {
+export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する", serverError }: Props) {
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,6 +67,9 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5"
     >
+      {serverError && (
+        <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
+      )}
       {/* 店舗名 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">

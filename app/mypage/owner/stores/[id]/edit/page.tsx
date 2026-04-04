@@ -7,10 +7,12 @@ import { editStore } from "@/app/mypage/owner/stores/actions";
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }
 
-export default async function EditStorePage({ params }: Props) {
+export default async function EditStorePage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { error } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
@@ -19,7 +21,6 @@ export default async function EditStorePage({ params }: Props) {
   const store = await getStoreById(id);
   if (!store) notFound();
 
-  // Bind storeId into the action
   const action = editStore.bind(null, id);
 
   return (
@@ -29,7 +30,7 @@ export default async function EditStorePage({ params }: Props) {
           ← オーナー管理に戻る
         </Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-6">店舗情報を編集</h1>
-        <OwnerStoreForm action={action} defaultValues={store} submitLabel="保存する" />
+        <OwnerStoreForm action={action} defaultValues={store} submitLabel="保存する" serverError={error} />
       </div>
     </div>
   );

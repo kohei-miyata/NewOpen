@@ -121,9 +121,10 @@ export async function getCoupons(): Promise<Coupon[]> {
 export async function createStore(
   payload: Omit<Store, "id" | "views" | "likes"> & { ownerId?: string }
 ): Promise<Store> {
-  const coords = payload.lat == null ? await geocodeAddress(payload.address) : null;
-  const lat = payload.lat ?? coords?.lat ?? null;
-  const lng = payload.lng ?? coords?.lng ?? null;
+  const coords = await geocodeAddress(payload.address);
+  if (!coords) throw new Error(`住所から座標を取得できませんでした。住所をご確認ください。`);
+  const lat = coords.lat;
+  const lng = coords.lng;
 
   const { data, error } = await getSupabaseClient()
     .from("stores")
@@ -207,13 +208,9 @@ export async function updateStore(
   if (payload.address !== undefined) {
     updates.address = payload.address;
     const coords = await geocodeAddress(payload.address);
-    if (coords) {
-      updates.lat = coords.lat;
-      updates.lng = coords.lng;
-    } else {
-      updates.lat = null;
-      updates.lng = null;
-    }
+    if (!coords) throw new Error(`住所から座標を取得できませんでした。住所をご確認ください。`);
+    updates.lat = coords.lat;
+    updates.lng = coords.lng;
   }
   if (payload.openDate !== undefined)    updates.open_date   = payload.openDate;
   if (payload.description !== undefined) updates.description = payload.description;

@@ -61,7 +61,12 @@ export async function editStore(storeId: string, formData: FormData) {
   if (!user) redirect("/auth/login");
 
   const payload = parseStoreFormData(formData);
-  await updateStore(storeId, payload, supabase);
+  try {
+    await updateStore(storeId, payload, supabase);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "保存に失敗しました";
+    redirect(`/mypage/owner/stores/${storeId}/edit?error=${encodeURIComponent(msg)}`);
+  }
   redirect(`/mypage/owner`);
 }
 
@@ -71,8 +76,12 @@ export async function newOwnerStore(formData: FormData) {
   if (!user) redirect("/auth/login");
 
   const payload = parseStoreFormData(formData);
-  const store = await createStore({
-    ...payload, lat: null, lng: null, ownerId: user.id,
-  });
+  let store;
+  try {
+    store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "登録に失敗しました";
+    redirect(`/mypage/owner/stores/new?error=${encodeURIComponent(msg)}`);
+  }
   redirect(`/stores/${store.id}`);
 }

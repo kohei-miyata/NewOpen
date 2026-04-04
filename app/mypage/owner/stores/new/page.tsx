@@ -4,7 +4,12 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import OwnerStoreForm from "@/components/OwnerStoreForm";
 import { newOwnerStore } from "@/app/mypage/owner/stores/actions";
 
-export default async function OwnerNewStorePage() {
+export default async function OwnerNewStorePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
@@ -17,7 +22,7 @@ export default async function OwnerNewStorePage() {
           ← オーナー管理に戻る
         </Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-6">新規店舗登録</h1>
-        <OwnerStoreForm action={newOwnerStore} submitLabel="登録する" />
+        <OwnerStoreForm action={newOwnerStore} submitLabel="登録する" serverError={error} />
       </div>
     </div>
   );
