@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { signup } from "@/app/auth/actions";
 
 const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors";
@@ -14,6 +14,8 @@ export default function SignupForm({ serverError }: { serverError?: string }) {
     password?: string;
     confirm?: string;
   }>({});
+  const loadedAt = useRef<number>(0);
+  useEffect(() => { loadedAt.current = Date.now(); }, []);
 
   function validate(fd: FormData): boolean {
     const e: typeof errors = {};
@@ -43,15 +45,28 @@ export default function SignupForm({ serverError }: { serverError?: string }) {
     return Object.keys(e).length === 0;
   }
 
+  function isSuspiciousBot(fd: FormData): boolean {
+    // ハニーポット: 人間は入力しない隠しフィールド
+    if ((fd.get("website_url") as string)?.trim()) return true;
+    // 速度チェック: 3秒未満は bot の疑い
+    if (Date.now() - loadedAt.current < 3000) return true;
+    return false;
+  }
+
   return (
     <form
       action={signup}
       onSubmit={(e) => {
         const fd = new FormData(e.currentTarget);
-        if (!validate(fd)) e.preventDefault();
+        if (isSuspiciousBot(fd) || !validate(fd)) e.preventDefault();
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4"
     >
+      {/* ハニーポット: botが入力するが人間には見えない */}
+      <div style={{ position: "absolute", left: "-9999px", opacity: 0, pointerEvents: "none" }} aria-hidden="true" tabIndex={-1}>
+        <input name="website_url" type="text" autoComplete="off" tabIndex={-1} />
+      </div>
+
       {serverError && (
         <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
       )}
