@@ -7,7 +7,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 async function assertAdmin() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.user_metadata?.role !== "admin") throw new Error("Forbidden");
+  if (!user || user.app_metadata?.role !== "admin") throw new Error("Forbidden");
 }
 
 export async function banUser(userId: string) {
