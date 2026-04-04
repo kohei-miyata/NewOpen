@@ -9,7 +9,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2">
             <Logo size={24} />
-            <p className="text-lg font-bold text-orange-500">NewOpen</p>
+            <p className="text-lg font-bold text-orange-500">EW OPEN</p>
           </div>
             <p className="text-xs text-gray-400 mt-1">あなたの街の新規オープン情報をいち早くお届け</p>
           </div>

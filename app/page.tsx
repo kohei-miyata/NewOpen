@@ -38,8 +38,13 @@ export default async function Home() {
           <span className="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wide">
             🎉 新規オープン情報プラットフォーム
           </span>
-          <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight drop-shadow-sm">
-            NewOpen
+          <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight drop-shadow-sm flex items-center justify-center gap-3">
+            <svg width="56" height="56" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="16" r="16" fill="white" fillOpacity="0.25"/>
+              <circle cx="16" cy="16" r="14" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
+              <text x="16" y="22" textAnchor="middle" fontFamily="'Arial Black', Arial, sans-serif" fontWeight="900" fontSize="20" fill="white" letterSpacing="-1">N</text>
+            </svg>
+            EW OPEN
           </h1>
           <p className="mt-4 text-xl sm:text-2xl opacity-90 font-medium">
             あなたの街の<span className="font-extrabold underline decoration-white/60 decoration-2">新規オープン</span>情報をいち早くお届け

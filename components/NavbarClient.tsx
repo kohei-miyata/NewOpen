@@ -26,7 +26,7 @@ export default function NavbarClient({ user, isOwner }: Props) {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
           <Logo size={28} />
-          <span className="text-xl font-bold text-orange-500 tracking-tight">NewOpen</span>
+          <span className="text-xl font-bold text-orange-500 tracking-tight">EW OPEN</span>
         </Link>
 
         {/* Desktop nav */}
