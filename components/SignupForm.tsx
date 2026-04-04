@@ -7,8 +7,8 @@ const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none tra
 const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
 const INPUT_ERROR = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
-export default function SignupForm({ serverError }: { serverError?: string }) {
-  const [role, setRole] = useState<"user" | "owner">("user");
+export default function SignupForm({ serverError, defaultRole = "user" }: { serverError?: string; defaultRole?: "user" | "owner" }) {
+  const [role, setRole] = useState<"user" | "owner">(defaultRole);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;

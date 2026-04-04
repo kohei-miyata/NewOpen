@@ -6,7 +6,7 @@ import StoreForm from "@/components/StoreForm";
 export default async function NewStorePage() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/signup?redirect=/stores/new");
+  if (!user) redirect("/auth/signup?redirect=/stores/new&role=owner");
 
   return (
     <div className="bg-gray-50 min-h-screen">

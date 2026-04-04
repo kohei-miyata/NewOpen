@@ -4,7 +4,7 @@ import SignupForm from "@/components/SignupForm";
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; success?: string }>;
+  searchParams: Promise<{ error?: string; success?: string; role?: string }>;
 }) {
   const sp = await searchParams;
 
@@ -31,7 +31,7 @@ export default async function SignupPage({
           <p className="text-sm text-gray-500 mt-1">新規登録</p>
         </div>
 
-        <SignupForm serverError={sp.error} />
+        <SignupForm serverError={sp.error} defaultRole={sp.role === "owner" ? "owner" : "user"} />
 
         <p className="text-center text-sm text-gray-500 mt-4">
           すでにアカウントをお持ちの方は{" "}
