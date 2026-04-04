@@ -10,7 +10,7 @@ function basicAuth(request: NextRequest): NextResponse | null {
   if (auth) {
     const [scheme, encoded] = auth.split(" ");
     if (scheme === "Basic" && encoded) {
-      const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+      const decoded = atob(encoded);
       const [u, p] = decoded.split(":");
       if (u === user && p === pass) return null; // 認証成功
     }
