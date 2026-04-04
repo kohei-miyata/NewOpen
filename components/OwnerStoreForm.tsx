@@ -149,6 +149,16 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
         </div>
       </div>
 
+      {/* ステータス */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">ステータス</label>
+        <select name="status" defaultValue={defaultValues?.status ?? "active"} className={INPUT_NORMAL}>
+          <option value="active">営業中</option>
+          <option value="temporarily_closed">休業中</option>
+          <option value="closed">閉店</option>
+        </select>
+      </div>
+
       {/* タグ */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">タグ</label>

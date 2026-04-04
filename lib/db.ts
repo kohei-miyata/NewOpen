@@ -34,6 +34,7 @@ function toStore(row: any): Store {
     twitterPostUrl: row.twitter_post_url ?? null,
     instagramPostUrl: row.instagram_post_url ?? null,
     tiktokPostUrl: row.tiktok_post_url ?? null,
+    status: (row.status ?? "active") as Store["status"],
   };
 }
 
@@ -137,6 +138,7 @@ export async function createStore(
       twitter_post_url: payload.twitterPostUrl ?? null,
       instagram_post_url: payload.instagramPostUrl ?? null,
       tiktok_post_url: payload.tiktokPostUrl ?? null,
+      status: payload.status ?? "active",
       owner_id: payload.ownerId ?? null,
       views: 0,
       likes: 0,
@@ -195,6 +197,7 @@ export async function updateStore(
   if (payload.twitterPostUrl !== undefined)  updates.twitter_post_url  = payload.twitterPostUrl;
   if (payload.instagramPostUrl !== undefined) updates.instagram_post_url = payload.instagramPostUrl;
   if (payload.tiktokPostUrl !== undefined)   updates.tiktok_post_url   = payload.tiktokPostUrl;
+  if (payload.status !== undefined)          updates.status             = payload.status;
 
   const { data, error } = await db
     .from("stores")

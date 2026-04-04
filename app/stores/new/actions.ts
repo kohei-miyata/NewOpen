@@ -62,6 +62,7 @@ export async function registerStore(formData: FormData) {
     twitterPostUrl,
     instagramPostUrl,
     tiktokPostUrl,
+    status: "active",
     ownerId: user?.id,
   });
 

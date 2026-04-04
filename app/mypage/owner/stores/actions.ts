@@ -39,6 +39,11 @@ function parseStoreFormData(formData: FormData) {
   const instagramPostUrl = (formData.get("post_instagram_url") as string)?.trim() || null;
   const tiktokPostUrl   = (formData.get("post_tiktok_url")    as string)?.trim() || null;
 
+  const statusRaw = (formData.get("status") as string) || "active";
+  const status = ["active", "temporarily_closed", "closed"].includes(statusRaw)
+    ? (statusRaw as "active" | "temporarily_closed" | "closed")
+    : "active" as const;
+
   return {
     name, category, address, openDate, description, hoursText, imageUrl,
     photos, tags,
@@ -46,6 +51,7 @@ function parseStoreFormData(formData: FormData) {
     twitterPostUrl,
     instagramPostUrl,
     tiktokPostUrl,
+    status,
   };
 }
 

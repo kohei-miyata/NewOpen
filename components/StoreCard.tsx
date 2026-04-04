@@ -24,12 +24,22 @@ export default function StoreCard({ store, rank }: Props) {
             className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
           />
           <div className="absolute top-2 left-2 flex gap-1">
-            {isNew && (
+            {store.status === "closed" && (
+              <span className="bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                閉店
+              </span>
+            )}
+            {store.status === "temporarily_closed" && (
+              <span className="bg-yellow-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                休業中
+              </span>
+            )}
+            {store.status === "active" && isNew && (
               <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 NEW
               </span>
             )}
-            {isComingSoon && (
+            {store.status === "active" && isComingSoon && (
               <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 SOON
               </span>

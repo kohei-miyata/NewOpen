@@ -17,6 +17,8 @@ export interface SnsLinks {
   line?: string;
 }
 
+export type StoreStatus = "active" | "closed" | "temporarily_closed";
+
 export interface Store {
   id: string;
   name: string;
@@ -36,6 +38,7 @@ export interface Store {
   twitterPostUrl: string | null;
   instagramPostUrl: string | null;
   tiktokPostUrl: string | null;
+  status: StoreStatus;
 }
 
 export interface Coupon {
