@@ -83,30 +83,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── NewOpenだけの特徴バナー ── */}
-      <section className="bg-orange-50 border-y border-orange-100 py-8">
-        <div className="max-w-5xl mx-auto px-4">
-          <p className="text-center text-xs font-semibold text-orange-500 uppercase tracking-widest mb-3">NewOpenだけの特徴</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-orange-100">
-              <p className="text-2xl mb-1">📅</p>
-              <p className="font-bold text-gray-900 text-sm">オープン前から掲載</p>
-              <p className="text-xs text-gray-500 mt-1">「まもなくオープン」として<br/>30日前から告知できる</p>
-            </div>
-            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-orange-100">
-              <p className="text-2xl mb-1">📆</p>
-              <p className="font-bold text-gray-900 text-sm">オープンから3年間掲載</p>
-              <p className="text-xs text-gray-500 mt-1">他サービスと違い<br/>3年間継続して露出できる</p>
-            </div>
-            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-orange-100">
-              <p className="text-2xl mb-1">🆓</p>
-              <p className="font-bold text-gray-900 text-sm">すべて完全無料</p>
-              <p className="text-xs text-gray-500 mt-1">掲載・編集・クーポン発行<br/>すべて0円</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── 特徴（ユーザー向け） ── */}
       <section className="bg-white py-16">
         <div className="max-w-5xl mx-auto px-4">
@@ -117,6 +93,9 @@ export default async function Home() {
               { icon: "🗺️", title: "エリアから探す", desc: "渋谷・新宿・銀座など、街や駅名で新規オープン店舗を絞り込んで検索。" },
               { icon: "🏷️", title: "カテゴリで絞り込む", desc: "レストラン・カフェ・スイーツ・美容院・ジムなど9カテゴリから探せる。" },
               { icon: "🎟️", title: "お得なクーポン", desc: "オープン記念クーポンをGETして、お得に新しいお店を体験しよう。" },
+              { icon: "📅", title: "オープン前から掲載", desc: "「まもなくオープン」として30日前から告知。話題を先取りしよう。" },
+              { icon: "📆", title: "3年間継続掲載", desc: "他サービスと違い、オープンから3年間ずっと情報が残り続ける。" },
+              { icon: "🆓", title: "すべて完全無料", desc: "掲載・編集・クーポン発行・SNS埋め込みもすべて0円。" },
             ].map((f) => (
               <div key={f.title} className="bg-orange-50 rounded-2xl p-6 text-center">
                 <div className="text-4xl mb-3">{f.icon}</div>
