@@ -14,6 +14,12 @@ export async function submitContact(formData: FormData) {
     redirect("/contact?error=missing");
   }
 
+  if (name.length > 100) redirect("/contact?error=missing");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) redirect("/contact?error=missing");
+  if (message.length < 10 || message.length > 5000) redirect("/contact?error=missing");
+  if ((company ?? "").length > 200) redirect("/contact?error=missing");
+  if ((department ?? "").length > 200) redirect("/contact?error=missing");
+
   const { error } = await getSupabaseClient()
     .from("contacts")
     .insert({ name, email, message, company, department });

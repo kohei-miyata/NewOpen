@@ -82,6 +82,15 @@ export async function getStores(userLatLng?: LatLng, limit?: number): Promise<St
   return result;
 }
 
+export async function getStoreOwnerId(storeId: string): Promise<string | null> {
+  const { data } = await getSupabaseClient()
+    .from("stores")
+    .select("owner_id")
+    .eq("id", storeId)
+    .single();
+  return data?.owner_id ?? null;
+}
+
 export async function getStoreById(id: string): Promise<Store | undefined> {
   const { data, error } = await getSupabaseClient()
     .from("stores")

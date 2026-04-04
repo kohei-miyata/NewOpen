@@ -42,7 +42,13 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
 
     if (!name || name.length < 2)      e.name        = "店舗名は2文字以上で入力してください";
     if (name.length > 50)              e.name        = "店舗名は50文字以内で入力してください";
-    if (!address || address.length < 5) e.address    = "正確な住所を入力してください";
+    if (!address) {
+      e.address = "住所を入力してください";
+    } else if (!/[都道府県]/.test(address)) {
+      e.address = "都道府県から入力してください（例: 東京都渋谷区〇〇1-2-3）";
+    } else if (!/[市区町村郡]/.test(address)) {
+      e.address = "市区町村まで入力してください（例: 東京都渋谷区〇〇1-2-3）";
+    }
     if (!openDate)                     e.openDate    = "オープン日を選択してください";
     if (!description || description.length < 10) e.description = "説明は10文字以上で入力してください";
     if (description.length > 500)     e.description = "説明は500文字以内で入力してください";

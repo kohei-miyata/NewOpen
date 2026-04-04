@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import { createCoupon, updateCoupon, deleteCoupon, getStoreById } from "@/lib/db";
+import { createCoupon, updateCoupon, deleteCoupon, getStoreById, getStoreOwnerId, getCouponsByStoreId } from "@/lib/db";
 import type { Category } from "@/types";
 
 export async function addCoupon(storeId: string, formData: FormData) {
@@ -34,6 +34,14 @@ export async function editCoupon(couponId: string, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
+  const storeId = formData.get("storeId") as string;
+  const ownerId = await getStoreOwnerId(storeId);
+  if (ownerId !== user.id) redirect("/mypage/owner");
+
+  // couponがこのstoreに属するか確認
+  const coupons = await getCouponsByStoreId(storeId);
+  if (!coupons.find((c) => c.id === couponId)) redirect("/mypage/owner");
+
   await updateCoupon(couponId, {
     title: (formData.get("title") as string).trim(),
     description: (formData.get("description") as string).trim(),
@@ -42,7 +50,6 @@ export async function editCoupon(couponId: string, formData: FormData) {
     code: (formData.get("code") as string).trim(),
   }, supabase);
 
-  const storeId = formData.get("storeId") as string;
   redirect(`/mypage/owner/stores/${storeId}/coupons`);
 }
 
@@ -50,6 +57,13 @@ export async function removeCoupon(couponId: string, storeId: string) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
+
+  const ownerId = await getStoreOwnerId(storeId);
+  if (ownerId !== user.id) redirect("/mypage/owner");
+
+  // couponがこのstoreに属するか確認
+  const coupons = await getCouponsByStoreId(storeId);
+  if (!coupons.find((c) => c.id === couponId)) redirect("/mypage/owner");
 
   await deleteCoupon(couponId, supabase);
   redirect(`/mypage/owner/stores/${storeId}/coupons`);

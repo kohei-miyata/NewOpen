@@ -1,9 +1,16 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { updateStore, createStore } from "@/lib/db";
+import { updateStore, createStore, getStoreOwnerId } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { Category, SnsLinks } from "@/types";
+
+function validateAddress(address: string): string | null {
+  if (!address?.trim()) return "住所を入力してください";
+  if (!/[都道府県]/.test(address)) return "都道府県から入力してください";
+  if (!/[市区町村郡]/.test(address)) return "市区町村まで入力してください";
+  return null;
+}
 
 function parseStoreFormData(formData: FormData) {
   const name        = formData.get("name") as string;
@@ -60,7 +67,13 @@ export async function editStore(storeId: string, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
+  const ownerId = await getStoreOwnerId(storeId);
+  if (ownerId !== user.id) redirect("/mypage/owner");
+
   const payload = parseStoreFormData(formData);
+  const addrErr = validateAddress(payload.address);
+  if (addrErr) redirect(`/mypage/owner/stores/${storeId}/edit?error=${encodeURIComponent(addrErr)}`);
+
   try {
     await updateStore(storeId, payload, supabase);
   } catch (e) {
@@ -76,6 +89,9 @@ export async function newOwnerStore(formData: FormData) {
   if (!user) redirect("/auth/login");
 
   const payload = parseStoreFormData(formData);
+  const addrErr = validateAddress(payload.address);
+  if (addrErr) redirect(`/mypage/owner/stores/new?error=${encodeURIComponent(addrErr)}`);
+
   let store;
   try {
     store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id });

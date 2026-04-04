@@ -40,8 +40,10 @@ export default function StoreForm({ serverError }: { serverError?: string }) {
 
     if (!address) {
       e.address = "住所を入力してください";
-    } else if (address.length < 5) {
-      e.address = "正確な住所を入力してください";
+    } else if (!/[都道府県]/.test(address)) {
+      e.address = "都道府県から入力してください（例: 東京都渋谷区〇〇1-2-3）";
+    } else if (!/[市区町村郡]/.test(address)) {
+      e.address = "市区町村まで入力してください（例: 東京都渋谷区〇〇1-2-3）";
     }
 
     if (!openDate) {
