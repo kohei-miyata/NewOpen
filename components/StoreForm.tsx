@@ -16,7 +16,7 @@ const fields = [
   { name: "sns_instagram", icon: "/icons/instagram.svg", placeholder: "Instagram URL" },
   { name: "sns_twitter", icon: "/icons/x.png", placeholder: "X (Twitter) URL" },
   { name: "sns_tiktok", icon: "/icons/tiktok.png", placeholder: "TikTok URL" },
-  { name: "sns_line", icon: "/icons/line.png", placeholder: "LINE 公式アカウント URL" },
+  { name: "sns_line", icon: "/icons/LINE.png", placeholder: "LINE 公式アカウント URL" },
 ];
 type Errors = Partial<Record<"name" | "address" | "openDate" | "description", string>>;
 
