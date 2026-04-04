@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+
+const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24時間
 
 interface Props {
   storeId: string;
@@ -9,11 +11,13 @@ interface Props {
 
 export default function ViewTracker({ storeId, initialViews }: Props) {
   const [views, setViews] = useState(initialViews);
-  const called = useRef(false);
 
   useEffect(() => {
-    if (called.current) return;
-    called.current = true;
+    const key = `viewed_${storeId}`;
+    const last = Number(localStorage.getItem(key) ?? 0);
+    if (Date.now() - last < COOLDOWN_MS) return;
+
+    localStorage.setItem(key, String(Date.now()));
     fetch(`/api/stores/${storeId}/view`, { method: "POST" })
       .then((r) => r.json())
       .then(() => setViews((v) => v + 1))
