@@ -61,7 +61,7 @@ export async function editStore(storeId: string, formData: FormData) {
   if (!user) redirect("/auth/login");
 
   const payload = parseStoreFormData(formData);
-  await updateStore(storeId, { ...payload, lat: null, lng: null }, supabase);
+  await updateStore(storeId, payload, supabase);
   redirect(`/mypage/owner`);
 }
 

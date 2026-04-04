@@ -206,9 +206,13 @@ export async function updateStore(
   if (payload.category !== undefined)    updates.category    = payload.category;
   if (payload.address !== undefined) {
     updates.address = payload.address;
-    if (payload.lat == null) {
-      const coords = await geocodeAddress(payload.address);
-      if (coords) { updates.lat = coords.lat; updates.lng = coords.lng; }
+    const coords = await geocodeAddress(payload.address);
+    if (coords) {
+      updates.lat = coords.lat;
+      updates.lng = coords.lng;
+    } else {
+      updates.lat = null;
+      updates.lng = null;
     }
   }
   if (payload.openDate !== undefined)    updates.open_date   = payload.openDate;

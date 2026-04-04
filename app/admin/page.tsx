@@ -31,10 +31,20 @@ export default async function AdminPage() {
     return acc;
   }, {});
 
-  // 都道府県別集計（住所の先頭3〜4文字）
+  // 都道府県＋市区町村別集計
+  function extractArea(address: string): string {
+    if (!address) return "不明";
+    // 「○○区」「○○市」「○○郡」「○○町」「○○村」の位置で切る
+    const m = address.match(/^(.{2,6}?[都道府県])(.{1,6}?[市区町村郡])/);
+    if (m) return m[1] + m[2];
+    // 都道府県だけでも取れる場合
+    const pref = address.match(/^.{2,4}?[都道府県]/);
+    if (pref) return pref[0];
+    return address.slice(0, 6);
+  }
   const byArea = storeList.reduce<Record<string, number>>((acc, s) => {
-    const pref = s.address?.slice(0, 4) ?? "不明";
-    acc[pref] = (acc[pref] ?? 0) + 1;
+    const area = extractArea(s.address ?? "");
+    acc[area] = (acc[area] ?? 0) + 1;
     return acc;
   }, {});
   const topAreas = Object.entries(byArea).sort((a, b) => b[1] - a[1]).slice(0, 10);
