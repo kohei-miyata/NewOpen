@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getStoreById, getCouponsByStoreId } from "@/lib/db";
 import { addCoupon, removeCoupon } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
 
@@ -70,12 +71,11 @@ export default async function OwnerCouponsPage({ params }: Props) {
                         編集
                       </Link>
                       <form action={removeCoupon.bind(null, coupon.id, storeId)}>
-                        <button
-                          type="submit"
-                          className="text-xs border border-red-200 text-red-500 px-3 py-1.5 rounded-full hover:bg-red-50 transition-colors"
-                        >
-                          削除
-                        </button>
+                        <SubmitButton
+                          label="削除"
+                          loadingLabel="削除中..."
+                          className="text-xs border border-red-200 text-red-500 px-3 py-1.5 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
                       </form>
                     </div>
                   </div>
@@ -112,12 +112,7 @@ export default async function OwnerCouponsPage({ params }: Props) {
               <input name="expiryDate" type="date" required className={INPUT} />
             </div>
             <input type="hidden" name="imageUrl" value="" />
-            <button
-              type="submit"
-              className="w-full bg-orange-500 text-white font-bold py-2.5 rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              追加する
-            </button>
+            <SubmitButton label="追加する" loadingLabel="追加中..." />
           </form>
         </section>
       </div>

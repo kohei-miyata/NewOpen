@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getCouponsByStoreId } from "@/lib/db";
 import { editCoupon } from "../../actions";
+import SubmitButton from "@/components/SubmitButton";
 
 const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
 
@@ -58,12 +59,7 @@ export default async function EditCouponPage({ params }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1">有効期限 <span className="text-red-500">*</span></label>
             <input name="expiryDate" type="date" required defaultValue={coupon.expiryDate} className={INPUT} />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-orange-500 text-white font-bold py-2.5 rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            保存する
-          </button>
+          <SubmitButton />
         </form>
       </div>
     </div>

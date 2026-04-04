@@ -30,6 +30,7 @@ interface Props {
 
 export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する" }: Props) {
   const [errors, setErrors] = useState<Errors>({});
+  const [submitting, setSubmitting] = useState(false);
 
   function validate(fd: FormData): boolean {
     const e: Errors = {};
@@ -60,7 +61,8 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       action={action}
       onSubmit={(e) => {
         const fd = new FormData(e.currentTarget);
-        if (!validate(fd)) e.preventDefault();
+        if (!validate(fd)) { e.preventDefault(); return; }
+        setSubmitting(true);
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5"
     >
@@ -227,9 +229,15 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
 
       <button
         type="submit"
-        className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors"
+        disabled={submitting}
+        className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {submitLabel}
+        {submitting ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            保存中...
+          </span>
+        ) : submitLabel}
       </button>
     </form>
   );
