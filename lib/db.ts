@@ -155,6 +155,19 @@ export async function createStore(
   return toStore(data);
 }
 
+export async function getTodayOpenStores(): Promise<Store[]> {
+  const today = todayJST();
+  const { data, error } = await getSupabaseClient()
+    .from("stores")
+    .select("*")
+    .eq("open_date", today)
+    .eq("status", "active")
+    .order("name", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(toStore);
+}
+
 export async function getComingSoonStores(): Promise<Store[]> {
   const today = todayJST();
   const in30 = new Date(Date.now() + (9 + 30 * 24) * 60 * 60 * 1000).toISOString().split("T")[0];

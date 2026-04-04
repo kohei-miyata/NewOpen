@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getSupabaseClient } from "@/lib/supabase";
+import { banUser, unbanUser } from "./actions";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
 
@@ -70,13 +71,17 @@ export default async function AdminPage() {
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">メールアドレス</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">ロール</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">ステータス</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">登録日</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">最終ログイン</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {users.filter((u) => u.user_metadata?.role !== "admin").map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
+              {users.filter((u) => u.user_metadata?.role !== "admin").map((u) => {
+                const isBanned = u.user_metadata?.status === "banned";
+                return (
+                <tr key={u.id} className={`hover:bg-gray-50 ${isBanned ? "opacity-60" : ""}`}>
                   <td className="px-4 py-3 text-gray-800">{u.email}</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
@@ -87,14 +92,37 @@ export default async function AdminPage() {
                       {u.user_metadata?.role === "owner" ? "オーナー" : "一般"}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                      isBanned ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
+                    }`}>
+                      {isBanned ? "BAN" : "有効"}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
                     {u.created_at ? new Date(u.created_at).toLocaleDateString("ja-JP") : "-"}
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
                     {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString("ja-JP") : "-"}
                   </td>
+                  <td className="px-4 py-3">
+                    {isBanned ? (
+                      <form action={unbanUser.bind(null, u.id)}>
+                        <button type="submit" className="text-xs text-green-600 border border-green-200 px-2 py-1 rounded-full hover:bg-green-50 transition-colors">
+                          解除
+                        </button>
+                      </form>
+                    ) : (
+                      <form action={banUser.bind(null, u.id)}>
+                        <button type="submit" className="text-xs text-red-500 border border-red-200 px-2 py-1 rounded-full hover:bg-red-50 transition-colors">
+                          BAN
+                        </button>
+                      </form>
+                    )}
+                  </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

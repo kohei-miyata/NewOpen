@@ -1,7 +1,13 @@
+import { redirect } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import PageHeader from "@/components/PageHeader";
 import StoreForm from "@/components/StoreForm";
 
-export default function NewStorePage() {
+export default async function NewStorePage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth/signup?redirect=/stores/new");
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-8">

@@ -50,7 +50,17 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // BANユーザーは /banned 以外アクセス不可
+  if (
+    user?.user_metadata?.status === "banned" &&
+    !request.nextUrl.pathname.startsWith("/banned") &&
+    !request.nextUrl.pathname.startsWith("/auth/logout") &&
+    !request.nextUrl.pathname.startsWith("/api")
+  ) {
+    return NextResponse.redirect(new URL("/banned", request.url));
+  }
 
   return supabaseResponse;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getStores, getRankedStores, getCoupons, getComingSoonStores } from "@/lib/db";
+import { getStores, getRankedStores, getCoupons, getComingSoonStores, getTodayOpenStores } from "@/lib/db";
 import StoreCard from "@/components/StoreCard";
 import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
@@ -17,11 +17,12 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [allStores, ranked, coupons, comingSoon] = await Promise.all([
+  const [allStores, ranked, coupons, comingSoon, todayStores] = await Promise.all([
     getStores(),
     getRankedStores(),
     getCoupons(),
     getComingSoonStores(),
+    getTodayOpenStores(),
   ]);
 
   const topStores = ranked.slice(0, 3);
@@ -111,6 +112,23 @@ export default async function Home() {
 
         {/* ── 最近見たお店 ── */}
         <RecentlyViewedSection />
+
+        {/* ── 本日オープン ── */}
+        {todayStores.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">🎊 本日オープン</h2>
+                <p className="text-xs text-gray-500 mt-0.5">今日オープンしたばかりのお店</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {todayStores.map((store) => (
+                <StoreCard key={store.id} store={store} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── まもなくオープン・最新オープン（現在地ソート） ── */}
         <TopStoresSections allStores={allStores} comingSoon={comingSoon} />
