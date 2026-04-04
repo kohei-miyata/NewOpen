@@ -27,7 +27,7 @@ export default async function Home() {
     getCoupons(),
     getComingSoonStores(),
     getTodayOpenStores(),
-    user ? getUsedCouponIds(user.id) : Promise.resolve(new Set<string>()),
+    user ? getUsedCouponIds(user.id, supabase) : Promise.resolve(new Set<string>()),
   ]);
 
   const topStores = ranked.slice(0, 3);

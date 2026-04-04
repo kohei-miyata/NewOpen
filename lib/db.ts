@@ -312,8 +312,9 @@ export async function deleteCoupon(id: string, client?: any): Promise<void> { //
   if (error) throw new Error(error.message);
 }
 
-export async function getUsedCouponIds(userId: string): Promise<Set<string>> {
-  const { data } = await getSupabaseClient()
+export async function getUsedCouponIds(userId: string, client?: any): Promise<Set<string>> { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const db = client ?? getSupabaseClient();
+  const { data } = await db
     .from("coupon_uses")
     .select("coupon_id")
     .eq("user_id", userId);

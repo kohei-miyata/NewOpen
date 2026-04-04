@@ -10,7 +10,7 @@ export default async function CouponsPage() {
 
   const [coupons, usedCouponIds] = await Promise.all([
     getCoupons(),
-    user ? getUsedCouponIds(user.id) : Promise.resolve(new Set<string>()),
+    user ? getUsedCouponIds(user.id, supabase) : Promise.resolve(new Set<string>()),
   ]);
 
   return (
