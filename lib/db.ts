@@ -306,7 +306,7 @@ export async function getUsedCouponIds(userId: string): Promise<Set<string>> {
   return new Set((data ?? []).map((r: { coupon_id: string }) => r.coupon_id));
 }
 
-export async function useCoupon(couponId: string, userId: string): Promise<void> {
+export async function recordCouponUse(couponId: string, userId: string): Promise<void> {
   const { error } = await getSupabaseClient()
     .from("coupon_uses")
     .insert({ coupon_id: couponId, user_id: userId });
