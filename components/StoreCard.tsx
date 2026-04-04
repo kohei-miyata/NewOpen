@@ -11,6 +11,7 @@ export default function StoreCard({ store, rank }: Props) {
     (new Date().getTime() - new Date(store.openDate).getTime()) / (1000 * 60 * 60 * 24)
   );
   const isNew = daysAgo >= 0 && daysAgo <= 30;
+  const isComingSoon = daysAgo < 0;
 
   return (
     <Link href={`/stores/${store.id}`} className="group block">
@@ -26,6 +27,11 @@ export default function StoreCard({ store, rank }: Props) {
             {isNew && (
               <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 NEW
+              </span>
+            )}
+            {isComingSoon && (
+              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                SOON
               </span>
             )}
             <span className="bg-white text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full shadow-sm">
