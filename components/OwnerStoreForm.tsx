@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import type { Store } from "@/types";
 
@@ -32,6 +32,16 @@ interface Props {
 export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する", serverError }: Props) {
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  // エラーが更新されたら最初のエラー要素へスクロール
+  useEffect(() => {
+    const firstErrorKey = (["name", "address", "openDate", "description"] as const).find(
+      (k) => errors[k]
+    );
+    if (!firstErrorKey) return;
+    const el = document.querySelector(`[data-field="${firstErrorKey}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [errors]);
 
   function validate(fd: FormData): boolean {
     const e: Errors = {};
@@ -77,7 +87,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
         <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
       )}
       {/* 店舗名 */}
-      <div>
+      <div data-field="name">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           店舗名 <span className="text-red-500">*</span>
         </label>
@@ -100,7 +110,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       </div>
 
       {/* 住所 */}
-      <div>
+      <div data-field="address">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           住所 <span className="text-red-500">*</span>
         </label>
@@ -113,7 +123,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       </div>
 
       {/* オープン日 */}
-      <div>
+      <div data-field="openDate">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           オープン日 <span className="text-red-500">*</span>
         </label>
@@ -135,7 +145,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       </div>
 
       {/* 説明 */}
-      <div>
+      <div data-field="description">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           説明 <span className="text-red-500">*</span>
         </label>
