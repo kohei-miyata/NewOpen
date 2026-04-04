@@ -10,7 +10,7 @@ export default function StoreCard({ store, rank }: Props) {
   const daysAgo = Math.floor(
     (new Date().getTime() - new Date(store.openDate).getTime()) / (1000 * 60 * 60 * 24)
   );
-  const isNew = daysAgo <= 7;
+  const isNew = daysAgo <= 30;
 
   return (
     <Link href={`/stores/${store.id}`} className="group block">
