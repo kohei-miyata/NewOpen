@@ -17,6 +17,8 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [justUsed, setJustUsed] = useState(false);
   const router = useRouter();
 
   const daysLeft = Math.ceil(
@@ -29,6 +31,11 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
       router.push("/auth/login");
       return;
     }
+    setConfirming(true);
+  }
+
+  async function handleConfirm() {
+    setConfirming(false);
     setLoading(true);
     setError(null);
     try {
@@ -37,6 +44,7 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
         setError("エラーが発生しました。もう一度お試しください。");
       } else {
         setUsed(true);
+        setJustUsed(true);
       }
     } catch {
       setError("エラーが発生しました。もう一度お試しください。");
@@ -136,7 +144,26 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
                   </div>
                   <p className="text-xs text-gray-400 text-right">有効期限: {coupon.expiryDate}</p>
                   {error && <p className="text-xs text-red-500 text-center">{error}</p>}
-                  {!used ? (
+                  {confirming ? (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                      <p className="text-sm font-bold text-gray-900 text-center">本当に使用しますか？</p>
+                      <p className="text-xs text-gray-500 text-center">一度使用すると、このクーポンは再利用できません。</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setConfirming(false)}
+                          className="flex-1 border border-gray-300 text-gray-600 font-medium py-2.5 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                        >
+                          キャンセル
+                        </button>
+                        <button
+                          onClick={handleConfirm}
+                          className="flex-1 bg-orange-500 text-white font-bold py-2.5 rounded-lg text-sm hover:bg-orange-600 transition-colors"
+                        >
+                          使用する
+                        </button>
+                      </div>
+                    </div>
+                  ) : !used ? (
                     <button
                       onClick={handleUse}
                       disabled={loading}
@@ -145,8 +172,13 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
                       {loading ? "処理中..." : "使用する"}
                     </button>
                   ) : (
-                    <div className="w-full bg-gray-100 text-gray-400 font-bold py-3 rounded-xl text-center">
-                      使用済み
+                    <div className="space-y-2">
+                      {justUsed && (
+                        <p className="text-xs text-center text-green-600 font-medium">✓ クーポンを使用しました</p>
+                      )}
+                      <div className="w-full bg-gray-100 text-gray-400 font-bold py-3 rounded-xl text-center text-sm">
+                        使用済み（再利用不可）
+                      </div>
                     </div>
                   )}
                 </>
