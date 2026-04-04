@@ -4,6 +4,7 @@ import { getStores, getRankedStores, getCoupons, getComingSoonStores } from "@/l
 import StoreCard from "@/components/StoreCard";
 import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
+import TopStoresSections from "@/components/TopStoresSections";
 
 export const metadata: Metadata = {
   title: "NewOpen | あなたの街の新規オープン情報",
@@ -23,7 +24,6 @@ export default async function Home() {
     getComingSoonStores(),
   ]);
 
-  const recentStores = allStores.slice(0, 4);
   const topStores = ranked.slice(0, 3);
   const latestCoupons = coupons.slice(0, 3);
 
@@ -112,43 +112,8 @@ export default async function Home() {
         {/* ── 最近見たお店 ── */}
         <RecentlyViewedSection />
 
-        {/* ── まもなくオープン ── */}
-        {comingSoon.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">まもなくオープン</h2>
-                <p className="text-xs text-gray-500 mt-0.5">30日以内にオープン予定のお店</p>
-              </div>
-              <Link href="/stores?filter=coming_soon" className="text-sm text-orange-500 hover:underline">
-                すべて見る →
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {comingSoon.slice(0, 4).map((store) => (
-                <StoreCard key={store.id} store={store} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── 最新オープン ── */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">最新オープン</h2>
-              <p className="text-xs text-gray-500 mt-0.5">新しくオープンしたお店をチェック</p>
-            </div>
-            <Link href="/stores" className="text-sm text-orange-500 hover:underline">
-              すべて見る →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {recentStores.map((store) => (
-              <StoreCard key={store.id} store={store} />
-            ))}
-          </div>
-        </section>
+        {/* ── まもなくオープン・最新オープン（現在地ソート） ── */}
+        <TopStoresSections allStores={allStores} comingSoon={comingSoon} />
 
         {/* ── ランキング ── */}
         <section>
