@@ -2,6 +2,10 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { haversineKm, type LatLng } from "@/lib/geolocation";
 import type { Store, Coupon, Category } from "@/types";
 
+function todayJST(): string {
+  return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split("T")[0];
+}
+
 function isWithinThreeYears(openDate: string): boolean {
   const open = new Date(openDate);
   const limit = new Date(open);
@@ -50,7 +54,7 @@ function toCoupon(row: any): Coupon {
 }
 
 export async function getStores(userLatLng?: LatLng): Promise<Store[]> {
-  const today = new Date().toISOString().split("T")[0];
+  const today = todayJST();
   const { data, error } = await getSupabaseClient()
     .from("stores")
     .select("*")
@@ -91,7 +95,7 @@ export async function getStoreById(id: string): Promise<Store | undefined> {
 }
 
 export async function getRankedStores(): Promise<Store[]> {
-  const today = new Date().toISOString().split("T")[0];
+  const today = todayJST();
   const { data, error } = await getSupabaseClient()
     .from("stores")
     .select("*")
@@ -145,8 +149,8 @@ export async function createStore(
 }
 
 export async function getComingSoonStores(): Promise<Store[]> {
-  const today = new Date().toISOString().split("T")[0];
-  const in30 = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const today = todayJST();
+  const in30 = new Date(Date.now() + (9 + 30 * 24) * 60 * 60 * 1000).toISOString().split("T")[0];
   const { data, error } = await getSupabaseClient()
     .from("stores")
     .select("*")
