@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { getSupabaseClient } from "@/lib/supabase";
 import { haversineKm, type LatLng } from "@/lib/geolocation";
 import { geocodeAddress } from "@/lib/geocode";
@@ -55,32 +56,30 @@ function toCoupon(row: any): Coupon {
   };
 }
 
-export async function getStores(userLatLng?: LatLng): Promise<Store[]> {
+export async function getStores(userLatLng?: LatLng, limit?: number): Promise<Store[]> {
   const today = todayJST();
-  const { data, error } = await getSupabaseClient()
+  let query = getSupabaseClient()
     .from("stores")
     .select("*")
     .lte("open_date", today)
     .order("open_date", { ascending: false });
 
+  if (limit) query = query.limit(limit * 3); // 3年フィルタで減る分を考慮して多めに取得
+
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
 
   const stores = (data ?? []).map(toStore).filter((s) => isWithinThreeYears(s.openDate));
+  const result = limit ? stores.slice(0, limit) : stores;
 
   if (userLatLng) {
-    return stores.sort((a, b) => {
-      const distA =
-        a.lat != null && a.lng != null
-          ? haversineKm(userLatLng, { lat: a.lat, lng: a.lng })
-          : Infinity;
-      const distB =
-        b.lat != null && b.lng != null
-          ? haversineKm(userLatLng, { lat: b.lat, lng: b.lng })
-          : Infinity;
+    return result.sort((a, b) => {
+      const distA = a.lat != null && a.lng != null ? haversineKm(userLatLng, { lat: a.lat, lng: a.lng }) : Infinity;
+      const distB = b.lat != null && b.lng != null ? haversineKm(userLatLng, { lat: b.lat, lng: b.lng }) : Infinity;
       return distA - distB;
     });
   }
-  return stores;
+  return result;
 }
 
 export async function getStoreById(id: string): Promise<Store | undefined> {
@@ -96,27 +95,34 @@ export async function getStoreById(id: string): Promise<Store | undefined> {
   return store;
 }
 
-export async function getRankedStores(): Promise<Store[]> {
+export async function getRankedStores(limit?: number): Promise<Store[]> {
   const today = todayJST();
-  const { data, error } = await getSupabaseClient()
+  let query = getSupabaseClient()
     .from("stores")
     .select("*")
     .lte("open_date", today)
     .order("likes", { ascending: false });
 
+  if (limit) query = query.limit(limit);
+
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
   return (data ?? []).map(toStore).filter((s) => isWithinThreeYears(s.openDate));
 }
 
-export async function getCoupons(): Promise<Coupon[]> {
-  const { data, error } = await getSupabaseClient()
-    .from("coupons")
-    .select("*")
-    .order("expiry_date", { ascending: true });
+export const getCoupons = unstable_cache(
+  async (): Promise<Coupon[]> => {
+    const { data, error } = await getSupabaseClient()
+      .from("coupons")
+      .select("*")
+      .order("expiry_date", { ascending: true });
 
-  if (error) throw new Error(error.message);
-  return (data ?? []).map(toCoupon);
-}
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(toCoupon);
+  },
+  ["coupons"],
+  { revalidate: 60 }
+);
 
 export async function createStore(
   payload: Omit<Store, "id" | "views" | "likes"> & { ownerId?: string }
@@ -312,6 +318,18 @@ export async function recordCouponUse(couponId: string, userId: string): Promise
     .insert({ coupon_id: couponId, user_id: userId });
 
   if (error && error.code !== "23505") throw new Error(error.message); // 23505 = unique violation (already used)
+}
+
+export async function getLikedStores(userId: string): Promise<Store[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("store_likes")
+    .select("stores(*)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((r: any) => r.stores).filter(Boolean).map(toStore);
 }
 
 export async function getUserLikedStoreIds(userId: string): Promise<Set<string>> {

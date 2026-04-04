@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import { getUserLikedStoreIds, getStoreById } from "@/lib/db";
+import { getLikedStores } from "@/lib/db";
 import StoreCard from "@/components/StoreCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 
@@ -11,12 +11,7 @@ export default async function MypagePage() {
   if (!user) redirect("/auth/login");
 
   const role = (user.user_metadata?.role as string) ?? "user";
-  const likedIds = await getUserLikedStoreIds(user.id);
-
-  // Fetch liked stores
-  const likedStores = await Promise.all(
-    [...likedIds].map((id) => getStoreById(id))
-  ).then((results) => results.filter(Boolean) as Awaited<ReturnType<typeof getStoreById>>[]);
+  const likedStores = await getLikedStores(user.id);
 
   return (
     <div className="bg-gray-50 min-h-screen">

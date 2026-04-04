@@ -22,8 +22,8 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser();
 
   const [allStores, ranked, coupons, comingSoon, todayStores, usedCouponIds] = await Promise.all([
-    getStores(),
-    getRankedStores(),
+    getStores(),           // 現在地ソートのため全件必要
+    getRankedStores(10),   // ランキングTOP3 + 余裕
     getCoupons(),
     getComingSoonStores(),
     getTodayOpenStores(),

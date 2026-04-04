@@ -7,7 +7,7 @@ import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 const MEDALS = ["🥇", "🥈", "🥉"];
 
 export default async function RankingPage() {
-  const ranked = await getRankedStores();
+  const ranked = await getRankedStores(50);
 
   return (
     <div className="bg-gray-50 min-h-screen">
