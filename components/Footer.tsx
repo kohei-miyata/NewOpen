@@ -20,8 +20,10 @@ export default function Footer() {
             </Link>
           </div>
         </div>
-        <div className="mt-8 flex justify-center gap-6 text-xs text-gray-400">
+        <div className="mt-8 flex justify-center gap-6 text-xs text-gray-400 flex-wrap">
           <Link href="/contact" className="hover:text-orange-500 transition-colors">お問い合わせ</Link>
+          <Link href="/terms" className="hover:text-orange-500 transition-colors">利用規約</Link>
+          <Link href="/privacy" className="hover:text-orange-500 transition-colors">プライバシーポリシー</Link>
         </div>
         <p className="text-xs text-gray-400 mt-4 text-center">© 2026 NewOpen</p>
       </div>
