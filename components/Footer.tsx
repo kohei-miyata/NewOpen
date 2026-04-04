@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function Footer() {
   return (
@@ -6,7 +7,10 @@ export default function Footer() {
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
+            <div className="flex items-center gap-2">
+            <Logo size={24} />
             <p className="text-lg font-bold text-orange-500">NewOpen</p>
+          </div>
             <p className="text-xs text-gray-400 mt-1">あなたの街の新規オープン情報をいち早くお届け</p>
           </div>
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 sm:max-w-xs">
