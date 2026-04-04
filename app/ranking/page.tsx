@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getRankedStores } from "@/lib/db";
 import StoreCard from "@/components/StoreCard";
 import PageHeader from "@/components/PageHeader";
@@ -28,8 +29,9 @@ export default async function RankingPage() {
         <h2 className="text-lg font-bold text-gray-700 mb-4">4位以降</h2>
         <div className="space-y-3">
           {ranked.slice(3).map((store, i) => (
-            <div
+            <Link
               key={store.id}
+              href={`/stores/${store.id}`}
               className="bg-white rounded-xl border border-gray-100 shadow-sm flex items-center gap-4 p-4 hover:shadow-md transition-shadow"
             >
               <span className="text-2xl font-bold text-gray-300 w-8 text-center">{i + 4}</span>
@@ -52,7 +54,7 @@ export default async function RankingPage() {
                 <div className="font-bold text-gray-700">{store.likes.toLocaleString()}</div>
                 <div className="text-xs text-gray-400">いいね</div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
