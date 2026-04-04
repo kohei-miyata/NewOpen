@@ -232,7 +232,7 @@ export default async function Home() {
 
           <div className="mt-12 flex gap-4 justify-center flex-wrap">
             <Link
-              href="/auth/signup"
+              href="/auth/signup?role=owner"
               className="bg-orange-500 text-white font-bold px-10 py-3.5 rounded-full hover:bg-orange-600 transition-colors shadow-lg text-sm"
             >
               無料でオーナー登録する →
