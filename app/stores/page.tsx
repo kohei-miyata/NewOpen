@@ -6,7 +6,7 @@ import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
 import type { Category } from "@/types";
 
-export const CATEGORIES: Category[] = [
+const CATEGORIES: Category[] = [
   "レストラン","カフェ","スイーツ","居酒屋","ラーメン","美容院","ジム","ショップ","その他",
 ];
 
