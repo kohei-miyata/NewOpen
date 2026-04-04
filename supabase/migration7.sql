@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS coupon_uses (
 
 ALTER TABLE coupon_uses ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "自分の使用履歴のみ参照・登録可" ON coupon_uses;
 CREATE POLICY "自分の使用履歴のみ参照・登録可"
   ON coupon_uses FOR ALL
   USING (auth.uid() = user_id)

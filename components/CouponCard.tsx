@@ -16,6 +16,7 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
   const [used, setUsed] = useState(initialUsed);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const daysLeft = Math.ceil(
@@ -29,9 +30,19 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
       return;
     }
     setLoading(true);
-    await markCouponUsed(coupon.id);
-    setUsed(true);
-    setLoading(false);
+    setError(null);
+    try {
+      const result = await markCouponUsed(coupon.id);
+      if (result?.error) {
+        setError("エラーが発生しました。もう一度お試しください。");
+      } else {
+        setUsed(true);
+      }
+    } catch {
+      setError("エラーが発生しました。もう一度お試しください。");
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleCopy() {
@@ -124,6 +135,7 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 text-right">有効期限: {coupon.expiryDate}</p>
+                  {error && <p className="text-xs text-red-500 text-center">{error}</p>}
                   {!used ? (
                     <button
                       onClick={handleUse}

@@ -321,8 +321,9 @@ export async function getUsedCouponIds(userId: string): Promise<Set<string>> {
   return new Set((data ?? []).map((r: { coupon_id: string }) => r.coupon_id));
 }
 
-export async function recordCouponUse(couponId: string, userId: string): Promise<void> {
-  const { error } = await getSupabaseClient()
+export async function recordCouponUse(couponId: string, userId: string, client?: any): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const db = client ?? getSupabaseClient();
+  const { error } = await db
     .from("coupon_uses")
     .insert({ coupon_id: couponId, user_id: userId });
 
