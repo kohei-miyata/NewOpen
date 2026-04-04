@@ -297,6 +297,23 @@ export async function deleteCoupon(id: string, client?: any): Promise<void> { //
   if (error) throw new Error(error.message);
 }
 
+export async function getUsedCouponIds(userId: string): Promise<Set<string>> {
+  const { data } = await getSupabaseClient()
+    .from("coupon_uses")
+    .select("coupon_id")
+    .eq("user_id", userId);
+
+  return new Set((data ?? []).map((r: { coupon_id: string }) => r.coupon_id));
+}
+
+export async function useCoupon(couponId: string, userId: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from("coupon_uses")
+    .insert({ coupon_id: couponId, user_id: userId });
+
+  if (error && error.code !== "23505") throw new Error(error.message); // 23505 = unique violation (already used)
+}
+
 export async function getUserLikedStoreIds(userId: string): Promise<Set<string>> {
   const { data } = await getSupabaseClient()
     .from("store_likes")

@@ -1,9 +1,16 @@
-import { getCoupons } from "@/lib/db";
+import { getCoupons, getUsedCouponIds } from "@/lib/db";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import CouponCard from "@/components/CouponCard";
 import PageHeader from "@/components/PageHeader";
 
 export default async function CouponsPage() {
-  const coupons = await getCoupons();
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const [coupons, usedCouponIds] = await Promise.all([
+    getCoupons(),
+    user ? getUsedCouponIds(user.id) : Promise.resolve(new Set<string>()),
+  ]);
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -12,7 +19,7 @@ export default async function CouponsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {coupons.map((coupon) => (
-            <CouponCard key={coupon.id} coupon={coupon} />
+            <CouponCard key={coupon.id} coupon={coupon} isUsed={usedCouponIds.has(coupon.id)} isLoggedIn={!!user} />
           ))}
         </div>
       </div>

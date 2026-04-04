@@ -58,7 +58,7 @@ export default function StoresWithLocation({ stores }: Props) {
         </p>
       )}
       {granted && (
-        <p className="text-xs text-orange-500 mb-3">📍 現在地に近い順に表示しています</p>
+        <p className="text-xs text-orange-500 mb-3">現在地に近い順に表示しています</p>
       )}
       {error && (
         <p className="text-xs text-gray-400 mb-3">{error}</p>

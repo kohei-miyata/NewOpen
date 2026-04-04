@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getStores, getRankedStores, getCoupons, getComingSoonStores, getTodayOpenStores } from "@/lib/db";
+import { getStores, getRankedStores, getCoupons, getComingSoonStores, getTodayOpenStores, getUsedCouponIds } from "@/lib/db";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import StoreCard from "@/components/StoreCard";
 import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
@@ -17,12 +18,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [allStores, ranked, coupons, comingSoon, todayStores] = await Promise.all([
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const [allStores, ranked, coupons, comingSoon, todayStores, usedCouponIds] = await Promise.all([
     getStores(),
     getRankedStores(),
     getCoupons(),
     getComingSoonStores(),
     getTodayOpenStores(),
+    user ? getUsedCouponIds(user.id) : Promise.resolve(new Set<string>()),
   ]);
 
   const topStores = ranked.slice(0, 3);
@@ -110,9 +115,6 @@ export default async function Home() {
 
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-14">
 
-        {/* ── 最近見たお店 ── */}
-        <RecentlyViewedSection />
-
         {/* ── 本日オープン ── */}
         {todayStores.length > 0 && (
           <section>
@@ -133,6 +135,26 @@ export default async function Home() {
         {/* ── まもなくオープン・最新オープン（現在地ソート） ── */}
         <TopStoresSections allStores={allStores} comingSoon={comingSoon} />
 
+        {/* ── クーポン ── */}
+        {latestCoupons.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">🎟️ お得なクーポン</h2>
+                <p className="text-xs text-gray-500 mt-0.5">新規オープン記念の特別クーポン</p>
+              </div>
+              <Link href="/coupons" className="text-sm text-orange-500 hover:underline">
+                すべて見る →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {latestCoupons.map((coupon) => (
+                <CouponCard key={coupon.id} coupon={coupon} isUsed={usedCouponIds.has(coupon.id)} isLoggedIn={!!user} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ── ランキング ── */}
         <section>
           <div className="flex items-center justify-between mb-4">
@@ -151,25 +173,9 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* ── クーポン ── */}
-        {latestCoupons.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">🎟️ お得なクーポン</h2>
-                <p className="text-xs text-gray-500 mt-0.5">新規オープン記念の特別クーポン</p>
-              </div>
-              <Link href="/coupons" className="text-sm text-orange-500 hover:underline">
-                すべて見る →
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {latestCoupons.map((coupon) => (
-                <CouponCard key={coupon.id} coupon={coupon} />
-              ))}
-            </div>
-          </section>
-        )}
+        {/* ── 最近見たお店 ── */}
+        <RecentlyViewedSection />
+
       </div>
 
       {/* ── オーナー向けLP ── */}
