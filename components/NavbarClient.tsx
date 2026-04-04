@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { logout } from "@/app/auth/actions";
-import Logo from "@/components/Logo";
 
 const NAV_LINKS = [
   { href: "/", label: "ホーム" },
@@ -24,9 +24,8 @@ export default function NavbarClient({ user, isOwner }: Props) {
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <Logo size={28} />
-          <span className="text-xl font-bold text-orange-500 tracking-tight">EW OPEN</span>
+        <Link href="/" onClick={() => setOpen(false)}>
+          <Image src="/logo.svg" alt="NewOpen" width={140} height={32} priority />
         </Link>
 
         {/* Desktop nav */}
