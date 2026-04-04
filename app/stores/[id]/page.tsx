@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getStoreById, getUserLikedStoreIds } from "@/lib/db";
+import { getStoreById, getUserLikedStoreIds, getCouponsByStoreId } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import LikeButton from "@/components/LikeButton";
 import ViewTracker from "@/components/ViewTracker";
@@ -56,7 +56,10 @@ export default async function StoreDetailPage({ params }: Props) {
   if (!store) notFound();
 
   const { data: { user } } = await supabase.auth.getUser();
-  const likedIds = user ? await getUserLikedStoreIds(user.id) : new Set<string>();
+  const [likedIds, coupons] = await Promise.all([
+    user ? getUserLikedStoreIds(user.id) : Promise.resolve(new Set<string>()),
+    getCouponsByStoreId(id),
+  ]);
   const initialLiked = likedIds.has(store.id);
 
   const allPhotos = [
@@ -162,6 +165,34 @@ export default async function StoreDetailPage({ params }: Props) {
             isLoggedIn={!!user}
           />
         </div>
+
+        {/* クーポン */}
+        {coupons.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-base font-semibold text-gray-800 mb-3">🎟️ クーポン</h2>
+            <div className="space-y-3">
+              {coupons.map((coupon) => (
+                <div key={coupon.id} className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-bold text-gray-900 text-sm">{coupon.title}</p>
+                      <p className="text-xs text-gray-600 mt-0.5">{coupon.description}</p>
+                    </div>
+                    <span className="shrink-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                      {coupon.discount}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-gray-500">有効期限: {coupon.expiryDate}</span>
+                    <span className="text-xs font-mono bg-white border border-orange-200 text-orange-600 px-2 py-0.5 rounded">
+                      {coupon.code}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* SNS 埋め込み */}
         <SnsPostEmbed

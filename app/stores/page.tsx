@@ -1,10 +1,9 @@
-import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { getStores, getComingSoonStores } from "@/lib/db";
-import { getLatLngFromIp } from "@/lib/geolocation";
-import StoreCard from "@/components/StoreCard";
 import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
+import StoresWithLocation from "@/components/StoresWithLocation";
+import StoreCard from "@/components/StoreCard";
 import type { Category } from "@/types";
 
 export const metadata: Metadata = {
@@ -26,22 +25,11 @@ export default async function StoresPage({
   const categoryFilter = sp.category ?? "";
   const filterParam = sp.filter ?? "";
 
-  const headersList = await headers();
-  const ip =
-    headersList.get("x-forwarded-for")?.split(",")[0].trim() ??
-    headersList.get("x-real-ip") ??
-    null;
-
-  const userLatLng = filterParam === "coming_soon"
-    ? undefined
-    : await getLatLngFromIp(ip);
-
   const [normalStores, comingSoonStores] = await Promise.all([
-    filterParam === "coming_soon" ? Promise.resolve([]) : getStores(userLatLng),
+    filterParam === "coming_soon" ? Promise.resolve([]) : getStores(),
     filterParam === "coming_soon" ? getComingSoonStores() : Promise.resolve([]),
   ]);
 
-  // coming_soon フィルターの場合はまもなくオープン、そうでなければ通常店舗
   let stores = filterParam === "coming_soon" ? comingSoonStores : normalStores;
 
   if (areaQuery) {
@@ -56,6 +44,8 @@ export default async function StoresPage({
   }
 
   const title = filterParam === "coming_soon" ? "まもなくオープン" : "新規オープン一覧";
+  // 絞り込みがある場合は現在地ソート不要
+  const useLocation = !areaQuery && !categoryFilter && filterParam !== "coming_soon";
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -74,6 +64,8 @@ export default async function StoresPage({
 
         {stores.length === 0 ? (
           <p className="text-gray-500 text-sm py-12 text-center">該当するお店が見つかりませんでした</p>
+        ) : useLocation ? (
+          <StoresWithLocation stores={stores} />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {stores.map((store) => (

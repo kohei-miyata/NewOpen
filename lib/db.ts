@@ -207,6 +207,68 @@ export async function updateStore(
   return toStore(data);
 }
 
+export async function getCouponsByStoreId(storeId: string): Promise<Coupon[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("coupons")
+    .select("*")
+    .eq("store_id", storeId)
+    .order("expiry_date", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(toCoupon);
+}
+
+export async function createCoupon(
+  payload: Omit<Coupon, "id">,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client?: any
+): Promise<Coupon> {
+  const db = client ?? getSupabaseClient();
+  const { data, error } = await db
+    .from("coupons")
+    .insert({
+      store_id: payload.storeId,
+      store_name: payload.storeName,
+      store_category: payload.storeCategory,
+      title: payload.title,
+      description: payload.description,
+      discount: payload.discount,
+      expiry_date: payload.expiryDate,
+      code: payload.code,
+      image_url: payload.imageUrl,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return toCoupon(data);
+}
+
+export async function updateCoupon(
+  id: string,
+  payload: Partial<Omit<Coupon, "id" | "storeId" | "storeName" | "storeCategory">>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client?: any
+): Promise<void> {
+  const db = client ?? getSupabaseClient();
+  const updates: Record<string, unknown> = {};
+  if (payload.title !== undefined)       updates.title       = payload.title;
+  if (payload.description !== undefined) updates.description = payload.description;
+  if (payload.discount !== undefined)    updates.discount    = payload.discount;
+  if (payload.expiryDate !== undefined)  updates.expiry_date = payload.expiryDate;
+  if (payload.code !== undefined)        updates.code        = payload.code;
+  if (payload.imageUrl !== undefined)    updates.image_url   = payload.imageUrl;
+
+  const { error } = await db.from("coupons").update(updates).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteCoupon(id: string, client?: any): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const db = client ?? getSupabaseClient();
+  const { error } = await db.from("coupons").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 export async function getUserLikedStoreIds(userId: string): Promise<Set<string>> {
   const { data } = await getSupabaseClient()
     .from("store_likes")

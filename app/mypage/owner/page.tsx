@@ -68,12 +68,18 @@ export default async function OwnerMypagePage() {
                       <p className="text-xs text-orange-500 mt-0.5">{store.category} · オープン {store.openDate}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex gap-2 shrink-0 flex-wrap justify-end">
                     <Link
                       href={`/stores/${store.id}`}
                       className="text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-full hover:border-orange-400 hover:text-orange-500 transition-colors"
                     >
                       表示
+                    </Link>
+                    <Link
+                      href={`/mypage/owner/stores/${store.id}/coupons`}
+                      className="text-xs border border-orange-200 text-orange-500 px-3 py-1.5 rounded-full hover:bg-orange-50 transition-colors"
+                    >
+                      🎟️ クーポン
                     </Link>
                     <Link
                       href={`/mypage/owner/stores/${store.id}/edit`}

@@ -15,9 +15,10 @@ const NAV_LINKS = [
 interface Props {
   user: { email?: string } | null;
   isOwner: boolean;
+  isAdmin: boolean;
 }
 
-export default function NavbarClient({ user, isOwner }: Props) {
+export default function NavbarClient({ user, isOwner, isAdmin }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -51,6 +52,14 @@ export default function NavbarClient({ user, isOwner }: Props) {
                   className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1.5 rounded-full hover:bg-orange-100 transition-colors font-medium"
                 >
                   オーナー管理
+                </Link>
+              )}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="text-xs bg-gray-900 text-white px-3 py-1.5 rounded-full hover:bg-gray-700 transition-colors font-medium"
+                >
+                  管理者
                 </Link>
               )}
               <form action={logout}>
@@ -118,6 +127,11 @@ export default function NavbarClient({ user, isOwner }: Props) {
               {isOwner && (
                 <Link href="/mypage/owner" onClick={() => setOpen(false)} className="block py-2.5 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors border-b border-gray-50">
                   オーナー管理
+                </Link>
+              )}
+              {isAdmin && (
+                <Link href="/admin" onClick={() => setOpen(false)} className="block py-2.5 text-sm font-medium text-gray-900 hover:text-gray-700 transition-colors border-b border-gray-50">
+                  管理者ダッシュボード
                 </Link>
               )}
               <div className="pt-2">

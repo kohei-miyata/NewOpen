@@ -4,12 +4,15 @@ import NavbarClient from "@/components/NavbarClient";
 export default async function Navbar() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const isOwner = (user?.user_metadata?.role as string) === "owner";
+  const role = user?.user_metadata?.role as string | undefined;
+  const isOwner = role === "owner";
+  const isAdmin = role === "admin";
 
   return (
     <NavbarClient
       user={user ? { email: user.email } : null}
       isOwner={isOwner}
+      isAdmin={isAdmin}
     />
   );
 }

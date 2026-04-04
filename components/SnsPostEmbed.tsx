@@ -35,7 +35,8 @@ export default function SnsPostEmbed({ twitterPostUrl, instagramPostUrl, tiktokP
         {tweetId && (
           <div>
             <p className="text-xs text-gray-500 mb-1.5 flex items-center gap-1">
-              <span>𝕏</span> X (Twitter)
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/x.png" alt="X" className="w-4 h-4" /> X (Twitter)
             </p>
             <iframe
               src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&lang=ja&theme=light`}
@@ -49,7 +50,10 @@ export default function SnsPostEmbed({ twitterPostUrl, instagramPostUrl, tiktokP
 
         {igId && (
           <div>
-            <p className="text-xs text-gray-500 mb-1.5">📸 Instagram</p>
+            <p className="text-xs text-gray-500 mb-1.5 flex items-center gap-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/instagram.svg" alt="Instagram" className="w-4 h-4" /> Instagram
+            </p>
             <iframe
               src={`https://www.instagram.com/p/${igId}/embed/?cr=1&v=14`}
               className="w-full rounded-xl border border-gray-200"
@@ -63,7 +67,10 @@ export default function SnsPostEmbed({ twitterPostUrl, instagramPostUrl, tiktokP
 
         {ttId && (
           <div>
-            <p className="text-xs text-gray-500 mb-1.5">🎵 TikTok</p>
+            <p className="text-xs text-gray-500 mb-1.5 flex items-center gap-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/tiktok.png" alt="TikTok" className="w-4 h-4" /> TikTok
+            </p>
             <iframe
               src={`https://www.tiktok.com/embed/v2/${ttId}?lang=ja`}
               className="w-full rounded-xl border border-gray-200"

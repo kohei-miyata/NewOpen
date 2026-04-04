@@ -13,6 +13,7 @@ export default function SignupForm({ serverError }: { serverError?: string }) {
     email?: string;
     password?: string;
     confirm?: string;
+    terms?: string;
   }>({});
   const loadedAt = useRef<number>(0);
   useEffect(() => { loadedAt.current = Date.now(); }, []);
@@ -40,6 +41,8 @@ export default function SignupForm({ serverError }: { serverError?: string }) {
     } else if (confirm !== password) {
       e.confirm = "パスワードが一致しません";
     }
+
+    if (!(fd.get("terms") as string)) e.terms = "利用規約への同意が必要です";
 
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -123,6 +126,26 @@ export default function SignupForm({ serverError }: { serverError?: string }) {
           onChange={() => setErrors((p) => ({ ...p, confirm: undefined }))}
         />
         {errors.confirm && <p className="text-xs text-red-500 mt-1">{errors.confirm}</p>}
+      </div>
+
+      {/* 利用規約同意 */}
+      <div>
+        <label className="flex items-start gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            name="terms"
+            value="1"
+            className="mt-0.5 accent-orange-500"
+            onChange={() => setErrors((p) => ({ ...p, terms: undefined }))}
+          />
+          <span className="text-sm text-gray-600">
+            <a href="/terms" target="_blank" className="text-orange-500 hover:underline font-medium">利用規約</a>
+            {" "}および{" "}
+            <a href="/privacy" target="_blank" className="text-orange-500 hover:underline font-medium">プライバシーポリシー</a>
+            に同意する
+          </span>
+        </label>
+        {errors.terms && <p className="text-xs text-red-500 mt-1">{errors.terms}</p>}
       </div>
 
       <button

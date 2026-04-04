@@ -83,6 +83,30 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ── NewOpenだけの特徴バナー ── */}
+      <section className="bg-orange-50 border-y border-orange-100 py-8">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-center text-xs font-semibold text-orange-500 uppercase tracking-widest mb-3">NewOpenだけの特徴</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-orange-100">
+              <p className="text-2xl mb-1">📅</p>
+              <p className="font-bold text-gray-900 text-sm">オープン前から掲載</p>
+              <p className="text-xs text-gray-500 mt-1">「まもなくオープン」として<br/>30日前から告知できる</p>
+            </div>
+            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-orange-100">
+              <p className="text-2xl mb-1">📆</p>
+              <p className="font-bold text-gray-900 text-sm">オープンから3年間掲載</p>
+              <p className="text-xs text-gray-500 mt-1">他サービスと違い<br/>3年間継続して露出できる</p>
+            </div>
+            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-orange-100">
+              <p className="text-2xl mb-1">🆓</p>
+              <p className="font-bold text-gray-900 text-sm">すべて完全無料</p>
+              <p className="text-xs text-gray-500 mt-1">掲載・編集・クーポン発行<br/>すべて0円</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── 特徴（ユーザー向け） ── */}
       <section className="bg-white py-16">
         <div className="max-w-5xl mx-auto px-4">
@@ -114,7 +138,7 @@ export default async function Home() {
           <section>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">🗓 まもなくオープン</h2>
+                <h2 className="text-xl font-bold text-gray-900">まもなくオープン</h2>
                 <p className="text-xs text-gray-500 mt-0.5">30日以内にオープン予定のお店</p>
               </div>
               <Link href="/stores?filter=coming_soon" className="text-sm text-orange-500 hover:underline">
@@ -133,7 +157,7 @@ export default async function Home() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">🆕 最新オープン</h2>
+              <h2 className="text-xl font-bold text-gray-900">最新オープン</h2>
               <p className="text-xs text-gray-500 mt-0.5">新しくオープンしたお店をチェック</p>
             </div>
             <Link href="/stores" className="text-sm text-orange-500 hover:underline">
