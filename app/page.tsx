@@ -56,7 +56,7 @@ export default async function Home() {
             <svg width="72" height="72" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="20" cy="20" r="20" fill="white" fillOpacity="0.25"/>
               <circle cx="20" cy="20" r="17" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
-              <text x="20" y="27" textAnchor="middle" dominantBaseline="auto" fontFamily="'Arial Black', Arial, sans-serif" fontWeight="900" fontSize="24" fill="white">N</text>
+              <text x="19" y="18" textAnchor="middle" dominantBaseline="central" fontFamily="'Arial Black', Arial, sans-serif" fontWeight="900" fontSize="24" fill="white">N</text>
             </svg>
             EW OPEN
           </h1>
