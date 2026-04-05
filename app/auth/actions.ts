@@ -82,6 +82,44 @@ export async function logout() {
   redirect("/");
 }
 
+export async function changePassword(formData: FormData): Promise<{ error?: string }> {
+  const password = formData.get("password") as string;
+  const confirm = formData.get("confirm") as string;
+
+  if (!password || password.length < 6) return { error: "パスワードは6文字以上で入力してください" };
+  if (password !== confirm) return { error: "パスワードが一致しません" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: toJapaneseAuthError(error.message) };
+  redirect("/mypage/change-password?success=1");
+}
+
+export async function forgotPassword(formData: FormData): Promise<{ error?: string }> {
+  const email = formData.get("email") as string;
+  if (!email) return { error: "メールアドレスを入力してください" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=recovery`,
+  });
+  if (error) return { error: toJapaneseAuthError(error.message) };
+  redirect("/auth/forgot-password?success=1");
+}
+
+export async function resetPassword(formData: FormData): Promise<{ error?: string }> {
+  const password = formData.get("password") as string;
+  const confirm = formData.get("confirm") as string;
+
+  if (!password || password.length < 6) return { error: "パスワードは6文字以上で入力してください" };
+  if (password !== confirm) return { error: "パスワードが一致しません" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: toJapaneseAuthError(error.message) };
+  redirect("/auth/reset-password?success=1");
+}
+
 export async function deleteAccount(): Promise<{ error?: string }> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();

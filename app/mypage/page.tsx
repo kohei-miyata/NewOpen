@@ -49,14 +49,22 @@ export default async function MypagePage() {
         {/* 最近見たお店はクライアント側で localStorage から表示 */}
         <RecentlyViewedSection />
 
-        {/* 退会 */}
-        <div className="border-t border-gray-200 pt-6 text-center">
+        {/* アカウント設定 */}
+        <div className="border-t border-gray-200 pt-6 space-y-3">
           <Link
-            href="/mypage/withdraw"
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+            href="/mypage/change-password"
+            className="block text-sm text-gray-600 hover:text-orange-500 transition-colors"
           >
-            退会する
+            パスワードを変更する →
           </Link>
+          <div>
+            <Link
+              href="/mypage/withdraw"
+              className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+            >
+              退会する
+            </Link>
+          </div>
         </div>
       </div>
     </div>

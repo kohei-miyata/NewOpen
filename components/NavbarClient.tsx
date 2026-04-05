@@ -136,7 +136,6 @@ export default function NavbarClient({ user, isOwner, isAdmin }: Props) {
                 </Link>
               )}
               <div className="pt-2">
-                <p className="text-xs text-gray-400 mb-2">{user.email}</p>
                 <form action={logout}>
                   <button type="submit" className="w-full text-sm text-gray-600 border border-gray-300 py-2 rounded-lg hover:border-orange-400 hover:text-orange-500 transition-colors">
                     ログアウト

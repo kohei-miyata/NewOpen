@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { login } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
@@ -56,7 +57,12 @@ export default function LoginForm({ serverError }: { serverError?: string }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">パスワード</label>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-gray-700">パスワード</label>
+          <Link href="/auth/forgot-password" className="text-xs text-orange-500 hover:underline">
+            パスワードをお忘れの方
+          </Link>
+        </div>
         <div className="relative">
           <input
             name="password" type={showPassword ? "text" : "password"} autoComplete="current-password"
