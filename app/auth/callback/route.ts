@@ -1,19 +1,44 @@
-import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-
-  if (code) {
-    const supabase = await createSupabaseServerClient();
-    await supabase.auth.exchangeCodeForSession(code);
-  }
-
   const type = searchParams.get("type");
-  if (type === "recovery") {
-    return NextResponse.redirect(`${origin}/auth/reset-password`);
+
+  const redirectUrl = type === "recovery"
+    ? `${origin}/auth/reset-password`
+    : `${origin}/`;
+
+  if (!code) {
+    return NextResponse.redirect(redirectUrl);
   }
 
-  return NextResponse.redirect(`${origin}/`);
+  // レスポンスを先に作り、そこにCookieを直接セットする
+  const response = NextResponse.redirect(redirectUrl);
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, {
+              ...options,
+              maxAge: 60 * 60 * 24,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "lax",
+            });
+          });
+        },
+      },
+    }
+  );
+
+  await supabase.auth.exchangeCodeForSession(code);
+  return response;
 }
