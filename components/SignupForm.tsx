@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { signup } from "@/app/auth/actions";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors";
 const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
@@ -9,6 +10,8 @@ const INPUT_ERROR = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 export default function SignupForm({ serverError, defaultRole = "user" }: { serverError?: string; defaultRole?: "user" | "owner" }) {
   const [role, setRole] = useState<"user" | "owner">(defaultRole);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -120,21 +123,41 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         <label className="block text-sm font-medium text-gray-700 mb-1">
           パスワード <span className="text-gray-400 font-normal">（英数字8文字以上）</span>
         </label>
-        <input
-          name="password" type="password" autoComplete="new-password"
-          className={errors.password ? INPUT_ERROR : INPUT_NORMAL}
-          onChange={() => setErrors((p) => ({ ...p, password: undefined }))}
-        />
+        <div className="relative">
+          <input
+            name="password" type={showPassword ? "text" : "password"} autoComplete="new-password"
+            className={`${errors.password ? INPUT_ERROR : INPUT_NORMAL} pr-10`}
+            onChange={() => setErrors((p) => ({ ...p, password: undefined }))}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            tabIndex={-1}
+          >
+            {showPassword ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+          </button>
+        </div>
         {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">パスワード（確認）</label>
-        <input
-          name="confirm" type="password" autoComplete="new-password"
-          className={errors.confirm ? INPUT_ERROR : INPUT_NORMAL}
-          onChange={() => setErrors((p) => ({ ...p, confirm: undefined }))}
-        />
+        <div className="relative">
+          <input
+            name="confirm" type={showConfirm ? "text" : "password"} autoComplete="new-password"
+            className={`${errors.confirm ? INPUT_ERROR : INPUT_NORMAL} pr-10`}
+            onChange={() => setErrors((p) => ({ ...p, confirm: undefined }))}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            tabIndex={-1}
+          >
+            {showConfirm ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+          </button>
+        </div>
         {errors.confirm && <p className="text-xs text-red-500 mt-1">{errors.confirm}</p>}
       </div>
 
