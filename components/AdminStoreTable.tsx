@@ -17,6 +17,10 @@ type SortKey = "name" | "likes" | "views" | "open_date";
 type SortDir = "asc" | "desc";
 
 const PAGE_SIZE = 20;
+const THREE_YEARS_MS = 3 * 365.25 * 24 * 60 * 60 * 1000;
+function isExpired(openDate: string): boolean {
+  return Date.now() - new Date(openDate).getTime() >= THREE_YEARS_MS;
+}
 
 function SortArrow({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <span className="text-gray-300 ml-0.5">↕</span>;
@@ -121,15 +125,24 @@ export default function AdminStoreTable({ stores }: { stores: StoreRow[] }) {
                 </td>
               </tr>
             ) : (
-              paged.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
+              paged.map((s) => {
+                const expired = isExpired(s.open_date);
+                return (
+                <tr key={s.id} className={`hover:bg-gray-50 ${expired ? "opacity-60" : ""}`}>
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/stores/${s.id}`}
-                      className="font-medium text-gray-900 hover:text-orange-500 transition-colors"
-                    >
-                      {s.name}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/stores/${s.id}`}
+                        className="font-medium text-gray-900 hover:text-orange-500 transition-colors"
+                      >
+                        {s.name}
+                      </Link>
+                      {expired && (
+                        <span className="text-xs bg-gray-200 text-gray-500 font-semibold px-1.5 py-0.5 rounded-full shrink-0">
+                          掲載終了
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-gray-500">{s.category}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs max-w-[8rem] truncate">{s.address}</td>
@@ -137,7 +150,8 @@ export default function AdminStoreTable({ stores }: { stores: StoreRow[] }) {
                   <td className="px-4 py-3 text-right font-bold text-blue-500">{s.views.toLocaleString()}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{s.open_date}</td>
                 </tr>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>

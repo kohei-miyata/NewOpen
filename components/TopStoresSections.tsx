@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import StoreCard from "@/components/StoreCard";
 import type { Store } from "@/types";
-import { MapPinIcon } from "@heroicons/react/24/outline";
+import { MapPinIcon, SparklesIcon, ClockIcon } from "@heroicons/react/24/outline";
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -55,7 +55,9 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
         <section>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">まもなくオープン</h2>
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <ClockIcon className="w-5 h-5 text-orange-500" />まもなくオープン
+              </h2>
               <p className="text-xs text-gray-500 mt-0.5">
                 {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "30日以内にオープン予定のお店"}
               </p>
@@ -76,7 +78,9 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
       <section>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">最新オープン</h2>
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <SparklesIcon className="w-5 h-5 text-orange-500" />最新オープン
+            </h2>
             <p className="text-xs text-gray-500 mt-0.5">
               {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "新しくオープンしたお店をチェック"}
             </p>
