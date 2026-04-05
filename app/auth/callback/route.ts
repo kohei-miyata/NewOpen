@@ -39,6 +39,12 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  await supabase.auth.exchangeCodeForSession(code);
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    const errUrl = type === "recovery"
+      ? `${origin}/auth/forgot-password?error=expired`
+      : `${origin}/auth/login?error=${encodeURIComponent(error.message)}`;
+    return NextResponse.redirect(errUrl);
+  }
   return response;
 }

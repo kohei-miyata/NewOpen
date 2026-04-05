@@ -40,7 +40,11 @@ export default function ResetPasswordPage() {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      setServerError("エラーが発生しました。リンクの有効期限が切れている場合は再度メールを送信してください。");
+      if (/session/i.test(error.message) || /not authenticated/i.test(error.message)) {
+        setServerError("セッションが見つかりません。リンクの有効期限が切れている可能性があります。");
+      } else {
+        setServerError(`エラー: ${error.message}`);
+      }
       setSubmitting(false);
       return;
     }

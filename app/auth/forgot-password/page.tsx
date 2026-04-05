@@ -13,6 +13,7 @@ const INPUT_ERROR = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 export default function ForgotPasswordPage() {
   const params = useSearchParams();
   const success = params.get("success") === "1";
+  const isExpired = params.get("error") === "expired";
 
   const [emailError, setEmailError] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | undefined>();
@@ -66,6 +67,11 @@ export default function ForgotPasswordPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
+          {isExpired && (
+            <p className="text-sm text-orange-700 bg-orange-50 border border-orange-200 px-3 py-2 rounded-lg">
+              リンクの有効期限が切れています。再度メールを送信してください。
+            </p>
+          )}
           {serverError && (
             <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
           )}
