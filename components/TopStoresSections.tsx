@@ -41,7 +41,7 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
         setGranted(true);
       },
       () => {},
-      { timeout: 6000 }
+      { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
     );
   }, []);
 

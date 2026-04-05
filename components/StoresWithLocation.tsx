@@ -48,7 +48,7 @@ export default function StoresWithLocation({ stores }: Props) {
         setError("位置情報を取得できませんでした。デフォルト順で表示します。");
         setLocating(false);
       },
-      { timeout: 5000 }
+      { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
     );
   }, [stores]);
 

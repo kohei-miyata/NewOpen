@@ -22,7 +22,44 @@ function basicAuth(request: NextRequest): NextResponse | null {
   });
 }
 
+// カミングスーン制御
+// オーナー登録関連は常に通す
+const COMING_SOON_OPEN_PATHS = [
+  "/coming-soon",
+  "/for-owners",
+  "/auth/signup",
+  "/auth/login",
+  "/auth/callback",
+  "/api/",
+  "/_next/",
+  "/favicon",
+];
+
+function isComingSoonBlocked(request: NextRequest): boolean {
+  if (process.env.COMING_SOON !== "true") return false;
+
+  const { pathname } = request.nextUrl;
+
+  // 許可パスは通す
+  if (COMING_SOON_OPEN_PATHS.some((p) => pathname.startsWith(p))) return false;
+
+  // 許可IPは通す
+  const allowedIps = (process.env.ALLOWED_IPS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "";
+  if (allowedIps.includes(ip)) return false;
+
+  return true;
+}
+
 export async function middleware(request: NextRequest) {
+  // カミングスーンチェック
+  if (isComingSoonBlocked(request)) {
+    return NextResponse.redirect(new URL("/coming-soon", request.url));
+  }
+
   // Basic認証チェック
   const authResponse = basicAuth(request);
   if (authResponse) return authResponse;
