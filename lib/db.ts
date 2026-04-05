@@ -99,9 +99,7 @@ export async function getStoreById(id: string): Promise<Store | undefined> {
     .single();
 
   if (error || !data) return undefined;
-  const store = toStore(data);
-  if (!isWithinThreeYears(store.openDate)) return undefined;
-  return store;
+  return toStore(data);
 }
 
 export async function getRankedStores(limit?: number): Promise<Store[]> {
