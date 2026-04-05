@@ -14,6 +14,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
     password?: string;
     confirm?: string;
     terms?: string;
+    birthdate?: string;
   }>({});
   const loadedAt = useRef<number>(0);
   useEffect(() => { loadedAt.current = Date.now(); }, []);
@@ -43,6 +44,15 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
     }
 
     if (!(fd.get("terms") as string)) e.terms = "利用規約への同意が必要です";
+
+    const birthdate = fd.get("birthdate") as string;
+    if (birthdate) {
+      const d = new Date(birthdate);
+      const now = new Date();
+      const age = now.getFullYear() - d.getFullYear() - (now < new Date(now.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+      if (age < 13) e.birthdate = "13歳未満の方はご登録いただけません";
+      if (age > 120) e.birthdate = "正しい生年月日を入力してください";
+    }
 
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -126,6 +136,38 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
           onChange={() => setErrors((p) => ({ ...p, confirm: undefined }))}
         />
         {errors.confirm && <p className="text-xs text-red-500 mt-1">{errors.confirm}</p>}
+      </div>
+
+      {/* 性別 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          性別 <span className="text-gray-400 font-normal">（任意）</span>
+        </label>
+        <select name="gender" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors">
+          <option value="">選択しない</option>
+          <option value="male">男性</option>
+          <option value="female">女性</option>
+          <option value="other">その他</option>
+          <option value="prefer_not_to_say">回答しない</option>
+        </select>
+      </div>
+
+      {/* 生年月日 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          生年月日 <span className="text-gray-400 font-normal">（任意）</span>
+        </label>
+        <input
+          name="birthdate"
+          type="date"
+          className={errors.birthdate
+            ? "w-full border border-red-400 bg-red-50 rounded-lg px-3 py-2 text-sm focus:outline-none"
+            : "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors"
+          }
+          max={new Date().toISOString().split("T")[0]}
+          onChange={() => setErrors((p) => ({ ...p, birthdate: undefined }))}
+        />
+        {errors.birthdate && <p className="text-xs text-red-500 mt-1">{errors.birthdate}</p>}
       </div>
 
       {/* 利用規約同意 */}

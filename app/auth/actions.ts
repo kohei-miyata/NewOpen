@@ -39,14 +39,20 @@ export async function signup(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const role = (formData.get("role") as string) === "owner" ? "owner" : "user";
+  const gender = (formData.get("gender") as string) || null;
+  const birthdate = (formData.get("birthdate") as string) || null;
   const supabase = await createSupabaseServerClient();
+
+  const metadata: Record<string, string> = { role };
+  if (gender) metadata.gender = gender;
+  if (birthdate) metadata.birthdate = birthdate;
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      data: { role },
+      data: metadata,
     },
   });
   if (error) redirect(`/auth/signup?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);

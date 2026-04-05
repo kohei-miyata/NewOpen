@@ -3,7 +3,7 @@ import { getStores, getComingSoonStores } from "@/lib/db";
 import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
 import StoresWithLocation from "@/components/StoresWithLocation";
-import StoreCard from "@/components/StoreCard";
+import StoresLoadMore from "@/components/StoresLoadMore";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import type { Category } from "@/types";
 
@@ -45,7 +45,6 @@ export default async function StoresPage({
   }
 
   const title = filterParam === "coming_soon" ? "まもなくオープン" : "新規オープン一覧";
-  // 絞り込みがある場合は現在地ソート不要
   const useLocation = !areaQuery && !categoryFilter && filterParam !== "coming_soon";
 
   return (
@@ -68,11 +67,7 @@ export default async function StoresPage({
         ) : useLocation ? (
           <StoresWithLocation stores={stores} />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {stores.map((store) => (
-              <StoreCard key={store.id} store={store} />
-            ))}
-          </div>
+          <StoresLoadMore stores={stores} />
         )}
 
         <div className="mt-14">

@@ -5,6 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { banUser, unbanUser } from "./actions";
+import AdminStoreTable from "@/components/AdminStoreTable";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
 
@@ -18,6 +19,21 @@ export default async function AdminPage() {
 
   // ユーザー一覧
   const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 });
+
+  // アクセスログ（直近30日）
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: accessLogs } = await admin
+    .from("access_logs")
+    .select("prefecture, country, created_at")
+    .gte("created_at", since);
+  const logList = accessLogs ?? [];
+  const accessByPref = logList.reduce<Record<string, number>>((acc, r) => {
+    const key = r.prefecture ?? r.country ?? "不明";
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
+  const topAccessAreas = Object.entries(accessByPref).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const totalAccess = logList.length;
   const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.user_metadata?.role !== "admin");
   const ownerUsers   = users.filter((u) => u.user_metadata?.role === "owner");
 
@@ -187,7 +203,7 @@ export default async function AdminPage() {
         </section>
       </div>
 
-      {/* カテゴリ別 + エリア別 */}
+      {/* カテゴリ別 + エリア別店舗数 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <section>
           <h2 className="text-lg font-bold text-gray-900 mb-3">🏷️ カテゴリ別店舗数</h2>
@@ -226,39 +242,124 @@ export default async function AdminPage() {
         </section>
       </div>
 
+      {/* アクセス元エリア */}
+      <section>
+        <h2 className="text-lg font-bold text-gray-900 mb-1">📍 アクセス元エリア（直近30日）</h2>
+        <p className="text-xs text-gray-400 mb-3">IPジオロケーションによる推定 · 合計 {totalAccess.toLocaleString()} アクセス</p>
+        {topAccessAreas.length === 0 ? (
+          <p className="text-sm text-gray-400">まだデータがありません</p>
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            {topAccessAreas.map(([area, count]) => (
+              <div key={area} className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
+                <span className="flex-1 text-sm text-gray-800">{area}</span>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="h-2 rounded-full bg-emerald-400"
+                    style={{ width: `${Math.round((count / (topAccessAreas[0]?.[1] ?? 1)) * 160)}px` }}
+                  />
+                  <span className="text-xs text-gray-400 w-10 text-right">
+                    {totalAccess > 0 ? Math.round(count / totalAccess * 100) : 0}%
+                  </span>
+                  <span className="text-sm font-bold text-gray-700 w-8 text-right">{count.toLocaleString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* エリア別閲覧数 + ユーザー属性 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <section>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">👁️ エリア別閲覧数（上位10）</h2>
+          <p className="text-xs text-gray-400 mb-2">どのエリアの店舗がよく見られているか</p>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            {(() => {
+              const viewsByArea = storeList.reduce<Record<string, number>>((acc, s) => {
+                const area = extractArea(s.address ?? "");
+                acc[area] = (acc[area] ?? 0) + (s.views ?? 0);
+                return acc;
+              }, {});
+              const maxViews = Math.max(...Object.values(viewsByArea), 1);
+              return Object.entries(viewsByArea)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10)
+                .map(([area, views]) => (
+                  <div key={area} className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
+                    <span className="flex-1 text-sm text-gray-800">{area}</span>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-2 rounded-full bg-purple-400"
+                        style={{ width: `${Math.round((views / maxViews) * 120)}px` }}
+                      />
+                      <span className="text-sm font-bold text-gray-700 w-12 text-right">{views.toLocaleString()}</span>
+                    </div>
+                  </div>
+                ));
+            })()}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">👤 ユーザー属性</h2>
+          <div className="space-y-4">
+            {/* 性別 */}
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              <p className="px-4 pt-3 text-xs font-semibold text-gray-500">性別</p>
+              {(() => {
+                const genderMap: Record<string, string> = { male: "男性", female: "女性", other: "その他", prefer_not_to_say: "回答しない" };
+                const counts = users.reduce<Record<string, number>>((acc, u) => {
+                  const g = (u.user_metadata?.gender as string) || "未設定";
+                  acc[g] = (acc[g] ?? 0) + 1;
+                  return acc;
+                }, {});
+                const total = users.length;
+                return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([g, n]) => (
+                  <div key={g} className="flex items-center gap-3 px-4 py-2 border-t border-gray-50">
+                    <span className="flex-1 text-sm text-gray-800">{genderMap[g] ?? g}</span>
+                    <span className="text-xs text-gray-400 w-10 text-right">{Math.round(n / total * 100)}%</span>
+                    <span className="text-sm font-bold text-gray-700 w-6 text-right">{n}</span>
+                  </div>
+                ));
+              })()}
+            </div>
+            {/* 登録月別 */}
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              <p className="px-4 pt-3 text-xs font-semibold text-gray-500">月別登録数（直近6ヶ月）</p>
+              {(() => {
+                const counts: Record<string, number> = {};
+                const now = new Date();
+                for (let i = 5; i >= 0; i--) {
+                  const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                  counts[`${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}`] = 0;
+                }
+                users.forEach((u) => {
+                  if (!u.created_at) return;
+                  const d = new Date(u.created_at);
+                  const key = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+                  if (key in counts) counts[key]++;
+                });
+                const max = Math.max(...Object.values(counts), 1);
+                return Object.entries(counts).map(([month, n]) => (
+                  <div key={month} className="flex items-center gap-3 px-4 py-2 border-t border-gray-50">
+                    <span className="text-sm text-gray-800 w-20">{month}</span>
+                    <div className="flex-1">
+                      <div className="h-2 rounded-full bg-green-400" style={{ width: `${Math.round((n / max) * 100)}%` }} />
+                    </div>
+                    <span className="text-sm font-bold text-gray-700 w-6 text-right">{n}</span>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
+        </section>
+      </div>
+
       {/* 全店舗一覧 */}
       <section>
         <h2 className="text-lg font-bold text-gray-900 mb-3">全店舗一覧</h2>
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">店舗名</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">カテゴリ</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">エリア</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500">いいね</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500">閲覧数</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">オープン日</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {storeList.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/stores/${s.id}`} className="font-medium text-gray-900 hover:text-orange-500 transition-colors">
-                      {s.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{s.category}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs max-w-32 truncate">{s.address}</td>
-                  <td className="px-4 py-3 text-right font-bold text-orange-500">{s.likes}</td>
-                  <td className="px-4 py-3 text-right font-bold text-blue-500">{s.views}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">{s.open_date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <AdminStoreTable stores={storeList} />
       </section>
 
     </div>
