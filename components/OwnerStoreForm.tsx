@@ -87,6 +87,12 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       {serverError && (
         <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
       )}
+      {!isEdit && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 text-xs text-orange-800 leading-relaxed">
+          <p className="font-bold mb-1">掲載期間について</p>
+          <p>オープン日から<strong>3年間</strong>、店舗情報が一般公開されます。3年経過後は自動的に一般公開が終了しますが、マイページからは引き続き確認・管理できます。</p>
+        </div>
+      )}
       {/* 店舗名 */}
       <div data-field="name">
         <label className="block text-sm font-medium text-gray-700 mb-1">
