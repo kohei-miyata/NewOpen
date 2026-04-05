@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { resetPassword } from "@/app/auth/actions";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { EyeIcon, EyeSlashIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 
 const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors pr-10";
@@ -11,19 +10,15 @@ const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
 const INPUT_ERROR = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 export default function ResetPasswordPage() {
-  const params = useSearchParams();
-  const success = params.get("success") === "1";
-
+  const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
   const [serverError, setServerError] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  function validate(fd: FormData): boolean {
+  function validate(password: string, confirm: string): boolean {
     const e: typeof errors = {};
-    const password = fd.get("password") as string;
-    const confirm = fd.get("confirm") as string;
     if (!password || password.length < 6) e.password = "パスワードは6文字以上で入力してください";
     if (!confirm) e.confirm = "確認用パスワードを入力してください";
     else if (password !== confirm) e.confirm = "パスワードが一致しません";
@@ -34,14 +29,24 @@ export default function ResetPasswordPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    if (!validate(fd)) return;
+    const password = fd.get("password") as string;
+    const confirm = fd.get("confirm") as string;
+    if (!validate(password, confirm)) return;
+
     setSubmitting(true);
     setServerError(undefined);
-    const result = await resetPassword(fd);
-    if (result?.error) {
-      setServerError(result.error);
+
+    const supabase = createSupabaseBrowserClient();
+    const { error } = await supabase.auth.updateUser({ password });
+
+    if (error) {
+      setServerError("エラーが発生しました。リンクの有効期限が切れている場合は再度メールを送信してください。");
       setSubmitting(false);
+      return;
     }
+
+    await supabase.auth.signOut();
+    setSuccess(true);
   }
 
   if (success) {
@@ -69,7 +74,12 @@ export default function ResetPasswordPage() {
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
           {serverError && (
-            <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
+            <div className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg space-y-1">
+              <p>{serverError}</p>
+              <Link href="/auth/forgot-password" className="underline text-orange-500">
+                再設定メールを送り直す
+              </Link>
+            </div>
           )}
 
           <div>
