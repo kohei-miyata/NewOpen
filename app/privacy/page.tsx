@@ -67,7 +67,15 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">8. お問い合わせ</h2>
+            <h2 className="font-bold text-gray-900 mb-2">8. 運営者情報</h2>
+            <ul className="space-y-1">
+              <li>氏名：宮田浩平</li>
+              <li>事業形態：個人事業主</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="font-bold text-gray-900 mb-2">9. お問い合わせ</h2>
             <p>個人情報に関するお問い合わせは<a href="/contact" className="text-orange-500 hover:underline">お問い合わせフォーム</a>よりご連絡ください。</p>
           </section>
 
