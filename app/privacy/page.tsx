@@ -15,7 +15,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-bold text-gray-900 mb-2">1. 収集する情報</h2>
-            <p>当サービスは以下の情報を収集します。</p>
+            <p>当サービスが個人情報を収集・利用する目的は，以下のとおりです。</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>メールアドレス（アカウント登録時）</li>
               <li>ロール情報（一般ユーザー / オーナー）</li>
@@ -28,11 +28,14 @@ export default function PrivacyPage() {
           <section>
             <h2 className="font-bold text-gray-900 mb-2">2. 情報の利用目的</h2>
             <ul className="list-disc list-inside space-y-1">
-              <li>サービスの提供・運営・改善</li>
-              <li>ユーザーへの通知・サポート対応</li>
-              <li>不正利用の防止・セキュリティ確保</li>
-              <li>エリアに基づく店舗情報の表示（IPジオロケーション）</li>
-              <li>アクセス解析（Vercel Analytics）</li>
+              <li>当サービスの提供・運営のため</li>
+              <li>ユーザーからのお問い合わせに回答するため（本人確認を行うことを含む）</li>
+              <li>ユーザーが利用中のサービスの新機能，更新情報，キャンペーン等及び当サービスが提供する他のサービスの案内のメールを送付するため</li>
+              <li>メンテナンス，重要なお知らせなど必要に応じたご連絡のため</li>
+              <li>利用規約に違反したユーザーや，不正・不当な目的でサービスを利用しようとするユーザーの特定をし，ご利用をお断りするため</li>
+              <li>ユーザーにご自身の登録情報の閲覧や変更，削除，ご利用状況の閲覧を行っていただくため</li>
+              <li>有料サービスにおいて，ユーザーに利用料金を請求するため</li>
+              <li>上記の利用目的に付随する目的</li>
             </ul>
           </section>
 
@@ -42,12 +45,12 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">4. 利用するサービス・技術</h2>
+            <h2 className="font-bold text-gray-900 mb-2">4. 個人情報の訂正および削除</h2>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong>Supabase</strong>：データベース・認証・ストレージ（EU/US）</li>
-              <li><strong>Vercel</strong>：ホスティング・アクセス解析</li>
-              <li><strong>ip-api.com</strong>：IPアドレスによる位置情報取得（エリア絞り込み）</li>
-              <li><strong>Google Maps</strong>：地図表示</li>
+              <li>ユーザーは，当サービスの保有する自己の個人情報が誤った情報である場合には，当サービスが定める手続きにより，当サービスに対して個人情報の訂正，追加または削除（以下，「訂正等」といいます。）を請求することができます。</li>
+              <li>当サービスは，ユーザーから前項の請求を受けてその請求に応じる必要があると判断した場合には，遅滞なく，当該個人情報の訂正等を行うものとします。</li>
+              <li>当サービスは，前項の規定に基づき訂正等を行った場合，または訂正等を行わない旨の決定をしたときは遅滞なく，これをユーザーに通知します。</li>
+
             </ul>
           </section>
 
@@ -57,17 +60,12 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">6. 個人情報の開示・削除</h2>
-            <p>ユーザーは自身のアカウント情報の開示・訂正・削除を求めることができます。お問い合わせフォームよりご連絡ください。</p>
-          </section>
-
-          <section>
-            <h2 className="font-bold text-gray-900 mb-2">7. ポリシーの変更</h2>
+            <h2 className="font-bold text-gray-900 mb-2">6. ポリシーの変更</h2>
             <p>本ポリシーは必要に応じて変更することがあります。変更後は本ページに掲載した時点で効力を生じます。</p>
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">8. 運営者情報</h2>
+            <h2 className="font-bold text-gray-900 mb-2">7. 運営者情報</h2>
             <ul className="space-y-1">
               <li>氏名：宮田浩平</li>
               <li>事業形態：個人事業主</li>
@@ -75,7 +73,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">9. お問い合わせ</h2>
+            <h2 className="font-bold text-gray-900 mb-2">8. お問い合わせ</h2>
             <p>個人情報に関するお問い合わせは<a href="/contact" className="text-orange-500 hover:underline">お問い合わせフォーム</a>よりご連絡ください。</p>
           </section>
 

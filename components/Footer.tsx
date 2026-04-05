@@ -21,7 +21,34 @@ export default function Footer() {
             </Link>
           </div>
         </div>
-        <div className="mt-8 flex justify-center gap-6 text-xs text-gray-400 flex-wrap">
+        {/* SNSリンク */}
+        <div className="mt-8 flex justify-center gap-5">
+          {process.env.NEXT_PUBLIC_SNS_X && (
+            <a href={process.env.NEXT_PUBLIC_SNS_X} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="text-gray-400 hover:text-gray-700 transition-colors">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/x.png" alt="X" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
+            </a>
+          )}
+          {process.env.NEXT_PUBLIC_SNS_INSTAGRAM && (
+            <a href={process.env.NEXT_PUBLIC_SNS_INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-gray-700 transition-colors">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/instagram.svg" alt="Instagram" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
+            </a>
+          )}
+          {process.env.NEXT_PUBLIC_SNS_TIKTOK && (
+            <a href={process.env.NEXT_PUBLIC_SNS_TIKTOK} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="text-gray-400 hover:text-gray-700 transition-colors">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/tiktok.png" alt="TikTok" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
+            </a>
+          )}
+          {process.env.NEXT_PUBLIC_SNS_LINE && (
+            <a href={process.env.NEXT_PUBLIC_SNS_LINE} target="_blank" rel="noopener noreferrer" aria-label="LINE" className="text-gray-400 hover:text-gray-700 transition-colors">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/LINE.png" alt="LINE" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
+            </a>
+          )}
+        </div>
+        <div className="mt-6 flex justify-center gap-6 text-xs text-gray-400 flex-wrap">
           <Link href="/about" className="hover:text-orange-500 transition-colors">NewOpenについて</Link>
           <Link href="/for-owners" className="hover:text-orange-500 transition-colors">オーナーの方へ</Link>
           <Link href="/contact" className="hover:text-orange-500 transition-colors">お問い合わせ</Link>

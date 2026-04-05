@@ -2,6 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function submitContact(formData: FormData) {
   const name       = (formData.get("name")       as string).trim();
@@ -25,5 +28,44 @@ export async function submitContact(formData: FormData) {
     .insert({ name, email, message, company, department });
 
   if (error) redirect(`/contact?error=${encodeURIComponent(error.message)}`);
+
+  const fromAddress = process.env.RESEND_FROM_ADDRESS ?? "noreply@newopen.jp";
+  const adminEmail  = process.env.ADMIN_EMAIL;
+
+  await Promise.allSettled([
+    // ユーザーへの自動返信
+    resend.emails.send({
+      from: `NewOpen <${fromAddress}>`,
+      to: email,
+      subject: "【NewOpen】お問い合わせを受け付けました",
+      html: `
+        <p>${name} 様</p>
+        <p>お問い合わせいただきありがとうございます。<br>
+        内容を確認の上、担当者よりご連絡いたします。</p>
+        <hr>
+        <p><strong>お問い合わせ内容</strong></p>
+        <p>${message.replace(/\n/g, "<br>")}</p>
+        <hr>
+        <p style="font-size:12px;color:#888;">NewOpen — あなたの街の新規オープン情報</p>
+      `,
+    }),
+    // 運営への通知
+    adminEmail
+      ? resend.emails.send({
+          from: `NewOpen <${fromAddress}>`,
+          to: adminEmail,
+          subject: `【NewOpen】お問い合わせ：${name}`,
+          html: `
+            <p><strong>氏名：</strong>${name}</p>
+            <p><strong>メール：</strong>${email}</p>
+            ${company ? `<p><strong>会社名：</strong>${company}</p>` : ""}
+            ${department ? `<p><strong>部署：</strong>${department}</p>` : ""}
+            <p><strong>内容：</strong></p>
+            <p>${message.replace(/\n/g, "<br>")}</p>
+          `,
+        })
+      : Promise.resolve(),
+  ]);
+
   redirect("/contact?success=1");
 }

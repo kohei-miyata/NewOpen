@@ -14,7 +14,12 @@ export async function createSupabaseServerClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, {
+                ...options,
+                maxAge: 60 * 60 * 24, // 24時間
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+              })
             );
           } catch {
             // Server Components では読み取り専用のため握り潰す
