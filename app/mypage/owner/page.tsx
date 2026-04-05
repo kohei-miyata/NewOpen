@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getOwnerStores } from "@/lib/db";
+import { TicketIcon } from "@heroicons/react/24/outline";
 
 export default async function OwnerMypagePage() {
   const supabase = await createSupabaseServerClient();
@@ -79,7 +80,7 @@ export default async function OwnerMypagePage() {
                       href={`/mypage/owner/stores/${store.id}/coupons`}
                       className="text-xs border border-orange-200 text-orange-500 px-3 py-1.5 rounded-full hover:bg-orange-50 transition-colors"
                     >
-                      🎟️ クーポン
+                      <TicketIcon className="w-3.5 h-3.5 inline-block mr-1" />クーポン
                     </Link>
                     <Link
                       href={`/mypage/owner/stores/${store.id}/edit`}

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import type { Category } from "@/types";
+import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   categories: Category[];
@@ -101,7 +102,7 @@ export default function StoresFilter({ categories, currentArea, currentCategory,
               : "bg-white border border-gray-200 text-gray-700 hover:border-blue-400 hover:text-blue-500"
           }`}
         >
-          🗓 まもなくオープン
+          <CalendarDaysIcon className="w-4 h-4 inline-block mr-1" />まもなくオープン
         </button>
 
         {/* カテゴリ */}

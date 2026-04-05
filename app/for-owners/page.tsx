@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
+import {
+  MegaphoneIcon, CameraIcon, TicketIcon, CalendarDaysIcon,
+  MapPinIcon, PencilSquareIcon,
+} from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = {
   title: "オーナーの方へ | 無料で店舗を掲載",
@@ -7,12 +12,12 @@ export const metadata: Metadata = {
 };
 
 const MERITS = [
-  { icon: "📣", title: "無料で掲載できる", desc: "基本掲載は完全無料。オープン前から「まもなくオープン」として告知できます。" },
-  { icon: "📸", title: "SNS投稿を埋め込み", desc: "X・Instagram・TikTokの最新投稿を店舗ページに自動表示。フォロワー獲得にも。" },
-  { icon: "🎟️", title: "クーポンで集客", desc: "オープン記念クーポンを発行して、初来店のハードルを下げましょう。" },
-  { icon: "📆", title: "3年間継続掲載", desc: "オープンから3年間、情報が残り続けます。他サービスとの差別化ポイントです。" },
-  { icon: "🗺️", title: "エリア検索で露出", desc: "ユーザーがエリア・カテゴリで検索した際に表示。地元のお客様に届きます。" },
-  { icon: "✏️", title: "いつでも編集可能", desc: "営業時間・写真・SNSリンクなど、オーナーページからいつでも更新できます。" },
+  { Icon: MegaphoneIcon, title: "無料で掲載できる", desc: "基本掲載は完全無料。オープン前から「まもなくオープン」として告知できます。" },
+  { Icon: CameraIcon, title: "SNS投稿を埋め込み", desc: "X・Instagram・TikTokの最新投稿を店舗ページに自動表示。フォロワー獲得にも。" },
+  { Icon: TicketIcon, title: "クーポンで集客", desc: "オープン記念クーポンを発行して、初来店のハードルを下げましょう。" },
+  { Icon: CalendarDaysIcon, title: "3年間継続掲載", desc: "オープンから3年間、情報が残り続けます。他サービスとの差別化ポイントです。" },
+  { Icon: MapPinIcon, title: "エリア検索で露出", desc: "ユーザーがエリア・カテゴリで検索した際に表示。地元のお客様に届きます。" },
+  { Icon: PencilSquareIcon, title: "いつでも編集可能", desc: "営業時間・写真・SNSリンクなど、オーナーページからいつでも更新できます。" },
 ];
 
 const STEPS = [
@@ -28,7 +33,14 @@ const FAQS = [
   { q: "複数店舗の登録は可能ですか？", a: "はい、1アカウントで複数店舗を登録・管理できます。" },
 ];
 
-export default function ForOwnersPage() {
+export default async function ForOwnersPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const isOwner = user?.user_metadata?.role === "owner";
+
+  const ctaHref = isOwner ? "/mypage/owner/stores/new" : "/auth/signup?role=owner";
+  const ctaLabel = isOwner ? "店舗を登録する →" : "無料でオーナー登録する →";
+
   return (
     <div className="bg-gray-50 min-h-screen">
 
@@ -47,10 +59,10 @@ export default function ForOwnersPage() {
           </p>
           <div className="mt-10 flex gap-4 justify-center flex-wrap">
             <Link
-              href="/auth/signup?role=owner"
+              href={ctaHref}
               className="bg-orange-500 text-white font-bold px-10 py-3.5 rounded-full hover:bg-orange-600 transition-colors shadow-lg text-sm"
             >
-              無料でオーナー登録する →
+              {ctaLabel}
             </Link>
             <Link
               href="/contact"
@@ -59,7 +71,7 @@ export default function ForOwnersPage() {
               お問い合わせ
             </Link>
           </div>
-          <p className="mt-4 text-xs text-gray-500">クレジットカード不要・無料で始められます</p>
+          {!isOwner && <p className="mt-4 text-xs text-gray-500">クレジットカード不要・無料で始められます</p>}
         </div>
       </section>
 
@@ -71,7 +83,7 @@ export default function ForOwnersPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {MERITS.map((m) => (
               <div key={m.title} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <div className="text-4xl mb-3">{m.icon}</div>
+                <m.Icon className="w-8 h-8 text-orange-500 mb-3" />
                 <h3 className="font-bold text-gray-900 mb-1">{m.title}</h3>
                 <p className="text-sm text-gray-600">{m.desc}</p>
               </div>
@@ -102,10 +114,10 @@ export default function ForOwnersPage() {
           </div>
           <div className="mt-12 text-center">
             <Link
-              href="/auth/signup?role=owner"
+              href={ctaHref}
               className="inline-block bg-orange-500 text-white font-bold px-10 py-3.5 rounded-full hover:bg-orange-600 transition-colors shadow-md text-sm"
             >
-              無料でオーナー登録する →
+              {ctaLabel}
             </Link>
           </div>
         </div>

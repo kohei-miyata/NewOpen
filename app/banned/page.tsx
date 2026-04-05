@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { logout } from "@/app/auth/actions";
+import { NoSymbolIcon } from "@heroicons/react/24/outline";
 
 export default function BannedPage() {
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
-        <div className="text-5xl mb-4">🚫</div>
+        <div className="mb-4 flex justify-center"><NoSymbolIcon className="w-14 h-14 text-red-500" /></div>
         <h1 className="text-xl font-bold text-gray-900 mb-2">アカウントが停止されています</h1>
         <p className="text-sm text-gray-500 mb-6">
           このアカウントは利用規約違反により停止されました。

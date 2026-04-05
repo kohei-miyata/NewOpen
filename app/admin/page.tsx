@@ -6,6 +6,13 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { banUser, unbanUser } from "./actions";
 import AdminStoreTable from "@/components/AdminStoreTable";
+import {
+  HeartIcon,
+  EyeIcon,
+  TagIcon,
+  MapIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
 
@@ -149,7 +156,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
       {/* いいね・閲覧ランキング */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-3">❤️ いいね上位10店舗</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5"><HeartIcon className="w-5 h-5 text-orange-500" /> いいね上位10店舗</h2>
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {topLiked.map((s, i) => (
               <Link
@@ -169,7 +176,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
         </section>
 
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-3">👁️ 閲覧数上位10店舗</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5"><EyeIcon className="w-5 h-5 text-blue-500" /> 閲覧数上位10店舗</h2>
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {topViewed.map((s, i) => (
               <Link
@@ -192,7 +199,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
       {/* カテゴリ別 + エリア別店舗数 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-3">🏷️ カテゴリ別店舗数</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5"><TagIcon className="w-5 h-5 text-orange-500" /> カテゴリ別店舗数</h2>
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
               <div key={cat} className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
@@ -210,7 +217,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
         </section>
 
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-3">🗺️ エリア別店舗数（上位10）</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5"><MapIcon className="w-5 h-5 text-blue-500" /> エリア別店舗数（上位10）</h2>
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {topAreas.map(([area, count]) => (
               <div key={area} className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
@@ -231,7 +238,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
 {/* エリア別閲覧数 + ユーザー属性 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-3">👁️ エリア別閲覧数（上位10）</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5"><EyeIcon className="w-5 h-5 text-purple-500" /> エリア別閲覧数（上位10）</h2>
           <p className="text-xs text-gray-400 mb-2">どのエリアの店舗がよく見られているか</p>
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {(() => {
@@ -261,7 +268,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
         </section>
 
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-3">👤 ユーザー属性</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5"><UserIcon className="w-5 h-5 text-gray-500" /> ユーザー属性</h2>
           <div className="space-y-4">
             {/* 性別 */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">

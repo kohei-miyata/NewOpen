@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { markCouponUsed } from "@/app/coupons/actions";
 import type { Coupon } from "@/types";
+import { LockClosedIcon, CheckIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   coupon: Coupon;
@@ -174,7 +175,7 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
                   ) : (
                     <div className="space-y-2">
                       {justUsed && (
-                        <p className="text-xs text-center text-green-600 font-medium">✓ クーポンを使用しました</p>
+                        <p className="text-xs text-center text-green-600 font-medium flex items-center justify-center gap-1"><CheckIcon className="w-3.5 h-3.5" />クーポンを使用しました</p>
                       )}
                       <div className="w-full bg-gray-100 text-gray-400 font-bold py-3 rounded-xl text-center text-sm">
                         使用済み（再利用不可）
@@ -186,7 +187,7 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
                 /* 未ログイン：コードを隠してログイン導線を前面に */
                 <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center space-y-3">
                   <div>
-                    <p className="text-sm font-bold text-gray-900">🔒 クーポンを使うにはログインが必要です</p>
+                    <p className="text-sm font-bold text-gray-900 flex items-center justify-center gap-1.5"><LockClosedIcon className="w-4 h-4" />クーポンを使うにはログインが必要です</p>
                     <p className="text-xs text-gray-500 mt-1">無料会員登録でクーポンコードを確認・使用できます</p>
                   </div>
                   <div className="flex gap-2">

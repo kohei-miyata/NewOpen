@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SignupForm from "@/components/SignupForm";
+import { EnvelopeIcon } from "@heroicons/react/24/outline";
 
 export default async function SignupPage({
   searchParams,
@@ -12,7 +13,7 @@ export default async function SignupPage({
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="text-4xl mb-4">✉️</div>
+          <div className="mb-4 flex justify-center"><EnvelopeIcon className="w-12 h-12 text-orange-500" /></div>
           <h2 className="text-lg font-bold text-gray-900">確認メールを送信しました</h2>
           <p className="text-sm text-gray-500 mt-2">メールのリンクをクリックして登録を完了してください。</p>
           <Link href="/auth/login" className="inline-block mt-6 text-orange-500 hover:underline text-sm">

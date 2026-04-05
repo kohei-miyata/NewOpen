@@ -4,7 +4,11 @@ import StoreCard from "@/components/StoreCard";
 import PageHeader from "@/components/PageHeader";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 
-const MEDALS = ["🥇", "🥈", "🥉"];
+const MEDAL_COLORS = [
+  "bg-yellow-400 text-white",
+  "bg-gray-300 text-white",
+  "bg-amber-600 text-white",
+];
 
 export default async function RankingPage() {
   const ranked = await getRankedStores(50);
@@ -18,8 +22,8 @@ export default async function RankingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           {ranked.slice(0, 3).map((store, i) => (
             <div key={store.id} className="relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-2xl z-10">
-                {MEDALS[i]}
+              <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold z-10 shadow ${MEDAL_COLORS[i]}`}>
+                {i + 1}
               </div>
               <StoreCard store={store} rank={i + 1} />
             </div>

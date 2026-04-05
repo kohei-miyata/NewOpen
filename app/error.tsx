@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export default function Error({
   error,
@@ -17,7 +18,7 @@ export default function Error({
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="text-center">
-        <p className="text-6xl mb-4">⚠️</p>
+        <div className="mb-4 flex justify-center"><ExclamationTriangleIcon className="w-16 h-16 text-yellow-500" /></div>
         <h1 className="text-2xl font-bold text-gray-900">エラーが発生しました</h1>
         <p className="mt-2 text-sm text-gray-500">
           申し訳ありません。予期しないエラーが発生しました。

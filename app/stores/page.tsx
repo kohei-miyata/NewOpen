@@ -4,7 +4,6 @@ import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
 import StoresWithLocation from "@/components/StoresWithLocation";
 import StoresLoadMore from "@/components/StoresLoadMore";
-import StoreCalendar from "@/components/StoreCalendar";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import type { Category } from "@/types";
 
@@ -29,11 +28,10 @@ export default async function StoresPage({
 
   const [normalStores, comingSoonStores] = await Promise.all([
     getStores(),
-    getComingSoonStores(),
+    filterParam === "coming_soon" ? getComingSoonStores() : Promise.resolve([]),
   ]);
 
   let stores = filterParam === "coming_soon" ? comingSoonStores : normalStores;
-  const allStoresForCalendar = normalStores;
 
   if (areaQuery) {
     const q = areaQuery.toLowerCase();
@@ -56,13 +54,6 @@ export default async function StoresPage({
           title={title}
           description={`${stores.length}件のお店`}
         />
-
-        {/* カレンダー（絞り込みなし時のみ表示） */}
-        {!areaQuery && !categoryFilter && !filterParam && (
-          <div className="mb-8">
-            <StoreCalendar stores={allStoresForCalendar} comingSoon={comingSoonStores} />
-          </div>
-        )}
 
         <StoresFilter
           categories={CATEGORIES}

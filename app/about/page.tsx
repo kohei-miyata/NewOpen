@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  MapIcon, TagIcon, TicketIcon, CalendarDaysIcon,
+  ClockIcon, CurrencyYenIcon,
+} from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = {
   title: "NewOpenについて",
@@ -7,12 +11,12 @@ export const metadata: Metadata = {
 };
 
 const FEATURES = [
-  { icon: "🗺️", title: "エリアから探す", desc: "渋谷・新宿・銀座など、街や駅名で新規オープン店舗を絞り込んで検索。" },
-  { icon: "🏷️", title: "カテゴリで絞り込む", desc: "レストラン・カフェ・スイーツ・美容院・ジムなど9カテゴリから探せる。" },
-  { icon: "🎟️", title: "お得なクーポン", desc: "オープン記念クーポンをGETして、お得に新しいお店を体験しよう。" },
-  { icon: "📅", title: "オープン前から掲載", desc: "「まもなくオープン」として30日前から告知。話題を先取りしよう。" },
-  { icon: "📆", title: "3年間継続掲載", desc: "他サービスと違い、オープンから3年間ずっと情報が残り続ける。" },
-  { icon: "🆓", title: "すべて完全無料", desc: "掲載・編集・クーポン発行・SNS埋め込みもすべて0円。" },
+  { Icon: MapIcon, title: "エリアから探す", desc: "渋谷・新宿・銀座など、街や駅名で新規オープン店舗を絞り込んで検索。" },
+  { Icon: TagIcon, title: "カテゴリで絞り込む", desc: "レストラン・カフェ・スイーツ・美容院・ジムなど9カテゴリから探せる。" },
+  { Icon: TicketIcon, title: "お得なクーポン", desc: "オープン記念クーポンをGETして、お得に新しいお店を体験しよう。" },
+  { Icon: CalendarDaysIcon, title: "オープン前から掲載", desc: "「まもなくオープン」として30日前から告知。話題を先取りしよう。" },
+  { Icon: ClockIcon, title: "3年間継続掲載", desc: "他サービスと違い、オープンから3年間ずっと情報が残り続ける。" },
+  { Icon: CurrencyYenIcon, title: "すべて完全無料", desc: "掲載・編集・クーポン発行・SNS埋め込みもすべて0円。" },
 ];
 
 const FAQS = [
@@ -65,8 +69,8 @@ export default function AboutPage() {
           <p className="text-center text-sm text-gray-500 mb-10">お店探しをもっとかんたんに、もっとたのしく</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {FEATURES.map((f) => (
-              <div key={f.title} className="bg-white rounded-2xl p-6 text-center border border-gray-100 shadow-sm">
-                <div className="text-4xl mb-3">{f.icon}</div>
+              <div key={f.title} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <f.Icon className="w-8 h-8 text-orange-500 mb-3" />
                 <h3 className="font-bold text-gray-900 mb-1">{f.title}</h3>
                 <p className="text-sm text-gray-600">{f.desc}</p>
               </div>

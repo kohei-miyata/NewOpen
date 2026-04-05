@@ -7,6 +7,13 @@ import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import TopStoresSections from "@/components/TopStoresSections";
 import StoreCalendar from "@/components/StoreCalendar";
+import {
+  CalendarDaysIcon,
+  SparklesIcon,
+  TicketIcon,
+  HeartIcon,
+  BuildingStorefrontIcon,
+} from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = {
   title: "NewOpen | あなたの街の新規オープン情報",
@@ -43,7 +50,7 @@ export default async function Home() {
           style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
         <div className="relative max-w-5xl mx-auto px-4 py-20 text-center">
           <span className="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wide">
-            🎉 新規オープン情報プラットフォーム
+            新規オープン情報プラットフォーム
           </span>
           <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight drop-shadow-sm flex items-center justify-center gap-3">
             <svg width="72" height="72" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -94,9 +101,12 @@ export default async function Home() {
 
         {/* ── オープンカレンダー ── */}
         <section>
-          <div className="mb-4">
-            <h2 className="text-xl font-bold text-gray-900">📅 オープンカレンダー</h2>
-            <p className="text-xs text-gray-500 mt-0.5">日付をタップしてオープン店舗を確認</p>
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">オープンカレンダー</h2>
+              <p className="text-xs text-gray-500">日付をタップしてオープン店舗を確認</p>
+            </div>
           </div>
           <StoreCalendar stores={allStores} comingSoon={comingSoon} />
         </section>
@@ -105,9 +115,12 @@ export default async function Home() {
         {todayStores.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">🎊 本日オープン</h2>
-                <p className="text-xs text-gray-500 mt-0.5">今日オープンしたばかりのお店</p>
+              <div className="flex items-center gap-2">
+                <SparklesIcon className="w-6 h-6 text-orange-500" />
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">本日オープン</h2>
+                  <p className="text-xs text-gray-500">今日オープンしたばかりのお店</p>
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -125,9 +138,12 @@ export default async function Home() {
         {latestCoupons.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">🎟️ お得なクーポン</h2>
-                <p className="text-xs text-gray-500 mt-0.5">新規オープン記念の特別クーポン</p>
+              <div className="flex items-center gap-2">
+                <TicketIcon className="w-6 h-6 text-orange-500" />
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">お得なクーポン</h2>
+                  <p className="text-xs text-gray-500">新規オープン記念の特別クーポン</p>
+                </div>
               </div>
               <Link href="/coupons" className="text-sm text-orange-500 hover:underline">
                 すべて見る →
@@ -144,9 +160,12 @@ export default async function Home() {
         {/* ── ランキング ── */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">❤️ いいね！ランキング TOP3</h2>
-              <p className="text-xs text-gray-500 mt-0.5">みんなが気になっているお店</p>
+            <div className="flex items-center gap-2">
+              <HeartIcon className="w-6 h-6 text-orange-500" />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">いいね！ランキング TOP3</h2>
+                <p className="text-xs text-gray-500">みんなが気になっているお店</p>
+              </div>
             </div>
             <Link href="/ranking" className="text-sm text-orange-500 hover:underline">
               すべて見る →
@@ -164,6 +183,9 @@ export default async function Home() {
 
         {/* ── オーナー向け誘導バナー ── */}
         <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-8 text-center">
+          <div className="flex justify-center mb-3">
+            <BuildingStorefrontIcon className="w-8 h-8 text-orange-400" />
+          </div>
           <p className="text-xs text-orange-400 font-bold mb-2 tracking-wide">店舗オーナー様へ</p>
           <h2 className="text-xl sm:text-2xl font-extrabold mb-2">新規オープンを無料で掲載しませんか？</h2>
           <p className="text-sm text-gray-300 mb-6">SNS埋め込み・クーポン・写真ギャラリーもすべて0円</p>

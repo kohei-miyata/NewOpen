@@ -9,6 +9,7 @@ const INPUT_ERROR = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 export default function LoginForm({ serverError }: { serverError?: string }) {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
 
   function validate(fd: FormData): boolean {
     const e: typeof errors = {};
@@ -33,7 +34,8 @@ export default function LoginForm({ serverError }: { serverError?: string }) {
       action={login}
       onSubmit={(e) => {
         const fd = new FormData(e.currentTarget);
-        if (!validate(fd)) e.preventDefault();
+        if (!validate(fd)) { e.preventDefault(); return; }
+        setSubmitting(true);
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4"
     >
@@ -63,9 +65,15 @@ export default function LoginForm({ serverError }: { serverError?: string }) {
 
       <button
         type="submit"
-        className="w-full bg-orange-500 text-white font-bold py-2.5 rounded-lg hover:bg-orange-600 transition-colors"
+        disabled={submitting}
+        className="w-full bg-orange-500 text-white font-bold py-2.5 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        ログイン
+        {submitting ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            ログイン中...
+          </span>
+        ) : "ログイン"}
       </button>
     </form>
   );

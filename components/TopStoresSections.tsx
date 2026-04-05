@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import StoreCard from "@/components/StoreCard";
 import type { Store } from "@/types";
+import { MapPinIcon } from "@heroicons/react/24/outline";
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -56,7 +57,7 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
             <div>
               <h2 className="text-xl font-bold text-gray-900">まもなくオープン</h2>
               <p className="text-xs text-gray-500 mt-0.5">
-                {granted ? "📍 現在地に近い順" : "30日以内にオープン予定のお店"}
+                {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "30日以内にオープン予定のお店"}
               </p>
             </div>
             <Link href="/stores?filter=coming_soon" className="text-sm text-orange-500 hover:underline">
@@ -77,7 +78,7 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
           <div>
             <h2 className="text-xl font-bold text-gray-900">最新オープン</h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              {granted ? "📍 現在地に近い順" : "新しくオープンしたお店をチェック"}
+              {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "新しくオープンしたお店をチェック"}
             </p>
           </div>
           <Link href="/stores" className="text-sm text-orange-500 hover:underline">

@@ -10,6 +10,13 @@ import MapWrapper from "@/components/MapWrapper";
 import RecentlyViewedSaver from "@/components/RecentlyViewedSaver";
 import SnsPostEmbed from "@/components/SnsPostEmbed";
 import type { SnsLinks } from "@/types";
+import {
+  NoSymbolIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
+  TicketIcon,
+  ArrowTopRightOnSquareIcon,
+} from "@heroicons/react/24/outline";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -40,12 +47,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const SNS_META: { key: keyof SnsLinks; label: string; icon: string; color: string }[] = [
-  { key: "website",   label: "公式サイト", icon: "🌐", color: "text-gray-700" },
-  { key: "instagram", label: "Instagram",  icon: "📸", color: "text-pink-500" },
-  { key: "twitter",   label: "X (Twitter)", icon: "🐦", color: "text-sky-500" },
-  { key: "tiktok",    label: "TikTok",     icon: "🎵", color: "text-gray-900" },
-  { key: "line",      label: "LINE",       icon: "💬", color: "text-green-500" },
+const SNS_META: { key: keyof SnsLinks; label: string; color: string }[] = [
+  { key: "website",   label: "公式サイト", color: "text-gray-700" },
+  { key: "instagram", label: "Instagram",  color: "text-pink-500" },
+  { key: "twitter",   label: "X (Twitter)", color: "text-sky-500" },
+  { key: "tiktok",    label: "TikTok",     color: "text-gray-900" },
+  { key: "line",      label: "LINE",       color: "text-green-500" },
 ];
 
 export default async function StoreDetailPage({ params }: Props) {
@@ -83,12 +90,12 @@ export default async function StoreDetailPage({ params }: Props) {
 
         {store.status === "closed" && (
           <div className="mb-4 bg-gray-800 text-white text-sm font-bold px-4 py-3 rounded-xl flex items-center gap-2">
-            🚫 この店舗は閉店しています
+            <NoSymbolIcon className="w-4 h-4 shrink-0" /> この店舗は閉店しています
           </div>
         )}
         {store.status === "temporarily_closed" && (
           <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm font-bold px-4 py-3 rounded-xl flex items-center gap-2">
-            ⚠️ 現在休業中です
+            <ExclamationTriangleIcon className="w-4 h-4 shrink-0" /> 現在休業中です
           </div>
         )}
 
@@ -130,7 +137,7 @@ export default async function StoreDetailPage({ params }: Props) {
         {/* 営業時間 */}
         {store.hoursText && (
           <div className="mt-4 flex items-center gap-2 text-sm text-gray-700">
-            <span>🕐</span>
+            <ClockIcon className="w-4 h-4 text-gray-400 shrink-0" />
             <span>{store.hoursText}</span>
           </div>
         )}
@@ -153,7 +160,7 @@ export default async function StoreDetailPage({ params }: Props) {
           <div className="mt-6">
             <h2 className="text-sm font-semibold text-gray-700 mb-2">SNS・公式サイト</h2>
             <div className="flex flex-wrap gap-3">
-              {snsEntries.map(({ key, label, icon, color }) => (
+              {snsEntries.map(({ key, label, color }) => (
                 <a
                   key={key}
                   href={store.snsLinks![key]!}
@@ -161,7 +168,7 @@ export default async function StoreDetailPage({ params }: Props) {
                   rel="noopener noreferrer"
                   className={`flex items-center gap-1.5 text-sm font-medium ${color} bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:shadow-sm transition-shadow`}
                 >
-                  <span>{icon}</span>
+                  <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
                   <span>{label}</span>
                 </a>
               ))}
@@ -182,7 +189,9 @@ export default async function StoreDetailPage({ params }: Props) {
         {/* クーポン */}
         {coupons.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-base font-semibold text-gray-800 mb-3">🎟️ クーポン</h2>
+            <h2 className="text-base font-semibold text-gray-800 mb-3 flex items-center gap-1.5">
+              <TicketIcon className="w-4 h-4 text-orange-500" /> クーポン
+            </h2>
             <div className="space-y-3">
               {coupons.map((coupon) => (
                 <CouponCard
