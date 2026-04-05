@@ -17,7 +17,11 @@ export default async function OwnerMypagePage() {
   const role = (user.user_metadata?.role as string) ?? "user";
   if (role !== "owner") redirect("/mypage");
 
-  const stores = await getOwnerStores(user.id);
+  const rawStores = await getOwnerStores(user.id);
+  const stores = [
+    ...rawStores.filter((s) => !isOver3Years(s.openDate)),
+    ...rawStores.filter((s) => isOver3Years(s.openDate)),
+  ];
 
   return (
     <div className="bg-gray-50 min-h-screen">
