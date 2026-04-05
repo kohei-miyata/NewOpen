@@ -14,14 +14,16 @@ export default function Footer() {
             <p className="text-sm font-semibold text-gray-800">お店のオーナー様へ</p>
             <p className="text-xs text-gray-500 mt-1">新規オープンの情報を無料で掲載できます。ぜひご登録ください。</p>
             <Link
-              href="/stores/new"
+              href="/for-owners"
               className="inline-block mt-3 bg-orange-500 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
             >
-              お店を登録する →
+              詳しく見る →
             </Link>
           </div>
         </div>
         <div className="mt-8 flex justify-center gap-6 text-xs text-gray-400 flex-wrap">
+          <Link href="/about" className="hover:text-orange-500 transition-colors">NewOpenについて</Link>
+          <Link href="/for-owners" className="hover:text-orange-500 transition-colors">オーナーの方へ</Link>
           <Link href="/contact" className="hover:text-orange-500 transition-colors">お問い合わせ</Link>
           <Link href="/terms" className="hover:text-orange-500 transition-colors">利用規約</Link>
           <Link href="/privacy" className="hover:text-orange-500 transition-colors">プライバシーポリシー</Link>

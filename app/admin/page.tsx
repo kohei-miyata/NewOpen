@@ -20,21 +20,7 @@ export default async function AdminPage() {
   // ユーザー一覧
   const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 });
 
-  // アクセスログ（直近30日）
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const { data: accessLogs } = await admin
-    .from("access_logs")
-    .select("prefecture, country, created_at")
-    .gte("created_at", since);
-  const logList = accessLogs ?? [];
-  const accessByPref = logList.reduce<Record<string, number>>((acc, r) => {
-    const key = r.prefecture ?? r.country ?? "不明";
-    acc[key] = (acc[key] ?? 0) + 1;
-    return acc;
-  }, {});
-  const topAccessAreas = Object.entries(accessByPref).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  const totalAccess = logList.length;
-  const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.user_metadata?.role !== "admin");
+const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.user_metadata?.role !== "admin");
   const ownerUsers   = users.filter((u) => u.user_metadata?.role === "owner");
 
   // 店舗一覧（全件）
@@ -242,34 +228,7 @@ export default async function AdminPage() {
         </section>
       </div>
 
-      {/* アクセス元エリア */}
-      <section>
-        <h2 className="text-lg font-bold text-gray-900 mb-1">📍 アクセス元エリア（直近30日）</h2>
-        <p className="text-xs text-gray-400 mb-3">IPジオロケーションによる推定 · 合計 {totalAccess.toLocaleString()} アクセス</p>
-        {topAccessAreas.length === 0 ? (
-          <p className="text-sm text-gray-400">まだデータがありません</p>
-        ) : (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-            {topAccessAreas.map(([area, count]) => (
-              <div key={area} className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
-                <span className="flex-1 text-sm text-gray-800">{area}</span>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="h-2 rounded-full bg-emerald-400"
-                    style={{ width: `${Math.round((count / (topAccessAreas[0]?.[1] ?? 1)) * 160)}px` }}
-                  />
-                  <span className="text-xs text-gray-400 w-10 text-right">
-                    {totalAccess > 0 ? Math.round(count / totalAccess * 100) : 0}%
-                  </span>
-                  <span className="text-sm font-bold text-gray-700 w-8 text-right">{count.toLocaleString()}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* エリア別閲覧数 + ユーザー属性 */}
+{/* エリア別閲覧数 + ユーザー属性 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <section>
           <h2 className="text-lg font-bold text-gray-900 mb-3">👁️ エリア別閲覧数（上位10）</h2>

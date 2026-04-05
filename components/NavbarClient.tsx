@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/stores", label: "新規オープン" },
   { href: "/ranking", label: "ランキング" },
   { href: "/coupons", label: "クーポン" },
+  { href: "/for-owners", label: "掲載する" },
 ];
 
 interface Props {
