@@ -6,6 +6,7 @@ import StoreCard from "@/components/StoreCard";
 import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import TopStoresSections from "@/components/TopStoresSections";
+import StoreCalendar from "@/components/StoreCalendar";
 
 export const metadata: Metadata = {
   title: "NewOpen | あなたの街の新規オープン情報",
@@ -114,6 +115,15 @@ export default async function Home() {
       </section>
 
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-14">
+
+        {/* ── オープンカレンダー ── */}
+        <section>
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-gray-900">📅 オープンカレンダー</h2>
+            <p className="text-xs text-gray-500 mt-0.5">日付をタップしてオープン店舗を確認</p>
+          </div>
+          <StoreCalendar stores={allStores} comingSoon={comingSoon} />
+        </section>
 
         {/* ── 本日オープン ── */}
         {todayStores.length > 0 && (
