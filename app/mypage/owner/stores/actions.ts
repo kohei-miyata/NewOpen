@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { updateStore, createStore, getStoreOwnerId } from "@/lib/db";
+import { updateStore, createStore, getStoreOwnerId, getStoreById } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { Category, SnsLinks } from "@/types";
 
@@ -67,10 +67,16 @@ export async function editStore(storeId: string, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
-  const ownerId = await getStoreOwnerId(storeId);
+  const [ownerId, existingStore] = await Promise.all([
+    getStoreOwnerId(storeId),
+    getStoreById(storeId),
+  ]);
   if (ownerId !== user.id) redirect("/mypage/owner");
+  if (!existingStore) redirect("/mypage/owner");
 
   const payload = parseStoreFormData(formData);
+  // オープン日は登録後に変更不可 — フォームの値を無視して既存値を使う
+  payload.openDate = existingStore.openDate;
   const addrErr = validateAddress(payload.address);
   if (addrErr) redirect(`/mypage/owner/stores/${storeId}/edit?error=${encodeURIComponent(addrErr)}`);
 

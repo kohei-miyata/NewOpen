@@ -27,9 +27,10 @@ interface Props {
   defaultValues?: Partial<Store>;
   submitLabel?: string;
   serverError?: string;
+  isEdit?: boolean;
 }
 
-export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する", serverError }: Props) {
+export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する", serverError, isEdit = false }: Props) {
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -127,12 +128,26 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
         <label className="block text-sm font-medium text-gray-700 mb-1">
           オープン日 <span className="text-red-500">*</span>
         </label>
-        <input
-          name="openDate" type="date" defaultValue={defaultValues?.openDate}
-          className={field("openDate")}
-          onChange={() => setErrors((p) => ({ ...p, openDate: undefined }))}
-        />
-        {errors.openDate && <p className="text-xs text-red-500 mt-1">{errors.openDate}</p>}
+        {isEdit ? (
+          <>
+            <input
+              type="date" value={defaultValues?.openDate ?? ""}
+              readOnly disabled
+              className={`${INPUT} border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed`}
+            />
+            <p className="text-xs text-gray-400 mt-1">一度登録したオープン日は変更できません</p>
+          </>
+        ) : (
+          <>
+            <input
+              name="openDate" type="date" defaultValue={defaultValues?.openDate}
+              className={field("openDate")}
+              onChange={() => setErrors((p) => ({ ...p, openDate: undefined }))}
+            />
+            <p className="text-xs text-gray-400 mt-1">一度登録すると変更できません。正確に入力してください。</p>
+            {errors.openDate && <p className="text-xs text-red-500 mt-1">{errors.openDate}</p>}
+          </>
+        )}
       </div>
 
       {/* 営業時間 */}
