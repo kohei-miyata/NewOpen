@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 function toJapaneseAuthError(message: string): string {
   if (/invalid login credentials/i.test(message))
@@ -47,7 +49,7 @@ export async function signup(formData: FormData) {
   if (gender) metadata.gender = gender;
   if (birthdate) metadata.birthdate = birthdate;
 
-  const { error } = await supabase.auth.signUp({
+  const { data: signUpData, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -56,6 +58,21 @@ export async function signup(formData: FormData) {
     },
   });
   if (error) redirect(`/auth/signup?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);
+
+  // 利用規約同意エビデンスをDBに保存
+  if (signUpData.user) {
+    const hdrs = await headers();
+    const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? null;
+    const ua = hdrs.get("user-agent") ?? null;
+    const admin = createSupabaseAdminClient();
+    await admin.from("terms_agreements").insert({
+      user_id: signUpData.user.id,
+      version: "1.0",
+      ip_address: ip,
+      user_agent: ua,
+    });
+  }
+
   redirect("/auth/signup?success=1");
 }
 
@@ -63,4 +80,16 @@ export async function logout() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+export async function deleteAccount(): Promise<{ error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth/login");
+
+  await supabase.auth.signOut();
+  const admin = createSupabaseAdminClient();
+  const { error } = await admin.auth.admin.deleteUser(user.id);
+  if (error) return { error: "退会処理に失敗しました。しばらく時間をおいてから再試行してください。" };
+  redirect("/withdraw/complete");
 }

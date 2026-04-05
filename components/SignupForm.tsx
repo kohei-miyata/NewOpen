@@ -3,6 +3,29 @@
 import { useState, useEffect, useRef } from "react";
 import { signup } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import TermsContent from "@/components/TermsContent";
+
+function TermsScrollBox({ onScrolled }: { onScrolled: () => void }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  function handleScroll() {
+    const el = boxRef.current;
+    if (!el) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 4) {
+      onScrolled();
+    }
+  }
+
+  return (
+    <div
+      ref={boxRef}
+      onScroll={handleScroll}
+      className="h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50 [&_h2]:text-xs [&_h2]:font-semibold [&_p]:text-xs [&_li]:text-xs [&_.space-y-6]:space-y-3"
+    >
+      <TermsContent />
+    </div>
+  );
+}
 
 const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors";
 const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
@@ -12,6 +35,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
   const [role, setRole] = useState<"user" | "owner">(defaultRole);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [termsScrolled, setTermsScrolled] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -194,12 +218,18 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
       </div>
 
       {/* 利用規約同意 */}
-      <div>
-        <label className="flex items-start gap-2 cursor-pointer">
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-gray-700">利用規約・プライバシーポリシー</p>
+        <TermsScrollBox onScrolled={() => setTermsScrolled(true)} />
+        {!termsScrolled && (
+          <p className="text-xs text-gray-400 text-center">↓ 最後までスクロールすると同意できます</p>
+        )}
+        <label className={`flex items-start gap-2 ${termsScrolled ? "cursor-pointer" : "cursor-not-allowed opacity-40"}`}>
           <input
             type="checkbox"
             name="terms"
             value="1"
+            disabled={!termsScrolled}
             className="mt-0.5 accent-orange-500"
             onChange={() => setErrors((p) => ({ ...p, terms: undefined }))}
           />
