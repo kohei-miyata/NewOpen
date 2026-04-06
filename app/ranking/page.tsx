@@ -22,9 +22,9 @@ export default async function RankingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           {ranked.slice(0, 3).map((store, i) => (
             <div key={store.id} className="relative">
-              <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold z-10 shadow ${MEDAL_COLORS[i]}`}>
+              {/* <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold z-10 shadow ${MEDAL_COLORS[i]}`}>
                 {i + 1}
-              </div>
+              </div> */}
               <StoreCard store={store} rank={i + 1} />
             </div>
           ))}
