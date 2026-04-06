@@ -5,6 +5,8 @@ import { signup } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import TermsContent from "@/components/TermsContent";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+
 function TermsScrollBox({ onScrolled }: { onScrolled: () => void }) {
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +37,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
   const [role, setRole] = useState<"user" | "owner">(defaultRole);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const [termsScrolled, setTermsScrolled] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
@@ -98,7 +101,8 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
       action={signup}
       onSubmit={(e) => {
         const fd = new FormData(e.currentTarget);
-        if (isSuspiciousBot(fd) || !validate(fd)) e.preventDefault();
+        if (isSuspiciousBot(fd) || !validate(fd)) { e.preventDefault(); return; }
+        setIsPending(true);
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4"
     >
@@ -234,9 +238,9 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
             onChange={() => setErrors((p) => ({ ...p, terms: undefined }))}
           />
           <span className="text-sm text-gray-600">
-            <a href="/terms" target="_blank" className="text-orange-500 hover:underline font-medium">利用規約</a>
+            <a href={`${SITE_URL}/terms`} target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline font-medium">利用規約</a>
             {" "}および{" "}
-            <a href="/privacy" target="_blank" className="text-orange-500 hover:underline font-medium">プライバシーポリシー</a>
+            <a href={`${SITE_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline font-medium">プライバシーポリシー</a>
             に同意する
           </span>
         </label>
@@ -245,9 +249,15 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
 
       <button
         type="submit"
-        className="w-full bg-orange-500 text-white font-bold py-2.5 rounded-lg hover:bg-orange-600 transition-colors"
+        disabled={isPending}
+        className="w-full bg-orange-500 text-white font-bold py-2.5 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        登録する
+        {isPending ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            送信中...
+          </span>
+        ) : "登録する"}
       </button>
     </form>
   );
