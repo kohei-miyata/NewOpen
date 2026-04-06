@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getStoreById, getCouponsByStoreId } from "@/lib/db";
 import { addCoupon, removeCoupon } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
+import { TicketIcon } from "@heroicons/react/24/outline";
 
 const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
 
@@ -26,6 +28,21 @@ export default async function OwnerCouponsPage({ params }: Props) {
   ]);
   if (!store) redirect("/mypage/owner");
 
+  // クーポン使用件数をadminクライアントで取得（RLS回避）
+  const adminClient = createSupabaseAdminClient();
+  const couponIds = coupons.map((c) => c.id);
+  const usageMap: Record<string, number> = {};
+  if (couponIds.length > 0) {
+    const { data: usageRows } = await adminClient
+      .from("coupon_uses")
+      .select("coupon_id")
+      .in("coupon_id", couponIds);
+    (usageRows ?? []).forEach((row) => {
+      usageMap[row.coupon_id] = (usageMap[row.coupon_id] ?? 0) + 1;
+    });
+  }
+  const totalUses = Object.values(usageMap).reduce((s, n) => s + n, 0);
+
   const addCouponBound = addCoupon.bind(null, storeId);
 
   return (
@@ -44,6 +61,22 @@ export default async function OwnerCouponsPage({ params }: Props) {
           </Link>
         </div>
 
+        {/* 使用状況サマリー */}
+        {coupons.length > 0 && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+              <p className="text-xs text-gray-500 mb-1">クーポン総使用数</p>
+              <p className="text-3xl font-extrabold text-orange-500">{totalUses}</p>
+              <p className="text-xs text-gray-400 mt-0.5">件</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+              <p className="text-xs text-gray-500 mb-1">登録クーポン数</p>
+              <p className="text-3xl font-extrabold text-gray-800">{coupons.length}</p>
+              <p className="text-xs text-gray-400 mt-0.5">件</p>
+            </div>
+          </div>
+        )}
+
         {/* 登録済みクーポン */}
         <section>
           <h2 className="text-base font-semibold text-gray-800 mb-3">登録済みクーポン（{coupons.length}件）</h2>
@@ -61,6 +94,10 @@ export default async function OwnerCouponsPage({ params }: Props) {
                         <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">{coupon.discount}</span>
                         <span>コード: <span className="font-mono">{coupon.code}</span></span>
                         <span>期限: {coupon.expiryDate}</span>
+                        <span className="flex items-center gap-0.5 bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">
+                          <TicketIcon className="w-3 h-3" />
+                          使用: {usageMap[coupon.id] ?? 0}件
+                        </span>
                       </div>
                     </div>
                     <div className="flex gap-2 shrink-0">

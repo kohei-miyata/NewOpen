@@ -14,17 +14,21 @@ export default function ChangePasswordPage() {
   const params = useSearchParams();
   const success = params.get("success") === "1";
 
-  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
+  const [errors, setErrors] = useState<{ currentPassword?: string; password?: string; confirm?: string }>({});
   const [serverError, setServerError] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   function validate(fd: FormData): boolean {
     const e: typeof errors = {};
+    const currentPassword = fd.get("currentPassword") as string;
     const password = fd.get("password") as string;
     const confirm = fd.get("confirm") as string;
-    if (!password || password.length < 6) e.password = "パスワードは6文字以上で入力してください";
+    if (!currentPassword) e.currentPassword = "現在のパスワードを入力してください";
+    if (!password || password.length < 6) e.password = "新しいパスワードは6文字以上で入力してください";
+    else if (currentPassword && currentPassword === password) e.password = "現在のパスワードと同じパスワードは使用できません";
     if (!confirm) e.confirm = "確認用パスワードを入力してください";
     else if (password !== confirm) e.confirm = "パスワードが一致しません";
     setErrors(e);
@@ -71,6 +75,22 @@ export default function ChangePasswordPage() {
           {serverError && (
             <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
           )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">現在のパスワード</label>
+            <div className="relative">
+              <input
+                name="currentPassword" type={showCurrent ? "text" : "password"} autoComplete="current-password"
+                className={errors.currentPassword ? INPUT_ERROR : INPUT_NORMAL}
+                onChange={() => setErrors((p) => ({ ...p, currentPassword: undefined }))}
+              />
+              <button type="button" onClick={() => setShowCurrent((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" tabIndex={-1}>
+                {showCurrent ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+              </button>
+            </div>
+            {errors.currentPassword && <p className="text-xs text-red-500 mt-1">{errors.currentPassword}</p>}
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">新しいパスワード</label>

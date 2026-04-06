@@ -12,6 +12,7 @@ import {
   TagIcon,
   MapIcon,
   UserIcon,
+  TicketIcon,
 } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
@@ -67,6 +68,24 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
   // いいね総数
   const { count: totalLikes } = await db.from("store_likes").select("*", { count: "exact", head: true });
 
+  // クーポン使用状況（adminクライアントでRLS回避）
+  const { data: allCoupons } = await db
+    .from("coupons")
+    .select("id, title, code, discount, store_id");
+  const { data: allUses } = await admin
+    .from("coupon_uses")
+    .select("coupon_id, used_at");
+
+  const couponUsageMap: Record<string, number> = {};
+  (allUses ?? []).forEach((u) => {
+    couponUsageMap[u.coupon_id] = (couponUsageMap[u.coupon_id] ?? 0) + 1;
+  });
+  const topCoupons = [...(allCoupons ?? [])]
+    .map((c) => ({ ...c, uses: couponUsageMap[c.id] ?? 0 }))
+    .sort((a, b) => b.uses - a.uses)
+    .slice(0, 10);
+  const totalCouponUses = Object.values(couponUsageMap).reduce((s, n) => s + n, 0);
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
 
@@ -79,6 +98,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
           { label: "掲載店舗数",   value: storeList.length,    sub: "stores" },
           { label: "いいね総数",   value: totalLikes ?? 0,     sub: "likes" },
           { label: "総閲覧数",     value: storeList.reduce((s, r) => s + (r.views ?? 0), 0), sub: "views" },
+          { label: "クーポン使用数", value: totalCouponUses,    sub: "uses" },
         ].map((c) => (
           <div key={c.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
             <p className="text-xs text-gray-500">{c.label}</p>
@@ -321,6 +341,53 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
           </div>
         </section>
       </div>
+
+      {/* クーポン使用ランキング */}
+      <section>
+        <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+          <TicketIcon className="w-5 h-5 text-orange-500" /> クーポン使用数ランキング（上位10）
+        </h2>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-100">
+              <tr>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">順位</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">クーポン名</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">コード</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">割引内容</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">店舗</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500">使用数</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {topCoupons.map((c, i) => {
+                const store = storeList.find((s) => s.id === c.store_id);
+                return (
+                  <tr key={c.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm font-bold text-gray-300">{i + 1}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{c.title}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-gray-600">{c.code}</td>
+                    <td className="px-4 py-3">
+                      <span className="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">{c.discount}</span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
+                      {store ? (
+                        <a href={`/stores/${store.id}`} className="hover:text-orange-500 transition-colors">{store.name}</a>
+                      ) : "-"}
+                    </td>
+                    <td className="px-4 py-3 text-right font-extrabold text-orange-500">{c.uses}</td>
+                  </tr>
+                );
+              })}
+              {topCoupons.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">まだクーポンの使用履歴がありません</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {/* 全店舗一覧 */}
       <section>

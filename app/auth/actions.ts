@@ -83,13 +83,26 @@ export async function logout() {
 }
 
 export async function changePassword(formData: FormData): Promise<{ error?: string }> {
+  const currentPassword = formData.get("currentPassword") as string;
   const password = formData.get("password") as string;
   const confirm = formData.get("confirm") as string;
 
-  if (!password || password.length < 6) return { error: "パスワードは6文字以上で入力してください" };
+  if (!currentPassword) return { error: "現在のパスワードを入力してください" };
+  if (!password || password.length < 6) return { error: "新しいパスワードは6文字以上で入力してください" };
   if (password !== confirm) return { error: "パスワードが一致しません" };
+  if (currentPassword === password) return { error: "現在のパスワードと同じパスワードは使用できません" };
 
   const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) redirect("/auth/login");
+
+  // 現在のパスワードを検証
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  });
+  if (signInError) return { error: "現在のパスワードが正しくありません" };
+
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: toJapaneseAuthError(error.message) };
   redirect("/mypage/change-password?success=1");
