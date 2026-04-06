@@ -123,6 +123,7 @@ export const getCoupons = unstable_cache(
     const { data, error } = await getSupabaseClient()
       .from("coupons")
       .select("*")
+      .eq("is_active", true)
       .order("expiry_date", { ascending: true });
 
     if (error) throw new Error(error.message);
