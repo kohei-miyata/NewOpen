@@ -253,6 +253,15 @@ export async function updateStore(
   return toStore(data);
 }
 
+export async function deleteStore(
+  storeId: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client: any
+): Promise<void> {
+  const { error } = await client.from("stores").delete().eq("id", storeId);
+  if (error) throw new Error(error.message);
+}
+
 /** 公開用：有効クーポンのみ */
 export async function getCouponsByStoreId(storeId: string): Promise<Coupon[]> {
   const { data, error } = await getSupabaseClient()

@@ -1,7 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { updateStore, createStore, getStoreOwnerId, getStoreById } from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { updateStore, createStore, deleteStore, getStoreOwnerId, getStoreById } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import type { Category, SnsLinks } from "@/types";
@@ -121,4 +122,23 @@ export async function newOwnerStore(
   }
 
   redirect(`/stores/${storeId}`);
+}
+
+export async function removeStore(storeId: string): Promise<{ error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth/login");
+
+  const ownerId = await getStoreOwnerId(storeId);
+  if (ownerId !== user.id) return { error: "権限がありません" };
+
+  try {
+    await deleteStore(storeId, createSupabaseAdminClient());
+  } catch (e) {
+    console.error("[removeStore]", e);
+    return { error: e instanceof Error ? e.message : "削除に失敗しました" };
+  }
+
+  revalidatePath("/mypage/owner");
+  return {};
 }

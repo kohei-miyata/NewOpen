@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getOwnerStores } from "@/lib/db";
 import { TicketIcon } from "@heroicons/react/24/outline";
+import DeleteStoreButton from "@/components/DeleteStoreButton";
 
 const THREE_YEARS_MS = 3 * 365.25 * 24 * 60 * 60 * 1000;
 function isOver3Years(openDate: string): boolean {
@@ -108,6 +109,7 @@ export default async function OwnerMypagePage() {
                         >
                           編集
                         </Link>
+                        <DeleteStoreButton storeId={store.id} storeName={store.name} />
                       </>
                     )}
                   </div>
