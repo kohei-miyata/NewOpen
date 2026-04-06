@@ -24,6 +24,7 @@ export async function addCoupon(storeId: string, formData: FormData) {
     expiryDate: formData.get("expiryDate") as string,
     code: (formData.get("code") as string).trim(),
     imageUrl: (formData.get("imageUrl") as string)?.trim() ?? "",
+    isActive: true,
   }, supabase);
 
   redirect(`/mypage/owner/stores/${storeId}/coupons`);
