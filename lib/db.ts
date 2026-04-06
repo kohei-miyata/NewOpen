@@ -134,14 +134,17 @@ export const getCoupons = unstable_cache(
 );
 
 export async function createStore(
-  payload: Omit<Store, "id" | "views" | "likes"> & { ownerId?: string }
+  payload: Omit<Store, "id" | "views" | "likes"> & { ownerId?: string },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client?: any
 ): Promise<Store> {
   const coords = await geocodeAddress(payload.address);
   if (!coords) throw new Error(`住所から座標を取得できませんでした。住所をご確認ください。`);
   const lat = coords.lat;
   const lng = coords.lng;
 
-  const { data, error } = await getSupabaseClient()
+  const db = client ?? getSupabaseClient();
+  const { data, error } = await db
     .from("stores")
     .insert({
       name: payload.name,

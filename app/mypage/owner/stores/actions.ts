@@ -102,7 +102,7 @@ export async function newOwnerStore(formData: FormData) {
 
   let store;
   try {
-    store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id });
+    store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id }, supabase);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "登録に失敗しました";
     redirect(`/mypage/owner/stores/new?error=${encodeURIComponent(msg)}`);
