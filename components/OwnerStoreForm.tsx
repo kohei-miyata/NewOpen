@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useActionState } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import type { Store } from "@/types";
 
@@ -22,9 +22,11 @@ const SNS_FIELDS = [
 ];
 
 type Errors = Partial<Record<"name" | "address" | "openDate" | "description", string>>;
+type ActionState = { error?: string } | null;
+type StoreAction = (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 
 interface Props {
-  action: (formData: FormData) => Promise<void>;
+  action: StoreAction;
   defaultValues?: Partial<Store>;
   submitLabel?: string;
   serverError?: string;
@@ -32,6 +34,7 @@ interface Props {
 }
 
 export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する", serverError, isEdit = false }: Props) {
+  const [state, formAction] = useActionState(action, null);
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<(string | undefined)[]>(
@@ -72,7 +75,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
     } else if (!/[市区町村郡]/.test(address)) {
       e.address = "市区町村まで入力してください（例: 東京都渋谷区〇〇1-2-3）";
     }
-    if (!openDate)                     e.openDate    = "オープン日を選択してください";
+    if (!isEdit && !openDate)                     e.openDate    = "オープン日を選択してください";
     if (!description || description.length < 10) e.description = "説明は10文字以上で入力してください";
     if (description.length > 500)     e.description = "説明は500文字以内で入力してください";
 
@@ -84,11 +87,17 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
     return errors[key] ? INPUT_ERROR : INPUT_NORMAL;
   }
 
+  const actionError = state?.error ?? serverError;
+
+  useEffect(() => {
+    if (state?.error) setSubmitting(false);
+  }, [state]);
+
   const sns = defaultValues?.snsLinks ?? {};
 
   return (
     <form
-      action={action}
+      action={formAction}
       onSubmit={(e) => {
         const fd = new FormData(e.currentTarget);
         if (!validate(fd)) { e.preventDefault(); return; }
@@ -96,8 +105,8 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5"
     >
-      {serverError && (
-        <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
+      {actionError && (
+        <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{actionError}</p>
       )}
       {!isEdit && (
         <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 text-xs text-orange-800 leading-relaxed">

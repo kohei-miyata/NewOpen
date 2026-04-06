@@ -6,6 +6,8 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import type { Category, SnsLinks } from "@/types";
 
+export type StoreFormState = { error?: string } | null;
+
 function validateAddress(address: string): string | null {
   if (!address?.trim()) return "住所を入力してください";
   if (!/[都道府県]/.test(address)) return "都道府県から入力してください";
@@ -32,22 +34,22 @@ function parseStoreFormData(formData: FormData) {
   const tags = tagsRaw.split(/[,、]/).map((t) => t.trim()).filter(Boolean);
 
   const snsLinks: SnsLinks = {};
-  const website   = (formData.get("sns_website")   as string)?.trim();
-  const instagram = (formData.get("sns_instagram")  as string)?.trim();
-  const twitter   = (formData.get("sns_twitter")    as string)?.trim();
-  const tiktok    = (formData.get("sns_tiktok")     as string)?.trim();
+  const website    = (formData.get("sns_website")    as string)?.trim();
+  const instagram  = (formData.get("sns_instagram")  as string)?.trim();
+  const twitter    = (formData.get("sns_twitter")    as string)?.trim();
+  const tiktok     = (formData.get("sns_tiktok")     as string)?.trim();
   const line       = (formData.get("sns_line")        as string)?.trim();
   const googleMaps = (formData.get("sns_google_maps") as string)?.trim();
-  if (website)    snsLinks.website    = website;
-  if (instagram)  snsLinks.instagram  = instagram;
-  if (twitter)    snsLinks.twitter    = twitter;
-  if (tiktok)     snsLinks.tiktok     = tiktok;
-  if (line)       snsLinks.line       = line;
+  if (website)    snsLinks.website     = website;
+  if (instagram)  snsLinks.instagram   = instagram;
+  if (twitter)    snsLinks.twitter     = twitter;
+  if (tiktok)     snsLinks.tiktok      = tiktok;
+  if (line)       snsLinks.line        = line;
   if (googleMaps) snsLinks.google_maps = googleMaps;
 
-  const twitterPostUrl  = (formData.get("post_twitter_url")   as string)?.trim() || null;
+  const twitterPostUrl   = (formData.get("post_twitter_url")   as string)?.trim() || null;
   const instagramPostUrl = (formData.get("post_instagram_url") as string)?.trim() || null;
-  const tiktokPostUrl   = (formData.get("post_tiktok_url")    as string)?.trim() || null;
+  const tiktokPostUrl    = (formData.get("post_tiktok_url")    as string)?.trim() || null;
 
   const statusRaw = (formData.get("status") as string) || "active";
   const status = ["active", "temporarily_closed", "closed"].includes(statusRaw)
@@ -58,14 +60,15 @@ function parseStoreFormData(formData: FormData) {
     name, category, address, openDate, description, hoursText, imageUrl,
     photos, tags,
     snsLinks: Object.keys(snsLinks).length > 0 ? snsLinks : null,
-    twitterPostUrl,
-    instagramPostUrl,
-    tiktokPostUrl,
-    status,
+    twitterPostUrl, instagramPostUrl, tiktokPostUrl, status,
   };
 }
 
-export async function editStore(storeId: string, formData: FormData) {
+export async function editStore(
+  storeId: string,
+  _prevState: StoreFormState,
+  formData: FormData
+): Promise<StoreFormState> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
@@ -78,37 +81,44 @@ export async function editStore(storeId: string, formData: FormData) {
   if (!existingStore) redirect("/mypage/owner");
 
   const payload = parseStoreFormData(formData);
-  // オープン日は登録後に変更不可 — フォームの値を無視して既存値を使う
   payload.openDate = existingStore.openDate;
-  const addrErr = validateAddress(payload.address);
-  if (addrErr) redirect(`/mypage/owner/stores/${storeId}/edit?error=${encodeURIComponent(addrErr)}`);
 
-  const admin = createSupabaseAdminClient();
+  const addrErr = validateAddress(payload.address);
+  if (addrErr) return { error: addrErr };
+
+  let errorMsg: string | null = null;
   try {
-    await updateStore(storeId, payload, admin);
+    await updateStore(storeId, payload, createSupabaseAdminClient());
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "保存に失敗しました";
-    redirect(`/mypage/owner/stores/${storeId}/edit?error=${encodeURIComponent(msg)}`);
+    console.error("[editStore]", e);
+    errorMsg = e instanceof Error ? e.message : "保存に失敗しました";
   }
-  redirect(`/mypage/owner`);
+
+  if (errorMsg) return { error: errorMsg };
+  redirect("/mypage/owner");
 }
 
-export async function newOwnerStore(formData: FormData) {
+export async function newOwnerStore(
+  _prevState: StoreFormState,
+  formData: FormData
+): Promise<StoreFormState> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
   const payload = parseStoreFormData(formData);
-  const addrErr = validateAddress(payload.address);
-  if (addrErr) redirect(`/mypage/owner/stores/new?error=${encodeURIComponent(addrErr)}`);
 
-  let store;
+  const addrErr = validateAddress(payload.address);
+  if (addrErr) return { error: addrErr };
+
+  let storeId: string;
   try {
-    const admin = createSupabaseAdminClient();
-    store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id }, admin);
+    const store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id }, createSupabaseAdminClient());
+    storeId = store.id;
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "登録に失敗しました";
-    redirect(`/mypage/owner/stores/new?error=${encodeURIComponent(msg)}`);
+    console.error("[newOwnerStore]", e);
+    return { error: e instanceof Error ? e.message : "登録に失敗しました" };
   }
-  redirect(`/stores/${store.id}`);
+
+  redirect(`/stores/${storeId}`);
 }
