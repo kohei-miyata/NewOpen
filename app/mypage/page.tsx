@@ -13,6 +13,7 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
+
 export default async function MypagePage() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -107,21 +108,13 @@ export default async function MypagePage() {
             </h2>
           </div>
           <Link
-            href="/mypage/change-password"
-            className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50"
+            href="/mypage/settings"
+            className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors"
           >
             <KeyIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <span className="flex-1 text-sm font-medium text-gray-800">パスワードを変更する</span>
+            <span className="flex-1 text-sm font-medium text-gray-800">アカウント設定</span>
             <ChevronRightIcon className="w-4 h-4 text-gray-300" />
           </Link>
-          <div className="px-5 py-4">
-            <Link
-              href="/mypage/withdraw"
-              className="text-sm text-gray-400 hover:text-red-500 transition-colors"
-            >
-              退会する
-            </Link>
-          </div>
         </section>
 
       </div>

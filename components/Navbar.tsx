@@ -7,12 +7,14 @@ export default async function Navbar() {
   const role = user?.user_metadata?.role as string | undefined;
   const isOwner = role === "owner";
   const isAdmin = role === "admin";
+  const isGeneral = !!user && !isOwner && !isAdmin;
 
   return (
     <NavbarClient
       user={user ? { email: user.email } : null}
       isOwner={isOwner}
       isAdmin={isAdmin}
+      isGeneral={isGeneral}
     />
   );
 }

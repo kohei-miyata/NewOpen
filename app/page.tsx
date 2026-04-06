@@ -28,6 +28,9 @@ export const metadata: Metadata = {
 export default async function Home() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const role = (user?.user_metadata?.role as string) ?? null;
+  const isOwner = role === "owner";
+  const isGeneral = user && role !== "owner" && role !== "admin";
 
   const [allStores, ranked, coupons, comingSoon, todayStores, usedCouponIds] = await Promise.all([
     getStores(),
@@ -181,8 +184,8 @@ export default async function Home() {
         {/* ── 最近見たお店 ── */}
         <RecentlyViewedSection />
 
-        {/* ── オーナー向け誘導バナー ── */}
-        <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-8 text-center">
+        {/* ── オーナー向け誘導バナー（一般ユーザーには非表示） ── */}
+        {!isGeneral && <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-8 text-center">
           <div className="flex justify-center mb-3">
             <BuildingStorefrontIcon className="w-8 h-8 text-orange-400" />
           </div>
@@ -203,7 +206,7 @@ export default async function Home() {
               無料登録する
             </Link>
           </div>
-        </section>
+        </section>}
 
       </div>
     </div>

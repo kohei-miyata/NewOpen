@@ -17,9 +17,10 @@ interface Props {
   user: { email?: string } | null;
   isOwner: boolean;
   isAdmin: boolean;
+  isGeneral: boolean;
 }
 
-export default function NavbarClient({ user, isOwner, isAdmin }: Props) {
+export default function NavbarClient({ user, isOwner, isAdmin, isGeneral }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -33,7 +34,7 @@ export default function NavbarClient({ user, isOwner, isAdmin }: Props) {
         {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-4">
           <ul className="flex gap-6 text-sm font-medium text-gray-600">
-            {NAV_LINKS.map((l) => (
+            {NAV_LINKS.filter((l) => !(isGeneral && l.href === "/for-owners")).map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="hover:text-orange-500 transition-colors">
                   {l.label}
@@ -109,7 +110,7 @@ export default function NavbarClient({ user, isOwner, isAdmin }: Props) {
       {/* Mobile menu */}
       {open && (
         <div className="sm:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-1">
-          {NAV_LINKS.map((l) => (
+          {NAV_LINKS.filter((l) => !(isGeneral && l.href === "/for-owners")).map((l) => (
             <Link
               key={l.href}
               href={l.href}
