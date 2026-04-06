@@ -2,10 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
-import { getStoreById, getCouponsByStoreId } from "@/lib/db";
-import { addCoupon, removeCoupon } from "./actions";
+import { getStoreById, getAllCouponsByStoreId } from "@/lib/db";
+import { addCoupon, removeCoupon, toggleCoupon } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
-import { TicketIcon } from "@heroicons/react/24/outline";
+import { TicketIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
 
@@ -24,7 +24,7 @@ export default async function OwnerCouponsPage({ params }: Props) {
 
   const [store, coupons] = await Promise.all([
     getStoreById(storeId),
-    getCouponsByStoreId(storeId),
+    getAllCouponsByStoreId(storeId),
   ]);
   if (!store) redirect("/mypage/owner");
 
@@ -42,6 +42,13 @@ export default async function OwnerCouponsPage({ params }: Props) {
     });
   }
   const totalUses = Object.values(usageMap).reduce((s, n) => s + n, 0);
+
+  function daysUntilExpiry(expiryDate: string): number {
+    const today = new Date(Date.now() + 9 * 60 * 60 * 1000);
+    today.setHours(0, 0, 0, 0);
+    const expiry = new Date(expiryDate);
+    return Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  }
 
   const addCouponBound = addCoupon.bind(null, storeId);
 
@@ -85,22 +92,46 @@ export default async function OwnerCouponsPage({ params }: Props) {
           ) : (
             <div className="space-y-3">
               {coupons.map((coupon) => (
-                <div key={coupon.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                <div key={coupon.id} className={`bg-white rounded-xl border shadow-sm p-4 ${!coupon.isActive ? "opacity-60 border-gray-100" : "border-gray-100"}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-gray-900 text-sm">{coupon.title}</p>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="font-bold text-gray-900 text-sm">{coupon.title}</p>
+                        {coupon.isActive
+                          ? <span className="text-xs bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full">有効</span>
+                          : <span className="text-xs bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full">無効</span>
+                        }
+                      </div>
                       <p className="text-xs text-gray-500 mt-0.5">{coupon.description}</p>
                       <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-500">
                         <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">{coupon.discount}</span>
                         <span>コード: <span className="font-mono">{coupon.code}</span></span>
-                        <span>期限: {coupon.expiryDate}</span>
+                        <span className={daysUntilExpiry(coupon.expiryDate) <= 0 ? "text-red-500 font-bold" : daysUntilExpiry(coupon.expiryDate) <= 7 ? "text-orange-500 font-bold" : ""}>
+                          期限: {coupon.expiryDate}
+                          {daysUntilExpiry(coupon.expiryDate) <= 0
+                            ? " （期限切れ）"
+                            : daysUntilExpiry(coupon.expiryDate) <= 30
+                            ? ` （残り${daysUntilExpiry(coupon.expiryDate)}日）`
+                            : ""}
+                        </span>
                         <span className="flex items-center gap-0.5 bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">
                           <TicketIcon className="w-3 h-3" />
                           使用: {usageMap[coupon.id] ?? 0}件
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2 shrink-0">
+                    <div className="flex gap-2 shrink-0 flex-wrap justify-end">
+                      <form action={toggleCoupon.bind(null, coupon.id, storeId, !coupon.isActive)}>
+                        <SubmitButton
+                          label={coupon.isActive ? "無効にする" : "有効にする"}
+                          loadingLabel="変更中..."
+                          className={`text-xs border px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                            coupon.isActive
+                              ? "border-gray-200 text-gray-600 hover:border-orange-400 hover:text-orange-500"
+                              : "border-green-200 text-green-600 hover:bg-green-50"
+                          }`}
+                        />
+                      </form>
                       <Link
                         href={`/mypage/owner/stores/${storeId}/coupons/${coupon.id}/edit`}
                         className="text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-full hover:border-orange-400 hover:text-orange-500 transition-colors"

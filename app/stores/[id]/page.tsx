@@ -9,6 +9,7 @@ import ViewTracker from "@/components/ViewTracker";
 import MapWrapper from "@/components/MapWrapper";
 import RecentlyViewedSaver from "@/components/RecentlyViewedSaver";
 import SnsPostEmbed from "@/components/SnsPostEmbed";
+import ShareButtons from "@/components/ShareButtons";
 import type { SnsLinks } from "@/types";
 import {
   NoSymbolIcon,
@@ -48,11 +49,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const SNS_META: { key: keyof SnsLinks; label: string; color: string }[] = [
-  { key: "website",   label: "公式サイト", color: "text-gray-700" },
-  { key: "instagram", label: "Instagram",  color: "text-pink-500" },
-  { key: "twitter",   label: "X (Twitter)", color: "text-sky-500" },
-  { key: "tiktok",    label: "TikTok",     color: "text-gray-900" },
-  { key: "line",      label: "LINE",       color: "text-green-500" },
+  { key: "website",     label: "公式サイト",    color: "text-gray-700" },
+  { key: "instagram",   label: "Instagram",    color: "text-pink-500" },
+  { key: "twitter",     label: "X (Twitter)",  color: "text-sky-500" },
+  { key: "tiktok",      label: "TikTok",       color: "text-gray-900" },
+  { key: "line",        label: "LINE",         color: "text-green-500" },
+  { key: "google_maps", label: "Google マップ", color: "text-red-500" },
 ];
 
 export default async function StoreDetailPage({ params }: Props) {
@@ -176,8 +178,16 @@ export default async function StoreDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* いいねボタン */}
+        {/* シェアボタン */}
         <div className="mt-6">
+          <ShareButtons
+            title={store.name}
+            url={`${process.env.NEXT_PUBLIC_SITE_URL}/stores/${store.id}`}
+          />
+        </div>
+
+        {/* いいねボタン */}
+        <div className="mt-4">
           <LikeButton
             storeId={store.id}
             initialLikes={store.likes}

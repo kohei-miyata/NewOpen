@@ -55,7 +55,7 @@ export default function Footer() {
           <Link href="/terms" className="hover:text-orange-500 transition-colors">利用規約</Link>
           <Link href="/privacy" className="hover:text-orange-500 transition-colors">プライバシーポリシー</Link>
         </div>
-        <p className="text-xs text-gray-400 mt-4 text-center">© 2026 NewOpen</p>
+        <p className="text-xs text-gray-400 mt-4 text-center">© {new Date().getFullYear()} NewOpen</p>
       </div>
     </footer>
   );

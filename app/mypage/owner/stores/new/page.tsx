@@ -7,9 +7,9 @@ import { newOwnerStore } from "@/app/mypage/owner/stores/actions";
 export default async function OwnerNewStorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; welcome?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, welcome } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
@@ -21,6 +21,11 @@ export default async function OwnerNewStorePage({
         <Link href="/mypage/owner" className="text-sm text-orange-500 hover:underline mb-4 inline-block">
           ← オーナー管理に戻る
         </Link>
+        {welcome && (
+          <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 mb-6 text-sm text-orange-800">
+            オーナー登録が完了しました！さっそく店舗情報を登録しましょう。
+          </div>
+        )}
         <h1 className="text-2xl font-bold text-gray-900 mb-6">新規店舗登録</h1>
         <OwnerStoreForm action={newOwnerStore} submitLabel="登録する" serverError={error} />
       </div>

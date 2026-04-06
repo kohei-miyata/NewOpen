@@ -13,11 +13,12 @@ const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
 const INPUT_ERROR  = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 const SNS_FIELDS = [
-  { name: "sns_website",   icon: "/icons/website.svg",   placeholder: "公式サイト URL" },
-  { name: "sns_instagram", icon: "/icons/instagram.svg", placeholder: "Instagram URL" },
-  { name: "sns_twitter",   icon: "/icons/x.png",         placeholder: "X (Twitter) URL" },
-  { name: "sns_tiktok",    icon: "/icons/tiktok.png",    placeholder: "TikTok URL" },
-  { name: "sns_line",      icon: "/icons/LINE.png",       placeholder: "LINE 公式アカウント URL" },
+  { name: "sns_website",     icon: "/icons/website.svg",   placeholder: "公式サイト URL" },
+  { name: "sns_instagram",   icon: "/icons/instagram.svg", placeholder: "Instagram URL" },
+  { name: "sns_twitter",     icon: "/icons/x.png",         placeholder: "X (Twitter) URL" },
+  { name: "sns_tiktok",      icon: "/icons/tiktok.png",    placeholder: "TikTok URL" },
+  { name: "sns_line",        icon: "/icons/LINE.png",      placeholder: "LINE 公式アカウント URL" },
+  { name: "sns_google_maps", icon: "/icons/maps.svg",      placeholder: "Google マップ URL" },
 ];
 
 type Errors = Partial<Record<"name" | "address" | "openDate" | "description", string>>;
@@ -33,6 +34,17 @@ interface Props {
 export default function OwnerStoreForm({ action, defaultValues, submitLabel = "保存する", serverError, isEdit = false }: Props) {
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<(string | undefined)[]>(
+    [0, 1, 2, 3, 4].map((i) => defaultValues?.photos?.[i])
+  );
+
+  function movePhoto(from: number, to: number) {
+    setPhotos((prev) => {
+      const next = [...prev];
+      [next[from], next[to]] = [next[to], next[from]];
+      return next;
+    });
+  }
 
   // エラーが更新されたら最初のエラー要素へスクロール
   useEffect(() => {
@@ -182,12 +194,44 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       {/* メイン画像 */}
       <ImageUpload name="imageUrl" label="メイン画像" defaultValue={defaultValues?.imageUrl} />
 
-      {/* サブ写真 */}
+      {/* サブ写真（並び替え対応） */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">写真（最大5枚）</label>
+        <p className="text-xs text-gray-400 mb-3">↑↓ で順番を変更できます。1枚目が店舗ページの先頭に表示されます。</p>
         <div className="space-y-3">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <ImageUpload key={i} name={`photo${i + 1}`} defaultValue={defaultValues?.photos?.[i]} />
+          {photos.map((url, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <div className="flex flex-col gap-1 pt-2">
+                <button
+                  type="button"
+                  disabled={i === 0}
+                  onClick={() => movePhoto(i, i - 1)}
+                  className="text-gray-400 hover:text-orange-500 disabled:opacity-20 disabled:cursor-not-allowed text-xs leading-none p-0.5"
+                  aria-label="上へ"
+                >▲</button>
+                <button
+                  type="button"
+                  disabled={i === photos.length - 1}
+                  onClick={() => movePhoto(i, i + 1)}
+                  className="text-gray-400 hover:text-orange-500 disabled:opacity-20 disabled:cursor-not-allowed text-xs leading-none p-0.5"
+                  aria-label="下へ"
+                >▼</button>
+              </div>
+              <div className="flex-1">
+                <ImageUpload
+                  key={`${i}-${url ?? ""}`}
+                  name={`photo${i + 1}`}
+                  defaultValue={url}
+                  onUpload={(newUrl) =>
+                    setPhotos((prev) => {
+                      const next = [...prev];
+                      next[i] = newUrl;
+                      return next;
+                    })
+                  }
+                />
+              </div>
+            </div>
           ))}
         </div>
       </div>

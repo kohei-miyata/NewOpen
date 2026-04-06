@@ -945,3 +945,9 @@ Storage の設定:
 2. New bucket: "NewOpen" (Public: ON)
 3. Policies タブで upload/read/update/delete ポリシーを設定
 ```
+
+
+お名前.com
+ID:92803038
+pass:kohei1024
+pay:楽天クレジットカード

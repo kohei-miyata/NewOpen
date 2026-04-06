@@ -6,9 +6,10 @@ interface Props {
   name: string;
   label?: string;
   defaultValue?: string;
+  onUpload?: (url: string) => void;
 }
 
-export default function ImageUpload({ name, label, defaultValue = "" }: Props) {
+export default function ImageUpload({ name, label, defaultValue = "", onUpload }: Props) {
   const [url, setUrl] = useState(defaultValue);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -24,6 +25,7 @@ export default function ImageUpload({ name, label, defaultValue = "" }: Props) {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Upload failed");
       setUrl(json.url);
+      onUpload?.(json.url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "アップロードに失敗しました");
     } finally {

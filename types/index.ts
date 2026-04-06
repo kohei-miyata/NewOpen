@@ -15,6 +15,7 @@ export interface SnsLinks {
   twitter?: string;
   tiktok?: string;
   line?: string;
+  google_maps?: string;
 }
 
 export type StoreStatus = "active" | "closed" | "temporarily_closed";
@@ -52,4 +53,5 @@ export interface Coupon {
   expiryDate: string;
   code: string;
   imageUrl: string;
+  isActive: boolean;
 }

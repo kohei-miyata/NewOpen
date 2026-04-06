@@ -53,6 +53,7 @@ function toCoupon(row: any): Coupon {
     expiryDate: row.expiry_date,
     code: row.code,
     imageUrl: row.image_url ?? "",
+    isActive: row.is_active ?? true,
   };
 }
 
@@ -248,7 +249,21 @@ export async function updateStore(
   return toStore(data);
 }
 
+/** 公開用：有効クーポンのみ */
 export async function getCouponsByStoreId(storeId: string): Promise<Coupon[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("coupons")
+    .select("*")
+    .eq("store_id", storeId)
+    .eq("is_active", true)
+    .order("expiry_date", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(toCoupon);
+}
+
+/** オーナー管理用：有効・無効含む全件 */
+export async function getAllCouponsByStoreId(storeId: string): Promise<Coupon[]> {
   const { data, error } = await getSupabaseClient()
     .from("coupons")
     .select("*")
@@ -329,16 +344,38 @@ export async function recordCouponUse(couponId: string, userId: string, client?:
   if (error && error.code !== "23505") throw new Error(error.message); // 23505 = unique violation (already used)
 }
 
-export async function getLikedStores(userId: string): Promise<Store[]> {
+export interface LikeFolder {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface LikedStoreWithFolder extends Store {
+  folderId: string | null;
+}
+
+export async function getLikedStores(userId: string): Promise<LikedStoreWithFolder[]> {
   const { data, error } = await getSupabaseClient()
     .from("store_likes")
-    .select("stores(*)")
+    .select("folder_id, stores(*)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((r: any) => r.stores).filter(Boolean).map(toStore);
+  return (data ?? []).map((r: any) => r.stores ? { ...toStore(r.stores), folderId: r.folder_id ?? null } : null).filter(Boolean) as LikedStoreWithFolder[];
+}
+
+export async function getLikeFolders(userId: string): Promise<LikeFolder[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("like_folders")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((r: any) => ({ id: r.id, name: r.name, createdAt: r.created_at }));
 }
 
 export async function getUserLikedStoreIds(userId: string): Promise<Set<string>> {

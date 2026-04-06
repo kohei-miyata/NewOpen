@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getLikedStores } from "@/lib/db";
-import StoreCard from "@/components/StoreCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import {
   HeartIcon,
@@ -20,7 +19,7 @@ export default async function MypagePage() {
   if (!user) redirect("/auth/login");
 
   const role = (user.user_metadata?.role as string) ?? "user";
-  const likedStores = await getLikedStores(user.id);
+  const likedCount = (await getLikedStores(user.id)).length;
 
   const roleLabel = role === "owner" ? "オーナー" : role === "admin" ? "管理者" : "一般ユーザー";
   const roleBadgeClass = role === "owner"
@@ -82,19 +81,16 @@ export default async function MypagePage() {
         )}
 
         {/* いいねしたお店 */}
-        <section>
-          <h2 className="text-base font-bold text-gray-800 mb-3 flex items-center gap-1.5">
-            <HeartIcon className="w-4 h-4 text-orange-400" /> いいねしたお店
-          </h2>
-          {likedStores.length === 0 ? (
-            <p className="text-sm text-gray-400 py-4">まだいいねしたお店はありません</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {likedStores.map((store) => store && (
-                <StoreCard key={store.id} store={store} />
-              ))}
-            </div>
-          )}
+        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <Link
+            href="/mypage/likes"
+            className="flex items-center gap-3 px-5 py-4 hover:bg-orange-50 transition-colors"
+          >
+            <HeartIcon className="w-4 h-4 text-orange-400 flex-shrink-0" />
+            <span className="flex-1 text-sm font-medium text-gray-800">いいねしたお店</span>
+            <span className="text-sm font-bold text-orange-500">{likedCount}件</span>
+            <ChevronRightIcon className="w-4 h-4 text-gray-300" />
+          </Link>
         </section>
 
         {/* 最近見たお店 */}

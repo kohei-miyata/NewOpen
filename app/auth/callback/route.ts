@@ -39,12 +39,23 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
     const errUrl = type === "recovery"
       ? `${origin}/auth/forgot-password?error=expired`
       : `${origin}/auth/login?error=${encodeURIComponent(error.message)}`;
     return NextResponse.redirect(errUrl);
   }
+
+  // オーナー登録直後（メール確認完了）→ 店舗登録へ
+  if (type !== "recovery") {
+    const role = data.user?.user_metadata?.role;
+    if (role === "owner") {
+      return NextResponse.redirect(`${origin}/mypage/owner/stores/new?welcome=1`, {
+        headers: response.headers, // 認証Cookieを引き継ぐ
+      });
+    }
+  }
+
   return response;
 }

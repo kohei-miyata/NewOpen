@@ -13,6 +13,7 @@ import {
   MapIcon,
   UserIcon,
   TicketIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
@@ -387,6 +388,16 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* クイックリンク */}
+      <section>
+        <Link
+          href="/admin/contacts"
+          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
+        >
+          <EnvelopeIcon className="w-4 h-4" /> お問い合わせ一覧を見る →
+        </Link>
       </section>
 
       {/* 全店舗一覧 */}
