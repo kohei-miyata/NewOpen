@@ -35,12 +35,14 @@ function parseStoreFormData(formData: FormData) {
   const instagram = (formData.get("sns_instagram")  as string)?.trim();
   const twitter   = (formData.get("sns_twitter")    as string)?.trim();
   const tiktok    = (formData.get("sns_tiktok")     as string)?.trim();
-  const line      = (formData.get("sns_line")       as string)?.trim();
-  if (website)   snsLinks.website   = website;
-  if (instagram) snsLinks.instagram = instagram;
-  if (twitter)   snsLinks.twitter   = twitter;
-  if (tiktok)    snsLinks.tiktok    = tiktok;
-  if (line)      snsLinks.line      = line;
+  const line       = (formData.get("sns_line")        as string)?.trim();
+  const googleMaps = (formData.get("sns_google_maps") as string)?.trim();
+  if (website)    snsLinks.website    = website;
+  if (instagram)  snsLinks.instagram  = instagram;
+  if (twitter)    snsLinks.twitter    = twitter;
+  if (tiktok)     snsLinks.tiktok     = tiktok;
+  if (line)       snsLinks.line       = line;
+  if (googleMaps) snsLinks.google_maps = googleMaps;
 
   const twitterPostUrl  = (formData.get("post_twitter_url")   as string)?.trim() || null;
   const instagramPostUrl = (formData.get("post_instagram_url") as string)?.trim() || null;

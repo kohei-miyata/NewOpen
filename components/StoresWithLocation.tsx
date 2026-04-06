@@ -44,8 +44,12 @@ export default function StoresWithLocation({ stores }: Props) {
         setGranted(true);
         setLocating(false);
       },
-      () => {
-        setError("位置情報を取得できませんでした。デフォルト順で表示します。");
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setError("denied");
+        } else {
+          setError("failed");
+        }
         setLocating(false);
       },
       { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
@@ -66,8 +70,13 @@ export default function StoresWithLocation({ stores }: Props) {
       {granted && (
         <p className="text-xs text-orange-500 mb-3">現在地に近い順に表示しています</p>
       )}
-      {error && (
-        <p className="text-xs text-gray-400 mb-3">{error}</p>
+      {error === "denied" && (
+        <p className="text-xs text-gray-400 mb-3">
+          現在地の利用が拒否されています。再度許可するにはアドレスバー横のアイコンから位置情報を「許可」に変更してください。
+        </p>
+      )}
+      {error === "failed" && (
+        <p className="text-xs text-gray-400 mb-3">位置情報を取得できませんでした。デフォルト順で表示します。</p>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {visible.map((store) => (
