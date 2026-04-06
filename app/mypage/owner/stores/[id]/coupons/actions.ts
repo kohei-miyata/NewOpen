@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createCoupon, updateCoupon, deleteCoupon, getStoreById, getStoreOwnerId, getAllCouponsByStoreId } from "@/lib/db";
 import type { Category } from "@/types";
@@ -63,7 +64,7 @@ export async function toggleCoupon(couponId: string, storeId: string, isActive: 
   if (ownerId !== user.id) redirect("/mypage/owner");
 
   await supabase.from("coupons").update({ is_active: isActive }).eq("id", couponId);
-  redirect(`/mypage/owner/stores/${storeId}/coupons`);
+  revalidatePath(`/mypage/owner/stores/${storeId}/coupons`);
 }
 
 export async function removeCoupon(couponId: string, storeId: string) {
