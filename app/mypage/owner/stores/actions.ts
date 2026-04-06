@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { updateStore, createStore, getStoreOwnerId, getStoreById } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import type { Category, SnsLinks } from "@/types";
 
 function validateAddress(address: string): string | null {
@@ -82,8 +83,9 @@ export async function editStore(storeId: string, formData: FormData) {
   const addrErr = validateAddress(payload.address);
   if (addrErr) redirect(`/mypage/owner/stores/${storeId}/edit?error=${encodeURIComponent(addrErr)}`);
 
+  const admin = createSupabaseAdminClient();
   try {
-    await updateStore(storeId, payload, supabase);
+    await updateStore(storeId, payload, admin);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "保存に失敗しました";
     redirect(`/mypage/owner/stores/${storeId}/edit?error=${encodeURIComponent(msg)}`);
@@ -102,7 +104,8 @@ export async function newOwnerStore(formData: FormData) {
 
   let store;
   try {
-    store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id }, supabase);
+    const admin = createSupabaseAdminClient();
+    store = await createStore({ ...payload, lat: null, lng: null, ownerId: user.id }, admin);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "登録に失敗しました";
     redirect(`/mypage/owner/stores/new?error=${encodeURIComponent(msg)}`);
