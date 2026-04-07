@@ -246,12 +246,36 @@ toggle_like(p_store_id UUID, increment BOOLEAN)
 
 ## 型定義
 
+### カテゴリの追加方法
+
+カテゴリは **`lib/categories.ts`** で一元管理されています。
+ここを変更するだけで、登録フォーム・フィルター・型定義すべてに自動反映されます。
+
+```typescript
+// lib/categories.ts
+export const CATEGORIES = [
+  "レストラン", "カフェ", "スイーツ", "居酒屋", "ラーメン",
+  "美容院", "ジム", "ショップ",
+  "新しいカテゴリ", // ← ここに追加するだけ
+  "その他",
+] as const;
+
+export type Category = (typeof CATEGORIES)[number];
+```
+
+反映先（変更不要）:
+- `types/index.ts` — `Category` 型
+- `components/OwnerStoreForm.tsx` — 登録フォームのドロップダウン
+- `components/StoreForm.tsx` — 管理者用フォーム
+- `app/stores/page.tsx` — 店舗一覧のカテゴリフィルター
+
+---
+
 `types/index.ts`
 
 ```typescript
-export type Category =
-  | "レストラン" | "カフェ" | "スイーツ" | "居酒屋" | "ラーメン"
-  | "美容院" | "ジム" | "ショップ" | "その他";
+import type { Category } from "@/lib/categories";
+export type { Category };
 
 export interface SnsLinks {
   website?: string;
@@ -951,3 +975,20 @@ Storage の設定:
 ID:92803038
 pass:kohei1024
 pay:楽天クレジットカード
+
+コンパネ
+rs2353495
+niu%7.#wjhtH4*^
+
+メールアドレス一覧
+info@newopen.site
+PY9!|6VhYHEG#H9r-+_WQ&9q.Yqq2N
+https://help.onamae.com/answer/20158
+
+メールサーバ
+mail1043.onamae.ne.jp
+
+
+インスタグラム
+info@newopen.site
+-6ZM$4uaH6BQ&5@jT9t@V/UyUE-s_Ui$3d=-xj7+

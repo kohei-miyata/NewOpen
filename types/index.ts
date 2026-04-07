@@ -1,13 +1,5 @@
-export type Category =
-  | "レストラン"
-  | "カフェ"
-  | "スイーツ"
-  | "居酒屋"
-  | "ラーメン"
-  | "美容院"
-  | "ジム"
-  | "ショップ"
-  | "その他";
+import type { Category } from "@/lib/categories";
+export type { Category };
 
 export interface SnsLinks {
   website?: string;

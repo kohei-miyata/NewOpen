@@ -5,6 +5,7 @@ import StoresFilter from "@/components/StoresFilter";
 import StoresWithLocation from "@/components/StoresWithLocation";
 import StoresLoadMore from "@/components/StoresLoadMore";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
+import { CATEGORIES } from "@/lib/categories";
 import type { Category } from "@/types";
 
 export const metadata: Metadata = {
@@ -12,9 +13,7 @@ export const metadata: Metadata = {
   description: "全国の新規オープン店舗一覧。エリア・カテゴリ別に絞り込んで最新のお店情報を探せます。",
 };
 
-const CATEGORIES: Category[] = [
-  "レストラン","カフェ","スイーツ","居酒屋","ラーメン","美容院","ジム","ショップ","その他",
-];
+
 
 export default async function StoresPage({
   searchParams,
@@ -56,7 +55,7 @@ export default async function StoresPage({
         />
 
         <StoresFilter
-          categories={CATEGORIES}
+          categories={[...CATEGORIES]}
           currentArea={areaQuery}
           currentCategory={categoryFilter}
           currentFilter={filterParam}

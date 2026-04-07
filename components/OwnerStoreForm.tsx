@@ -3,10 +3,7 @@
 import { useState, useEffect, useActionState } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import type { Store } from "@/types";
-
-const CATEGORIES = [
-  "レストラン", "カフェ", "スイーツ", "居酒屋", "ラーメン", "美容院", "ジム", "ショップ", "その他",
-] as const;
+import { CATEGORIES } from "@/lib/categories";
 
 const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors";
 const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
