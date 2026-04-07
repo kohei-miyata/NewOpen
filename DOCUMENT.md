@@ -271,6 +271,36 @@ export type Category = (typeof CATEGORIES)[number];
 
 ---
 
+### よくある質問の追加方法
+
+FAQは **`lib/faqs.ts`** で一元管理されています。
+`tags` でどのページに表示するかを制御しています。
+
+```typescript
+// lib/faqs.ts
+export const ALL_FAQS: Faq[] = [
+  {
+    q: "質問文",
+    a: "回答文",
+    tags: ["general", "owner", "contact"], // 表示するページを指定
+  },
+  // ...
+];
+```
+
+| tag | 表示ページ |
+|-----|-----------|
+| `"general"` | `/about`（NewOpenについて） |
+| `"owner"` | `/for-owners`（オーナー向け） |
+| `"contact"` | `/contact`（お問い合わせ） |
+
+反映先（変更不要）:
+- `app/about/page.tsx` — `GENERAL_FAQS` を使用
+- `app/for-owners/page.tsx` — `OWNER_FAQS` を使用
+- `app/contact/page.tsx` — `CONTACT_FAQS` を使用
+
+---
+
 `types/index.ts`
 
 ```typescript
