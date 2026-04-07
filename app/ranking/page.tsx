@@ -16,7 +16,7 @@ export default async function RankingPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <PageHeader title="いいね！ランキング" description="新規オープン店舗の中で最も注目されているお店をランキング形式でご紹介" />
+        <PageHeader title="全国いいね！ランキング" description="新規オープン店舗の中で最も注目されているお店をランキング形式でご紹介" />
 
         {/* TOP3 ハイライト */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">

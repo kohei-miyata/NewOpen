@@ -32,6 +32,7 @@ interface Props {
 export default function TopStoresSections({ allStores, comingSoon }: Props) {
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [granted, setGranted] = useState(false);
+  const [denied, setDenied] = useState(false);
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -40,7 +41,9 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
         setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setGranted(true);
       },
-      () => {},
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) setDenied(true);
+      },
       { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
     );
   }, []);
@@ -50,6 +53,13 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
 
   return (
     <>
+      {/* 位置情報拒否メッセージ */}
+      {denied && (
+        <p className="text-xs text-gray-400 -mt-2 mb-2">
+          現在地の利用が拒否されています。再度許可するにはアドレスバー横のアイコンから位置情報を「許可」に変更してください。
+        </p>
+      )}
+
       {/* まもなくオープン */}
       {comingSoon.length > 0 && (
         <section>

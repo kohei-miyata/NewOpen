@@ -166,7 +166,7 @@ export default async function Home() {
             <div className="flex items-center gap-2">
               <HeartIcon className="w-6 h-6 text-orange-500" />
               <div>
-                <h2 className="text-xl font-bold text-gray-900">いいね！ランキング TOP3</h2>
+                <h2 className="text-xl font-bold text-gray-900">全国いいね！ランキング TOP3</h2>
                 <p className="text-xs text-gray-500">みんなが気になっているお店</p>
               </div>
             </div>
