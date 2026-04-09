@@ -83,6 +83,16 @@ export default async function OwnerMypagePage() {
                             掲載期間終了
                           </span>
                         )}
+                        {!expired && store.approvalStatus === "pending" && (
+                          <span className="text-xs bg-yellow-100 text-yellow-700 font-semibold px-2 py-0.5 rounded-full shrink-0">
+                            審査中
+                          </span>
+                        )}
+                        {!expired && store.approvalStatus === "rejected" && (
+                          <span className="text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full shrink-0">
+                            否認
+                          </span>
+                        )}
                       </div>
                       <p className="text-xs text-gray-500 truncate">{store.address}</p>
                       <p className="text-xs text-orange-500 mt-0.5">{store.category} · オープン {store.openDate}</p>

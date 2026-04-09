@@ -14,6 +14,8 @@ import {
   UserIcon,
   TicketIcon,
   EnvelopeIcon,
+  BuildingStorefrontIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
@@ -31,6 +33,12 @@ export default async function AdminPage() {
 
 const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.user_metadata?.role !== "admin");
   const ownerUsers   = users.filter((u) => u.user_metadata?.role === "owner");
+
+  // ログイン統計（1週間以内 / 1週間以上）
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const loginWithin1Week = users.filter((u) => u.last_sign_in_at && new Date(u.last_sign_in_at) >= oneWeekAgo).length;
+  const loginOver1Week   = users.filter((u) => u.last_sign_in_at && new Date(u.last_sign_in_at) < oneWeekAgo).length;
+  const neverLoggedIn    = users.filter((u) => !u.last_sign_in_at).length;
 
   // 店舗一覧（全件）
   const { data: stores } = await db.from("stores").select("id, name, category, address, views, likes, open_date, owner_id").order("likes", { ascending: false });
@@ -390,8 +398,38 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
         </div>
       </section>
 
-      {/* クイックリンク */}
+      {/* ログイン統計 */}
       <section>
+        <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+          <ClockIcon className="w-5 h-5 text-blue-500" /> ログイン状況
+        </h2>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p className="text-xs text-gray-500">1週間以内にログイン</p>
+            <p className="text-3xl font-extrabold text-green-600 mt-1">{loginWithin1Week.toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-1">アクティブユーザー</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p className="text-xs text-gray-500">1週間以上ログインなし</p>
+            <p className="text-3xl font-extrabold text-orange-500 mt-1">{loginOver1Week.toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-1">非アクティブユーザー</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p className="text-xs text-gray-500">ログイン履歴なし</p>
+            <p className="text-3xl font-extrabold text-gray-400 mt-1">{neverLoggedIn.toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-1">未ログインユーザー</p>
+          </div>
+        </div>
+      </section>
+
+      {/* クイックリンク */}
+      <section className="flex flex-wrap gap-3">
+        <Link
+          href="/admin/owners"
+          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
+        >
+          <BuildingStorefrontIcon className="w-4 h-4" /> 店舗審査管理 →
+        </Link>
         <Link
           href="/admin/contacts"
           className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"

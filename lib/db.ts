@@ -37,6 +37,7 @@ function toStore(row: any): Store {
     instagramPostUrl: row.instagram_post_url ?? null,
     tiktokPostUrl: row.tiktok_post_url ?? null,
     status: (row.status ?? "active") as Store["status"],
+    approvalStatus: (row.approval_status ?? "approved") as Store["approvalStatus"],
   };
 }
 
@@ -63,6 +64,7 @@ export async function getStores(userLatLng?: LatLng, limit?: number): Promise<St
     .from("stores")
     .select("*")
     .lte("open_date", today)
+    .eq("approval_status", "approved")
     .order("open_date", { ascending: false });
 
   if (limit) query = query.limit(limit * 3); // 3年フィルタで減る分を考慮して多めに取得
@@ -109,6 +111,7 @@ export async function getRankedStores(limit?: number): Promise<Store[]> {
     .from("stores")
     .select("*")
     .lte("open_date", today)
+    .eq("approval_status", "approved")
     .order("likes", { ascending: false });
 
   if (limit) query = query.limit(limit);
@@ -134,7 +137,7 @@ export const getCoupons = unstable_cache(
 );
 
 export async function createStore(
-  payload: Omit<Store, "id" | "views" | "likes"> & { ownerId?: string },
+  payload: Omit<Store, "id" | "views" | "likes" | "approvalStatus"> & { ownerId?: string },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client?: any
 ): Promise<Store> {
@@ -163,6 +166,7 @@ export async function createStore(
       instagram_post_url: payload.instagramPostUrl ?? null,
       tiktok_post_url: payload.tiktokPostUrl ?? null,
       status: payload.status ?? "active",
+      approval_status: "pending",
       owner_id: payload.ownerId ?? null,
       views: 0,
       likes: 0,
@@ -181,6 +185,7 @@ export async function getTodayOpenStores(): Promise<Store[]> {
     .select("*")
     .eq("open_date", today)
     .eq("status", "active")
+    .eq("approval_status", "approved")
     .order("name", { ascending: true });
 
   if (error) throw new Error(error.message);
@@ -195,6 +200,7 @@ export async function getComingSoonStores(): Promise<Store[]> {
     .select("*")
     .gt("open_date", today)
     .lte("open_date", in30)
+    .eq("approval_status", "approved")
     .order("open_date", { ascending: true });
 
   if (error) throw new Error(error.message);

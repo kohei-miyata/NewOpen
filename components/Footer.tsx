@@ -22,31 +22,42 @@ export default function Footer() {
           </div>
         </div>
         {/* SNSリンク */}
-        <div className="mt-8 flex justify-center gap-5">
-          {process.env.NEXT_PUBLIC_SNS_X && (
-            <a href={process.env.NEXT_PUBLIC_SNS_X} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="text-gray-400 hover:text-gray-700 transition-colors">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icons/x.png" alt="X" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
-            </a>
-          )}
-          {process.env.NEXT_PUBLIC_SNS_INSTAGRAM && (
-            <a href={process.env.NEXT_PUBLIC_SNS_INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-gray-700 transition-colors">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icons/instagram.svg" alt="Instagram" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
-            </a>
-          )}
-          {process.env.NEXT_PUBLIC_SNS_TIKTOK && (
-            <a href={process.env.NEXT_PUBLIC_SNS_TIKTOK} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="text-gray-400 hover:text-gray-700 transition-colors">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icons/tiktok.png" alt="TikTok" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
-            </a>
-          )}
-          {process.env.NEXT_PUBLIC_SNS_LINE && (
-            <a href={process.env.NEXT_PUBLIC_SNS_LINE} target="_blank" rel="noopener noreferrer" aria-label="LINE" className="text-gray-400 hover:text-gray-700 transition-colors">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icons/LINE.png" alt="LINE" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
-            </a>
-          )}
+        <div className="mt-8 flex flex-col items-center gap-4">
+          {/* 公式 Instagram（常時表示） */}
+          <a
+            href={process.env.NEXT_PUBLIC_SNS_INSTAGRAM ?? "https://www.instagram.com/newopen_official/"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2.5 bg-gradient-to-r from-pink-50 to-orange-50 border border-pink-200 rounded-xl px-5 py-3 hover:border-pink-400 transition-colors group"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/instagram.svg" alt="Instagram" className="w-5 h-5" />
+            <div>
+              <p className="text-xs font-bold text-gray-800 group-hover:text-pink-600 transition-colors">NEW OPEN 公式 Instagram</p>
+              <p className="text-xs text-gray-400">@newopen_official</p>
+            </div>
+          </a>
+
+          <div className="flex gap-5">
+            {process.env.NEXT_PUBLIC_SNS_X && (
+              <a href={process.env.NEXT_PUBLIC_SNS_X} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="text-gray-400 hover:text-gray-700 transition-colors">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icons/x.png" alt="X" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
+              </a>
+            )}
+            {process.env.NEXT_PUBLIC_SNS_TIKTOK && (
+              <a href={process.env.NEXT_PUBLIC_SNS_TIKTOK} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="text-gray-400 hover:text-gray-700 transition-colors">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icons/tiktok.png" alt="TikTok" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
+              </a>
+            )}
+            {process.env.NEXT_PUBLIC_SNS_LINE && (
+              <a href={process.env.NEXT_PUBLIC_SNS_LINE} target="_blank" rel="noopener noreferrer" aria-label="LINE" className="text-gray-400 hover:text-gray-700 transition-colors">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icons/LINE.png" alt="LINE" className="w-5 h-5 opacity-40 hover:opacity-70 transition-opacity" />
+              </a>
+            )}
+          </div>
         </div>
         <div className="mt-6 flex justify-center gap-6 text-xs text-gray-400 flex-wrap">
           <Link href="/about" className="hover:text-orange-500 transition-colors">NewOpenについて</Link>

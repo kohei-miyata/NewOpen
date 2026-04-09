@@ -11,6 +11,7 @@ export interface SnsLinks {
 }
 
 export type StoreStatus = "active" | "closed" | "temporarily_closed";
+export type ApprovalStatus = "pending" | "approved" | "rejected";
 
 export interface Store {
   id: string;
@@ -32,6 +33,7 @@ export interface Store {
   instagramPostUrl: string | null;
   tiktokPostUrl: string | null;
   status: StoreStatus;
+  approvalStatus: ApprovalStatus;
 }
 
 export interface Coupon {

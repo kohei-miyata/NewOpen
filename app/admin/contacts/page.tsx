@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import { replyToContact } from "@/app/admin/actions";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = { title: "お問い合わせ一覧 | 管理者" };
@@ -13,10 +14,23 @@ export default async function AdminContactsPage() {
   if (!user || user.app_metadata?.role !== "admin") redirect("/");
 
   const admin = createSupabaseAdminClient();
+
   const { data: contacts } = await admin
     .from("contacts")
     .select("*")
     .order("created_at", { ascending: false });
+
+  // 返信履歴を一括取得
+  const { data: allReplies } = await admin
+    .from("contact_replies")
+    .select("*")
+    .order("sent_at", { ascending: true });
+
+  const repliesByContact: Record<string, { id: string; body: string; sent_at: string }[]> = {};
+  (allReplies ?? []).forEach((r) => {
+    if (!repliesByContact[r.contact_id]) repliesByContact[r.contact_id] = [];
+    repliesByContact[r.contact_id].push(r);
+  });
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -30,44 +44,99 @@ export default async function AdminContactsPage() {
         <span className="text-sm text-gray-500">{contacts?.length ?? 0} 件</span>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 whitespace-nowrap">日時</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">名前</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">メール</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">会社・部署</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">内容</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {(contacts ?? []).map((c) => (
-              <tr key={c.id} className="hover:bg-orange-50 transition-colors align-top">
-                <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
-                  {new Date(c.created_at).toLocaleString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                </td>
-                <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{c.name}</td>
-                <td className="px-4 py-3">
-                  <a href={`mailto:${c.email}`} className="text-orange-500 hover:underline">{c.email}</a>
-                </td>
-                <td className="px-4 py-3 text-xs text-gray-500">
-                  {[c.company, c.department].filter(Boolean).join(" / ") || "-"}
-                </td>
-                <td className="px-4 py-3 text-gray-700 max-w-sm">
-                  <p className="whitespace-pre-wrap text-xs leading-relaxed line-clamp-3">{c.message}</p>
-                </td>
-              </tr>
-            ))}
-            {(!contacts || contacts.length === 0) && (
-              <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-sm text-gray-400">
-                  お問い合わせはまだありません
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="space-y-4">
+        {(contacts ?? []).map((c) => {
+          const replies = repliesByContact[c.id] ?? [];
+          return (
+            <div key={c.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              {/* 問い合わせ内容 */}
+              <div className="px-5 py-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-gray-900">{c.name}</p>
+                    <a href={`mailto:${c.email}`} className="text-xs text-orange-500 hover:underline">{c.email}</a>
+                    {(c.company || c.department) && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {[c.company, c.department].filter(Boolean).join(" / ")}
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400 whitespace-nowrap">
+                    {new Date(c.created_at).toLocaleString("ja-JP", {
+                      year: "numeric", month: "2-digit", day: "2-digit",
+                      hour: "2-digit", minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                <p className="mt-3 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{c.message}</p>
+              </div>
+
+              {/* 返信履歴 */}
+              {replies.length > 0 && (
+                <div className="border-t border-gray-50 bg-orange-50 px-5 py-3 space-y-2">
+                  <p className="text-xs font-semibold text-gray-500">返信履歴（{replies.length} 件）</p>
+                  {replies.map((r) => (
+                    <div key={r.id} className="bg-white rounded-lg border border-orange-100 px-4 py-3">
+                      <p className="text-xs text-gray-400 mb-1">
+                        {new Date(r.sent_at).toLocaleString("ja-JP", {
+                          year: "numeric", month: "2-digit", day: "2-digit",
+                          hour: "2-digit", minute: "2-digit",
+                        })}
+                      </p>
+                      <p className="text-xs text-gray-500 italic mb-2">
+                        {c.name} 様<br />
+                        いつもNEW OPENをご利用いただきありがとうございます。
+                      </p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{r.body}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 返信フォーム */}
+              <details className="border-t border-gray-100 group">
+                <summary className="cursor-pointer px-5 py-3 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors select-none list-none flex items-center gap-1.5">
+                  <EnvelopeIcon className="w-4 h-4" />
+                  返信する
+                </summary>
+                <form action={replyToContact} className="px-5 pb-4 pt-3 space-y-3 border-t border-orange-100 bg-orange-50">
+                  <input type="hidden" name="contactId" value={c.id} />
+
+                  {/* プレビュー用固定ヘッダー */}
+                  <div className="bg-white border border-orange-200 rounded-lg px-4 py-3 text-sm text-gray-500 space-y-1">
+                    <p>{c.name} 様</p>
+                    <p>いつもNEW OPENをご利用いただきありがとうございます。</p>
+                  </div>
+
+                  <textarea
+                    name="replyBody"
+                    rows={5}
+                    required
+                    placeholder="返信内容を入力..."
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 resize-none"
+                  />
+
+                  <div className="text-xs text-gray-400">
+                    送信時に「{c.name} 様、いつもNEW OPENをご利用いただきありがとうございます。」が自動で付加されます。
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-orange-500 text-white text-sm font-bold py-2.5 rounded-lg hover:bg-orange-600 transition-colors"
+                  >
+                    メールで返信を送信
+                  </button>
+                </form>
+              </details>
+            </div>
+          );
+        })}
+
+        {(!contacts || contacts.length === 0) && (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-12 text-center text-sm text-gray-400">
+            お問い合わせはまだありません
+          </div>
+        )}
       </div>
     </div>
   );
