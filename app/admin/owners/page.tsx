@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
-import { approveStore, rejectStore, setPendingStore, REJECTION_TEMPLATES } from "@/app/admin/actions";
+import { approveStore, rejectStore, setPendingStore } from "@/app/admin/actions";
+import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
 import { BuildingStorefrontIcon } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = { title: "店舗審査管理 | 管理者" };
