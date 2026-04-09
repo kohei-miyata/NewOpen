@@ -1,32 +1,36 @@
 /**
- * 共通メーラー
+ * 共通メーラー (Resend)
  * 環境変数:
- *   SMTP_HOST      例: sv****.onamae.ne.jp
- *   SMTP_PORT      例: 587 (デフォルト)
- *   SMTP_USER      例: info@newopen.site
- *   SMTP_PASS      SMTPパスワード
- *   MAIL_FROM_NAME 例: NEW OPEN (デフォルト)
+ *   RESEND_API_KEY    Resendのシークレットキー (re_xxxxxxxxxxxx)
+ *   MAIL_FROM         送信元アドレス 例: info@newopen.site
+ *   MAIL_FROM_NAME    送信者名 例: NEW OPEN (デフォルト)
  */
-export async function getMailer() {
-  const host = process.env.SMTP_HOST;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  if (!host || !user || !pass) return null;
 
-  const port   = Number(process.env.SMTP_PORT ?? 587);
-  const secure = port === 465;
+export interface MailOptions {
+  to: string | string[];
+  subject: string;
+  html: string;
+}
+
+export async function sendMail(options: MailOptions): Promise<void> {
+  const apiKey   = process.env.RESEND_API_KEY;
+  const fromAddr = process.env.MAIL_FROM ?? "info@newopen.site";
   const fromName = process.env.MAIL_FROM_NAME ?? "NEW OPEN";
 
-  const nodemailer = await import("nodemailer");
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: { user, pass },
+  if (!apiKey) {
+    console.warn("[mailer] RESEND_API_KEY が設定されていません。メール送信をスキップします。");
+    return;
+  }
+
+  const { Resend } = await import("resend");
+  const resend = new Resend(apiKey);
+
+  const { error } = await resend.emails.send({
+    from: `${fromName} <${fromAddr}>`,
+    to: Array.isArray(options.to) ? options.to : [options.to],
+    subject: options.subject,
+    html: options.html,
   });
 
-  return {
-    transporter,
-    from: `${fromName} <${user}>`,
-  };
+  if (error) throw new Error(error.message);
 }

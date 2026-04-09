@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
-import { getMailer } from "@/lib/mailer";
+import { sendMail } from "@/lib/mailer";
 
 async function assertAdmin() {
   const supabase = await createSupabaseServerClient();
@@ -39,7 +39,6 @@ export async function approveStore(storeId: string) {
   await assertAdmin();
   const admin = createSupabaseAdminClient();
 
-  // オーナーのメールを取得
   const { data: storeRow } = await admin
     .from("stores")
     .select("id, name, owner_id")
@@ -52,37 +51,24 @@ export async function approveStore(storeId: string) {
     .update({ approval_status: "approved" })
     .eq("id", storeId);
 
-  // オーナーへ承認メール
   if (storeRow.owner_id) {
     const { data: ownerData } = await admin.auth.admin.getUserById(storeRow.owner_id);
     const ownerEmail = ownerData?.user?.email;
     if (ownerEmail) {
-      const mailer = await getMailer();
-      if (mailer) {
-        const subject = `【NEW OPEN】${storeRow.name}様の掲載が承認されました`;
-        const body = `
-          <p>${storeRow.name} 担当者様</p>
-          <p>この度はNEW OPENへのご登録ありがとうございます。<br>
-          ご登録いただいた店舗情報の審査が完了し、<strong>掲載が承認</strong>されました。<br>
-          現在、一般公開されています。</p>
-          <p>今後ともNEW OPENをよろしくお願いいたします。</p>
-          <hr>
-          <p style="font-size:12px;color:#888;">NEW OPEN — あなたの街の新規オープン情報</p>
-        `;
-        await mailer.transporter.sendMail({
-          from: mailer.from,
-          to: ownerEmail,
-          subject,
-          html: body,
-        }).catch(console.error);
-
-        await admin.from("store_email_history").insert({
-          store_id: storeId,
-          subject,
-          body,
-          recipient_email: ownerEmail,
-        }).then(null, console.error);
-      }
+      const subject = `【NEW OPEN】${storeRow.name}様の掲載が承認されました`;
+      const body = `
+        <p>${storeRow.name} 担当者様</p>
+        <p>この度はNEW OPENへのご登録ありがとうございます。<br>
+        ご登録いただいた店舗情報の審査が完了し、<strong>掲載が承認</strong>されました。<br>
+        現在、一般公開されています。</p>
+        <p>今後ともNEW OPENをよろしくお願いいたします。</p>
+        <hr>
+        <p style="font-size:12px;color:#888;">NEW OPEN — あなたの街の新規オープン情報</p>
+      `;
+      await sendMail({ to: ownerEmail, subject, html: body }).catch(console.error);
+      await admin.from("store_email_history").insert({
+        store_id: storeId, subject, body, recipient_email: ownerEmail,
+      }).then(null, console.error);
     }
   }
 
@@ -126,22 +112,10 @@ export async function rejectStore(formData: FormData) {
           : body;
       }
 
-      const mailer = await getMailer();
-      if (mailer) {
-        await mailer.transporter.sendMail({
-          from: mailer.from,
-          to: ownerEmail,
-          subject,
-          html: body,
-        }).catch(console.error);
-
-        await admin.from("store_email_history").insert({
-          store_id: storeId,
-          subject,
-          body,
-          recipient_email: ownerEmail,
-        }).then(null, console.error);
-      }
+      await sendMail({ to: ownerEmail, subject, html: body }).catch(console.error);
+      await admin.from("store_email_history").insert({
+        store_id: storeId, subject, body, recipient_email: ownerEmail,
+      }).then(null, console.error);
     }
   }
 
@@ -173,7 +147,6 @@ export async function replyToContact(formData: FormData) {
     .single();
   if (!contact) throw new Error("問い合わせが見つかりません");
 
-  const mailer = await getMailer();
   const fullHtml = `
     <p>${contact.name} 様</p>
     <p>いつもNEW OPENをご利用いただきありがとうございます。</p>
@@ -183,14 +156,11 @@ export async function replyToContact(formData: FormData) {
     ※このメールは運営からの返信です。</p>
   `;
 
-  if (mailer) {
-    await mailer.transporter.sendMail({
-      from: mailer.from,
-      to: contact.email,
-      subject: `【NEW OPEN】お問い合わせへのご返信`,
-      html: fullHtml,
-    });
-  }
+  await sendMail({
+    to: contact.email,
+    subject: "【NEW OPEN】お問い合わせへのご返信",
+    html: fullHtml,
+  });
 
   await admin.from("contact_replies").insert({
     contact_id: contactId,
