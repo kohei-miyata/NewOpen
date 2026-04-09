@@ -4,27 +4,12 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
+import { getMailer } from "@/lib/mailer";
 
 async function assertAdmin() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || user.app_metadata?.role !== "admin") throw new Error("Forbidden");
-}
-
-async function getMailer() {
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD;
-  if (!gmailUser || !gmailPass) return null;
-  const nodemailer = await import("nodemailer");
-  return {
-    transporter: nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: { user: gmailUser, pass: gmailPass },
-    }),
-    gmailUser,
-  };
 }
 
 // ─── ユーザー管理 ────────────────────────────────────────────────────────────
@@ -85,7 +70,7 @@ export async function approveStore(storeId: string) {
           <p style="font-size:12px;color:#888;">NEW OPEN — あなたの街の新規オープン情報</p>
         `;
         await mailer.transporter.sendMail({
-          from: `NEW OPEN <${mailer.gmailUser}>`,
+          from: mailer.from,
           to: ownerEmail,
           subject,
           html: body,
@@ -144,7 +129,7 @@ export async function rejectStore(formData: FormData) {
       const mailer = await getMailer();
       if (mailer) {
         await mailer.transporter.sendMail({
-          from: `NEW OPEN <${mailer.gmailUser}>`,
+          from: mailer.from,
           to: ownerEmail,
           subject,
           html: body,
@@ -200,7 +185,7 @@ export async function replyToContact(formData: FormData) {
 
   if (mailer) {
     await mailer.transporter.sendMail({
-      from: `NEW OPEN <${mailer.gmailUser}>`,
+      from: mailer.from,
       to: contact.email,
       subject: `【NEW OPEN】お問い合わせへのご返信`,
       html: fullHtml,
