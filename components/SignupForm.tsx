@@ -285,7 +285,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
             <span className="text-xs text-gray-400">または</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
-          <GoogleAuthButton label="Googleで登録（一般ユーザー）" />
+          <GoogleAuthButton label="Googleで登録" />
         </>
       )}
     </form>
