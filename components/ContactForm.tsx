@@ -17,6 +17,7 @@ interface Props {
 
 export default function ContactForm({ serverError, defaultEmail, defaultName }: Props) {
   const [errors, setErrors] = useState<Errors>({});
+  const [isPending, setIsPending] = useState(false);
   const isLoggedIn = !!(defaultName && defaultEmail);
 
   function validate(fd: FormData): boolean {
@@ -44,7 +45,8 @@ export default function ContactForm({ serverError, defaultEmail, defaultName }: 
       action={submitContact}
       onSubmit={(e) => {
         const fd = new FormData(e.currentTarget);
-        if (!validate(fd)) e.preventDefault();
+        if (!validate(fd)) { e.preventDefault(); return; }
+        setIsPending(true);
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5"
     >
@@ -123,9 +125,15 @@ export default function ContactForm({ serverError, defaultEmail, defaultName }: 
 
       <button
         type="submit"
-        className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors"
+        disabled={isPending}
+        className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        送信する
+        {isPending ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            送信中...
+          </span>
+        ) : "送信する"}
       </button>
     </form>
   );
