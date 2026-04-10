@@ -3,6 +3,13 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import OwnerStoreForm from "@/components/OwnerStoreForm";
 import { newOwnerStore } from "@/app/mypage/owner/stores/actions";
+import {
+  MagnifyingGlassIcon,
+  CalendarDaysIcon,
+  PhotoIcon,
+  TicketIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/outline";
 
 export default async function OwnerNewStorePage({
   searchParams,
@@ -26,23 +33,23 @@ export default async function OwnerNewStorePage({
             <p className="text-sm font-bold text-orange-800">オーナー登録が完了しました！さっそく店舗情報を登録しましょう。</p>
             <ul className="text-xs text-orange-700 space-y-1.5">
               <li className="flex items-start gap-2">
-                <span className="mt-0.5">🔍</span>
+                <MagnifyingGlassIcon className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />
                 <span><span className="font-semibold">審査について</span> — 登録後、管理者が内容を確認してから公開されます。審査完了までしばらくお待ちください。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-0.5">📅</span>
+                <CalendarDaysIcon className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />
                 <span><span className="font-semibold">掲載期間</span> — オープン日から3年間掲載されます。期間終了後は自動的に非公開になります。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-0.5">📸</span>
+                <PhotoIcon className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />
                 <span><span className="font-semibold">写真・SNS</span> — 写真やInstagram・Xなどのリンクを充実させると、ユーザーへの訴求力が高まります。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-0.5">🎟️</span>
+                <TicketIcon className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />
                 <span><span className="font-semibold">クーポン発行</span> — 店舗登録後にオープン記念クーポンを作成・管理できます。クーポンコードの使用状況もリアルタイムで確認できます。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-0.5">📊</span>
+                <ChartBarIcon className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />
                 <span><span className="font-semibold">アナリティクス</span> — 閲覧数・いいね数・クーポン使用数の推移をオーナー管理画面から確認できます。</span>
               </li>
             </ul>
