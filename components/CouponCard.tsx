@@ -117,7 +117,13 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
                 {!used && isExpiringSoon && <span className="text-xs text-red-500 font-semibold">残り{daysLeft}日</span>}
               </div>
               <div>
-                <p className="text-xs text-gray-500">{coupon.storeName}</p>
+                <a
+                  href={`/stores/${coupon.storeId}`}
+                  className="text-xs text-orange-500 hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {coupon.storeName} →
+                </a>
                 <h2 className="font-bold text-gray-900 text-base mt-0.5">{coupon.title}</h2>
                 {coupon.description && <p className="text-sm text-gray-600 mt-1">{coupon.description}</p>}
               </div>

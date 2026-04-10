@@ -136,6 +136,29 @@ export const getCoupons = unstable_cache(
   { revalidate: 60 }
 );
 
+export type CouponWithLocation = Coupon & { lat: number | null; lng: number | null };
+
+export const getCouponsWithLocation = unstable_cache(
+  async (): Promise<CouponWithLocation[]> => {
+    const { data, error } = await getSupabaseClient()
+      .from("coupons")
+      .select("*, stores(lat, lng)")
+      .eq("is_active", true)
+      .order("expiry_date", { ascending: true });
+
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => ({
+      ...toCoupon(row),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      lat: (row.stores as any)?.lat ?? null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      lng: (row.stores as any)?.lng ?? null,
+    }));
+  },
+  ["coupons-with-location"],
+  { revalidate: 60 }
+);
+
 export async function createStore(
   payload: Omit<Store, "id" | "views" | "likes" | "approvalStatus"> & { ownerId?: string },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
