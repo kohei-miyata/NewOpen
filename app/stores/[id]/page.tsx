@@ -10,6 +10,7 @@ import MapWrapper from "@/components/MapWrapper";
 import RecentlyViewedSaver from "@/components/RecentlyViewedSaver";
 import SnsPostEmbed from "@/components/SnsPostEmbed";
 import ShareButtons from "@/components/ShareButtons";
+import ScrollToTop from "@/components/ScrollToTop";
 import type { SnsLinks } from "@/types";
 import {
   NoSymbolIcon,
@@ -84,6 +85,7 @@ export default async function StoreDetailPage({ params }: Props) {
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      <ScrollToTop />
       <div className="max-w-3xl mx-auto px-4 py-8">
         <RecentlyViewedSaver storeId={store.id} />
         <Link href="/stores" className="text-sm text-orange-500 hover:underline mb-4 inline-block">

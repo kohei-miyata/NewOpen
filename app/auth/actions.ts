@@ -59,7 +59,7 @@ export async function signup(formData: FormData) {
   const birthdate = (formData.get("birthdate") as string) || null;
   const supabase = await createSupabaseServerClient();
 
-  const metadata: Record<string, string> = { role };
+  const metadata: Record<string, string | boolean> = { role, email_notifications: true };
   if (display_name) metadata.display_name = display_name;
   if (gender) metadata.gender = gender;
   if (birthdate) metadata.birthdate = birthdate;
