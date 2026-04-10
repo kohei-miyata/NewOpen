@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useActionState } from "react";
-import Link from "next/link";
 import { completeProfile } from "./actions";
 import BirthdatePicker from "@/components/BirthdatePicker";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -76,10 +75,6 @@ export default function CompleteProfilePage() {
             ) : "登録を完了する"}
           </button>
 
-          <p className="text-center text-xs text-gray-400">
-            後で設定する場合は{" "}
-            <Link href="/" className="text-orange-500 hover:underline">スキップ</Link>
-          </p>
         </form>
       </div>
     </div>
