@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const result = await supabase.auth.verifyOtp({
       token_hash,
-      type: type as Parameters<typeof supabase.auth.verifyOtp>[0]["type"],
+      type: type as "signup" | "recovery" | "email_change" | "email",
     });
     authUser = result.data?.user ?? null;
     error = result.error;
