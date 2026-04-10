@@ -70,14 +70,15 @@ export async function GET(request: NextRequest) {
     let role = user?.user_metadata?.role as string | undefined;
 
     // Google OAuth 新規ユーザーは role 未設定 → "user" を付与
-    if (user && !role) {
+    const isNewGoogleUser = user && !role;
+    if (isNewGoogleUser) {
       const adminClient = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         { auth: { autoRefreshToken: false, persistSession: false } }
       );
-      await adminClient.auth.admin.updateUserById(user.id, {
-        user_metadata: { ...user.user_metadata, role: "user" },
+      await adminClient.auth.admin.updateUserById(user!.id, {
+        user_metadata: { ...user!.user_metadata, role: "user", email_notifications: true },
       });
       role = "user";
     }
@@ -85,6 +86,12 @@ export async function GET(request: NextRequest) {
     // オーナーのメール確認完了 → 店舗登録へ
     if (role === "owner") {
       redirectTo = `${origin}/mypage/owner/stores/new?welcome=1`;
+    }
+
+    // Google OAuth 新規ユーザー → 性別・生年月日入力へ
+    const needsProfile = user && !user.user_metadata?.gender;
+    if (isNewGoogleUser || needsProfile) {
+      redirectTo = `${origin}/auth/complete-profile`;
     }
   }
 
