@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getOwnerStores } from "@/lib/db";
-import { TicketIcon } from "@heroicons/react/24/outline";
+import { TicketIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import DeleteStoreButton from "@/components/DeleteStoreButton";
 
 const THREE_YEARS_MS = 3 * 365.25 * 24 * 60 * 60 * 1000;
@@ -107,6 +107,12 @@ export default async function OwnerMypagePage() {
                     </Link>
                     {!expired && (
                       <>
+                        <Link
+                          href={`/mypage/owner/stores/${store.id}/analytics`}
+                          className="text-xs border border-blue-200 text-blue-500 px-3 py-1.5 rounded-full hover:bg-blue-50 transition-colors"
+                        >
+                          <ChartBarIcon className="w-3.5 h-3.5 inline-block mr-1" />分析
+                        </Link>
                         <Link
                           href={`/mypage/owner/stores/${store.id}/coupons`}
                           className="text-xs border border-orange-200 text-orange-500 px-3 py-1.5 rounded-full hover:bg-orange-50 transition-colors"
