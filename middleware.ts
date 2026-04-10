@@ -54,10 +54,28 @@ function isComingSoonBlocked(request: NextRequest): boolean {
   return true;
 }
 
+function isAdminBlocked(request: NextRequest): boolean {
+  if (!request.nextUrl.pathname.startsWith("/admin")) return false;
+
+  const allowedIps = (process.env.ADMIN_ALLOWED_IPS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (allowedIps.length === 0) return false; // 環境変数未設定時はスキップ
+
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "";
+  return !allowedIps.includes(ip);
+}
+
 export async function middleware(request: NextRequest) {
   // カミングスーンチェック
   if (isComingSoonBlocked(request)) {
     return NextResponse.redirect(new URL("/coming-soon", request.url));
+  }
+
+  // 管理画面IPチェック
+  if (isAdminBlocked(request)) {
+    return new NextResponse("Forbidden", { status: 403 });
   }
 
   // Basic認証チェック
