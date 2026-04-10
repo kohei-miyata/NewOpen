@@ -61,6 +61,7 @@ function isAdminBlocked(request: NextRequest): boolean {
   if (allowedIps.length === 0) return false; // 環境変数未設定時はスキップ
 
   const ip =
+    request.headers.get("x-vercel-forwarded-for") ??
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     request.headers.get("x-real-ip") ??
     "";
@@ -75,7 +76,7 @@ export async function middleware(request: NextRequest) {
 
   // 管理画面IPチェック
   if (isAdminBlocked(request)) {
-    return new NextResponse("Forbidden", { status: 403 });
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Basic認証チェック
