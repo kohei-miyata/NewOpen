@@ -136,15 +136,6 @@ export default async function OwnerMypagePage() {
           )}
         </section>
 
-        {/* 退会 */}
-        <div className="border-t border-gray-200 pt-6 text-center">
-          <Link
-            href="/mypage/withdraw"
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
-          >
-            退会する
-          </Link>
-        </div>
       </div>
     </div>
   );
