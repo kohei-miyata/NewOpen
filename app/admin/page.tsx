@@ -16,6 +16,7 @@ import {
   EnvelopeIcon,
   BuildingStorefrontIcon,
   ClockIcon,
+  MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = { title: "管理者ダッシュボード" };
@@ -33,6 +34,7 @@ export default async function AdminPage() {
 
 const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.user_metadata?.role !== "admin");
   const ownerUsers   = users.filter((u) => u.user_metadata?.role === "owner");
+  const emailNotifyCount = users.filter((u) => u.user_metadata?.email_notifications === true).length;
 
   // ログイン統計（1週間以内 / 1週間以上）
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -126,6 +128,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
           { label: "いいね総数",   value: totalLikes ?? 0,     sub: "likes" },
           { label: "総閲覧数",     value: storeList.reduce((s, r) => s + (r.views ?? 0), 0), sub: "views" },
           { label: "クーポン使用数", value: totalCouponUses,    sub: "uses" },
+          { label: "メール通知ON",  value: emailNotifyCount,   sub: "notify" },
         ].map((c) => (
           <div key={c.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
             <p className="text-xs text-gray-500">{c.label}</p>
@@ -462,6 +465,15 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
               {pendingStoreCount}
             </span>
           )}
+          →
+        </Link>
+        <Link
+          href="/admin/newsletter"
+          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
+        >
+          <MegaphoneIcon className="w-4 h-4" />
+          メルマガ配信
+          <span className="ml-1 text-xs text-gray-400">（通知ON: {emailNotifyCount}人）</span>
           →
         </Link>
         <Link

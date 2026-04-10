@@ -165,6 +165,44 @@ export async function setPendingStore(storeId: string) {
   revalidatePath("/admin/owners");
 }
 
+// ─── メルマガ配信 ─────────────────────────────────────────────────────────────
+
+export async function sendNewsletter(formData: FormData): Promise<{ sent: number; error?: string }> {
+  await assertAdmin();
+  const admin = createSupabaseAdminClient();
+
+  const subject = (formData.get("subject") as string).trim();
+  const body    = (formData.get("body")    as string).trim();
+  if (!subject || !body) return { sent: 0, error: "件名と本文を入力してください" };
+
+  const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  const targets = users.filter(
+    (u) => u.user_metadata?.email_notifications === true && u.email
+  );
+  if (targets.length === 0) return { sent: 0, error: "送信対象ユーザーがいません" };
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const html = `
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+      ${body.replace(/\n/g, "<br>")}
+      <hr style="margin:32px 0;border:none;border-top:1px solid #e5e7eb;">
+      <p style="font-size:12px;color:#9ca3af;">
+        NEW OPEN — あなたの街の新規オープン情報<br>
+        メール通知の停止は<a href="${siteUrl}/mypage/settings" style="color:#f97316;">マイページの設定</a>から行えます。
+      </p>
+    </div>
+  `;
+
+  const results = await Promise.allSettled(
+    targets.map((u) => sendMail({ to: u.email!, subject, html }))
+  );
+  const sent = results.filter((r) => r.status === "fulfilled").length;
+  const failed = results.length - sent;
+
+  if (failed > 0) console.error(`[sendNewsletter] ${failed}件 送信失敗`);
+  return { sent };
+}
+
 // ─── 問い合わせ返信 ───────────────────────────────────────────────────────────
 
 export async function replyToContact(formData: FormData) {
