@@ -207,6 +207,36 @@ export async function sendNewsletter(formData: FormData): Promise<{ sent: number
   return { sent };
 }
 
+export async function sendNewsletterTest(formData: FormData): Promise<{ error?: string }> {
+  await assertAdmin();
+  const subject = (formData.get("subject") as string).trim();
+  const body    = (formData.get("body")    as string).trim();
+  const to      = (formData.get("testTo")  as string).trim();
+  if (!subject || !body) return { error: "件名と本文を入力してください" };
+  if (!to) return { error: "送信先アドレスを入力してください" };
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const html = `
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+      <div style="background:#fff3e0;border:1px solid #fb923c;border-radius:8px;padding:8px 16px;margin-bottom:16px;font-size:12px;color:#c2410c;">
+        ⚠️ これはテスト送信です
+      </div>
+      ${body}
+      <hr style="margin:32px 0;border:none;border-top:1px solid #e5e7eb;">
+      <p style="font-size:12px;color:#9ca3af;">
+        NEW OPEN — あなたの街の新規オープン情報<br>
+        メール通知の停止は<a href="${siteUrl}/mypage/settings" style="color:#f97316;">マイページの設定</a>から行えます。
+      </p>
+    </div>
+  `;
+  try {
+    await sendMail({ to, subject: `[テスト] ${subject}`, html });
+    return {};
+  } catch (e) {
+    return { error: `送信失敗: ${e instanceof Error ? e.message : "不明なエラー"}` };
+  }
+}
+
 // ─── 問い合わせ返信 ───────────────────────────────────────────────────────────
 
 export async function replyToContact(formData: FormData) {
