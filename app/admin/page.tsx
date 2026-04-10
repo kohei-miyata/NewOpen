@@ -174,7 +174,9 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-700">
                     {u.user_metadata?.role === "owner"
-                      ? <span className="font-bold">{storeCountByOwner[u.id] ?? 0}</span>
+                      ? (storeCountByOwner[u.id] ?? 0) > 0
+                        ? <Link href={`/admin/owners?owner_id=${u.id}`} className="font-bold text-orange-500 hover:underline">{storeCountByOwner[u.id]}</Link>
+                        : <span className="text-gray-400">0</span>
                       : <span className="text-gray-300">—</span>
                     }
                   </td>

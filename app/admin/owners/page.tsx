@@ -22,9 +22,9 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
 export default async function AdminOwnersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; dir?: string }>;
+  searchParams: Promise<{ sort?: string; dir?: string; owner_id?: string }>;
 }) {
-  const { sort, dir } = await searchParams;
+  const { sort, dir, owner_id } = await searchParams;
   const sortKey = (sort as SortKey) || "created_at";
   const sortDir = (dir as SortDir) || "desc";
 
@@ -59,9 +59,14 @@ export default async function AdminOwnersPage({
     emailCountMap[r.store_id] = (emailCountMap[r.store_id] ?? 0) + 1;
   });
 
-  const pending = (stores ?? []).filter((s) => s.approval_status === "pending");
+  // owner_id フィルター
+  const filterOwnerEmail = owner_id ? ownerEmailMap[owner_id] : null;
+  const allStores = stores ?? [];
+  const filteredStores = owner_id ? allStores.filter((s) => s.owner_id === owner_id) : allStores;
 
-  const rawOthers = (stores ?? []).filter((s) => s.approval_status !== "pending");
+  const pending = filteredStores.filter((s) => s.approval_status === "pending");
+
+  const rawOthers = filteredStores.filter((s) => s.approval_status !== "pending");
   const others = [...rawOthers].sort((a, b) => {
     let av: string, bv: string;
     switch (sortKey) {
@@ -90,6 +95,19 @@ export default async function AdminOwnersPage({
           <p className="text-xs text-gray-400">審査待ち</p>
         </div>
       </div>
+
+      {/* オーナーフィルター中の表示 */}
+      {filterOwnerEmail && (
+        <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
+          <p className="text-sm text-orange-800 flex-1">
+            <span className="font-semibold">{filterOwnerEmail}</span> の店舗を表示中
+            <span className="ml-2 text-orange-600">（全 {filteredStores.length} 件）</span>
+          </p>
+          <Link href="/admin/owners" className="text-xs text-gray-500 hover:text-orange-500 border border-gray-300 px-3 py-1 rounded-full transition-colors">
+            フィルター解除
+          </Link>
+        </div>
+      )}
 
       {/* 審査待ち */}
       <section>
@@ -138,7 +156,7 @@ export default async function AdminOwnersPage({
                   return (
                     <th key={key} className="text-left px-4 py-3 text-xs font-semibold text-gray-500">
                       <Link
-                        href={`/admin/owners?sort=${key}&dir=${nextDir}`}
+                        href={`/admin/owners?sort=${key}&dir=${nextDir}${owner_id ? `&owner_id=${owner_id}` : ""}`}
                         className={`inline-flex items-center gap-0.5 hover:text-orange-500 transition-colors ${active ? "text-orange-500" : ""}`}
                       >
                         {label}
