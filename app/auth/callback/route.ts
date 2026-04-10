@@ -7,16 +7,15 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const type = searchParams.get("type");
 
-  const redirectUrl = type === "recovery"
-    ? `${origin}/auth/reset-password`
-    : `${origin}/`;
-
   if (!code) {
-    return NextResponse.redirect(redirectUrl);
+    const fallback = type === "recovery"
+      ? `${origin}/auth/reset-password`
+      : `${origin}/`;
+    return NextResponse.redirect(fallback);
   }
 
-  // レスポンスを先に作り、そこにCookieを直接セットする
-  const response = NextResponse.redirect(redirectUrl);
+  // クッキーを一時収集してからリダイレクト先確定後に1つのレスポンスにセットする
+  const cookiesToSet: { name: string; value: string; options: Record<string, unknown> }[] = [];
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,14 +25,9 @@ export async function GET(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, {
-              ...options,
-              maxAge: 60 * 60 * 24,
-              secure: process.env.NODE_ENV === "production",
-              sameSite: "lax",
-            });
+        setAll(incoming) {
+          incoming.forEach(({ name, value, options }) => {
+            cookiesToSet.push({ name, value, options: options as Record<string, unknown> });
           });
         },
       },
@@ -41,6 +35,7 @@ export async function GET(request: NextRequest) {
   );
 
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
   if (error) {
     const errUrl = type === "recovery"
       ? `${origin}/auth/forgot-password?error=expired`
@@ -48,11 +43,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(errUrl);
   }
 
-  if (type !== "recovery") {
-    const user = data.user;
-    const role = user?.user_metadata?.role;
+  // リダイレクト先を決定
+  let redirectTo = `${origin}/`;
 
-    // Google OAuth で新規登録したユーザーはroleが未設定 → "user" を付与
+  if (type === "recovery") {
+    redirectTo = `${origin}/auth/reset-password`;
+  } else {
+    const user = data.user;
+    let role = user?.user_metadata?.role as string | undefined;
+
+    // Google OAuth 新規ユーザーは role 未設定 → "user" を付与
     if (user && !role) {
       const adminClient = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -62,15 +62,25 @@ export async function GET(request: NextRequest) {
       await adminClient.auth.admin.updateUserById(user.id, {
         user_metadata: { ...user.user_metadata, role: "user" },
       });
+      role = "user";
     }
 
-    // オーナー登録直後（メール確認完了）→ 店舗登録へ
+    // オーナーのメール確認完了 → 店舗登録へ
     if (role === "owner") {
-      return NextResponse.redirect(`${origin}/mypage/owner/stores/new?welcome=1`, {
-        headers: response.headers,
-      });
+      redirectTo = `${origin}/mypage/owner/stores/new?welcome=1`;
     }
   }
+
+  // リダイレクト先が確定してからレスポンスを1つ作成し、クッキーをセット
+  const response = NextResponse.redirect(redirectTo);
+  cookiesToSet.forEach(({ name, value, options }) => {
+    response.cookies.set(name, value, {
+      ...options,
+      maxAge: 60 * 60 * 24,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+  });
 
   return response;
 }
