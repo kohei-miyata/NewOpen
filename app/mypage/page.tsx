@@ -23,12 +23,10 @@ export default async function MypagePage() {
   const displayName = (user.user_metadata?.display_name as string) || null;
   const likedCount = (await getLikedStores(user.id)).length;
 
-  const roleLabel = role === "owner" ? "オーナー" : role === "admin" ? "管理者" : "一般ユーザー";
+  const roleLabel = role === "owner" ? "オーナー" : role === "admin" ? "管理者" : null;
   const roleBadgeClass = role === "owner"
     ? "bg-orange-100 text-orange-600"
-    : role === "admin"
-    ? "bg-gray-900 text-white"
-    : "bg-gray-100 text-gray-600";
+    : "bg-gray-900 text-white";
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -42,9 +40,11 @@ export default async function MypagePage() {
           <div className="flex-1 min-w-0">
             {displayName && <p className="font-bold text-gray-900 truncate">{displayName}</p>}
             <p className={`truncate ${displayName ? "text-sm text-gray-500" : "font-bold text-gray-900"}`}>{user.email}</p>
-            <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 ${roleBadgeClass}`}>
-              {roleLabel}
-            </span>
+            {roleLabel && (
+              <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 ${roleBadgeClass}`}>
+                {roleLabel}
+              </span>
+            )}
           </div>
           <Link
             href="/mypage/settings"
