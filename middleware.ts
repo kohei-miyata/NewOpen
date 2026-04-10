@@ -108,6 +108,11 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
+  // ログイン済みユーザーが /auth/login or /auth/signup にアクセスしたらトップへ
+  if (user && (request.nextUrl.pathname.startsWith("/auth/login") || request.nextUrl.pathname.startsWith("/auth/signup"))) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   // BANユーザーは /banned 以外アクセス不可
   if (
     user?.user_metadata?.status === "banned" &&
