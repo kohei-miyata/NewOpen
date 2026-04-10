@@ -156,11 +156,15 @@ export async function replyToContact(formData: FormData) {
     ※このメールは運営からの返信です。</p>
   `;
 
-  await sendMail({
-    to: contact.email,
-    subject: "【NEW OPEN】お問い合わせへのご返信",
-    html: fullHtml,
-  });
+  try {
+    await sendMail({
+      to: contact.email,
+      subject: "【NEW OPEN】お問い合わせへのご返信",
+      html: fullHtml,
+    });
+  } catch (e) {
+    console.error("[replyToContact] メール送信失敗:", e);
+  }
 
   await admin.from("contact_replies").insert({
     contact_id: contactId,

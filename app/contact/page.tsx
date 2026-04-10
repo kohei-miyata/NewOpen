@@ -1,7 +1,7 @@
 import Link from "next/link";
 import ContactForm from "@/components/ContactForm";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
-
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { CONTACT_FAQS as FAQS } from "@/lib/faqs";
 
 export default async function ContactPage({
@@ -10,6 +10,11 @@ export default async function ContactPage({
   searchParams: Promise<{ error?: string; success?: string }>;
 }) {
   const sp = await searchParams;
+
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const defaultName  = (user?.user_metadata?.full_name as string | undefined) ?? "";
+  const defaultEmail = user?.email ?? "";
 
   if (sp.success) {
     return (
@@ -53,7 +58,7 @@ export default async function ContactPage({
           <p className="text-sm text-gray-500 mb-6">
             上記で解決しない場合はこちらからお送りください。
           </p>
-          <ContactForm serverError={sp.error} />
+          <ContactForm serverError={sp.error} defaultName={defaultName} defaultEmail={defaultEmail} />
         </section>
 
       </div>

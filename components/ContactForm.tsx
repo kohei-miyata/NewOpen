@@ -9,8 +9,15 @@ const INPUT_ERROR  = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
 
-export default function ContactForm({ serverError }: { serverError?: string }) {
+interface Props {
+  serverError?: string;
+  defaultName?: string;
+  defaultEmail?: string;
+}
+
+export default function ContactForm({ serverError, defaultName, defaultEmail }: Props) {
   const [errors, setErrors] = useState<Errors>({});
+  const isLoggedIn = !!(defaultName && defaultEmail);
 
   function validate(fd: FormData): boolean {
     const e: Errors = {};
@@ -59,27 +66,39 @@ export default function ContactForm({ serverError }: { serverError?: string }) {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          お名前 <span className="text-red-500">*</span>
-        </label>
-        <input
-          name="name" className={field("name")} placeholder="山田 太郎"
-          onChange={() => setErrors((p) => ({ ...p, name: undefined }))}
-        />
-        {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
-      </div>
+      {isLoggedIn ? (
+        /* ログイン済み：名前・メールを隠しフィールドで送信、表示のみ */
+        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-600 space-y-1">
+          <input type="hidden" name="name" value={defaultName} />
+          <input type="hidden" name="email" value={defaultEmail} />
+          <p><span className="text-gray-400 text-xs">お名前</span><br />{defaultName}</p>
+          <p><span className="text-gray-400 text-xs">メールアドレス</span><br />{defaultEmail}</p>
+        </div>
+      ) : (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              お名前 <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="name" className={field("name")} placeholder="山田 太郎"
+              onChange={() => setErrors((p) => ({ ...p, name: undefined }))}
+            />
+            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          メールアドレス <span className="text-red-500">*</span>
-        </label>
-        <input
-          name="email" type="email" className={field("email")} placeholder="example@email.com"
-          onChange={() => setErrors((p) => ({ ...p, email: undefined }))}
-        />
-        {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              メールアドレス <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="email" type="email" className={field("email")} placeholder="example@email.com"
+              onChange={() => setErrors((p) => ({ ...p, email: undefined }))}
+            />
+            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+          </div>
+        </>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
