@@ -131,6 +131,9 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
                 <p className="text-xs text-gray-500 mb-1">割引内容</p>
                 <p className="text-2xl font-extrabold text-orange-500">{coupon.discount}</p>
               </div>
+              <div className={`text-xs font-semibold px-3 py-1.5 rounded-lg text-center ${coupon.combinable ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500"}`}>
+                {coupon.combinable ? "他のクーポンと併用可" : "他のクーポンとの併用不可"}
+              </div>
 
               {isLoggedIn ? (
                 <>

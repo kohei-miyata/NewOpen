@@ -5,6 +5,7 @@ import { signup } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import TermsContent from "@/components/TermsContent";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
+import DatePicker from "@/components/DatePicker";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
@@ -226,15 +227,11 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         <label className="block text-sm font-medium text-gray-700 mb-1">
           生年月日 <span className="text-gray-400 font-normal">（任意）</span>
         </label>
-        <input
+        <DatePicker
           name="birthdate"
-          type="date"
-          className={errors.birthdate
-            ? "w-full border border-red-400 bg-red-50 rounded-lg px-3 py-2 text-sm focus:outline-none"
-            : "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors"
-          }
-          max={new Date().toISOString().split("T")[0]}
+          maxDate={new Date()}
           onChange={() => setErrors((p) => ({ ...p, birthdate: undefined }))}
+          className={errors.birthdate ? "ring-1 ring-red-400 rounded-lg" : ""}
         />
         {errors.birthdate && <p className="text-xs text-red-500 mt-1">{errors.birthdate}</p>}
       </div>

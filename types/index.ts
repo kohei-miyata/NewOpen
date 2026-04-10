@@ -48,4 +48,5 @@ export interface Coupon {
   code: string;
   imageUrl: string;
   isActive: boolean;
+  combinable: boolean;
 }

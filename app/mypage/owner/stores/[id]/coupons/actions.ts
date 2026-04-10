@@ -26,6 +26,7 @@ export async function addCoupon(storeId: string, formData: FormData) {
     code: (formData.get("code") as string).trim(),
     imageUrl: (formData.get("imageUrl") as string)?.trim() ?? "",
     isActive: true,
+    combinable: formData.get("combinable") === "true",
   }, supabase);
 
   redirect(`/mypage/owner/stores/${storeId}/coupons`);
@@ -50,6 +51,7 @@ export async function editCoupon(couponId: string, formData: FormData) {
     discount: (formData.get("discount") as string).trim(),
     expiryDate: formData.get("expiryDate") as string,
     code: (formData.get("code") as string).trim(),
+    combinable: formData.get("combinable") === "true",
   }, supabase);
 
   redirect(`/mypage/owner/stores/${storeId}/coupons`);

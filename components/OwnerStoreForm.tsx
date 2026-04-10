@@ -3,6 +3,7 @@
 import { useState, useEffect, useActionState, useRef } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import SnsPostEmbed from "@/components/SnsPostEmbed";
+import DatePicker from "@/components/DatePicker";
 import type { Store } from "@/types";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -12,6 +13,7 @@ const INPUT_ERROR  = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 const SNS_FIELDS = [
   { name: "sns_website",     icon: "/icons/website.svg",   placeholder: "公式サイト URL" },
+  { name: "sns_reservation", icon: "/icons/website.svg",   placeholder: "予約サイト URL（食べログ・ホットペッパー等）" },
   { name: "sns_instagram",   icon: "/icons/instagram.svg", placeholder: "Instagram URL" },
   { name: "sns_twitter",     icon: "/icons/x.png",         placeholder: "X (Twitter) URL" },
   { name: "sns_tiktok",      icon: "/icons/tiktok.png",    placeholder: "TikTok URL" },
@@ -223,19 +225,20 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
           </label>
           {isEdit ? (
             <>
-              <input
-                type="date" value={defaultValues?.openDate ?? ""}
-                readOnly disabled
-                className={`${INPUT} border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed`}
+              <DatePicker
+                name="openDate"
+                defaultValue={defaultValues?.openDate}
+                disabled
               />
               <p className="text-xs text-gray-400 mt-1">一度登録したオープン日は変更できません</p>
             </>
           ) : (
             <>
-              <input
-                name="openDate" type="date" defaultValue={defaultValues?.openDate}
-                className={field("openDate")}
+              <DatePicker
+                name="openDate"
+                defaultValue={defaultValues?.openDate}
                 onChange={() => setErrors((p) => ({ ...p, openDate: undefined }))}
+                className={errors.openDate ? "ring-1 ring-red-400 rounded-lg" : ""}
               />
               <p className="text-xs text-gray-400 mt-1">一度登録すると変更できません。正確に入力してください。</p>
               {errors.openDate && <p className="text-xs text-red-500 mt-1">{errors.openDate}</p>}

@@ -55,6 +55,7 @@ function toCoupon(row: any): Coupon {
     code: row.code,
     imageUrl: row.image_url ?? "",
     isActive: row.is_active ?? true,
+    combinable: row.combinable ?? false,
   };
 }
 
@@ -334,6 +335,7 @@ export async function createCoupon(
       expiry_date: payload.expiryDate,
       code: payload.code,
       image_url: payload.imageUrl,
+      combinable: payload.combinable ?? false,
     })
     .select()
     .single();
@@ -356,6 +358,7 @@ export async function updateCoupon(
   if (payload.expiryDate !== undefined)  updates.expiry_date = payload.expiryDate;
   if (payload.code !== undefined)        updates.code        = payload.code;
   if (payload.imageUrl !== undefined)    updates.image_url   = payload.imageUrl;
+  if (payload.combinable !== undefined)  updates.combinable  = payload.combinable;
 
   const { error } = await db.from("coupons").update(updates).eq("id", id);
   if (error) throw new Error(error.message);

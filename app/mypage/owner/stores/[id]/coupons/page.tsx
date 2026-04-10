@@ -5,7 +5,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getStoreById, getAllCouponsByStoreId } from "@/lib/db";
 import { addCoupon, removeCoupon, toggleCoupon } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
-import { TicketIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import CouponFormClient from "@/components/CouponFormClient";
+import { TicketIcon } from "@heroicons/react/24/outline";
 
 const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
 
@@ -118,6 +119,9 @@ export default async function OwnerCouponsPage({ params }: Props) {
                           <TicketIcon className="w-3 h-3" />
                           使用: {usageMap[coupon.id] ?? 0}件
                         </span>
+                        <span className={`px-2 py-0.5 rounded-full font-semibold ${coupon.combinable ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500"}`}>
+                          {coupon.combinable ? "併用可" : "併用不可"}
+                        </span>
                       </div>
                     </div>
                     <div className="flex gap-2 shrink-0 flex-wrap justify-end">
@@ -156,32 +160,7 @@ export default async function OwnerCouponsPage({ params }: Props) {
         {/* 新規クーポン追加フォーム */}
         <section>
           <h2 className="text-base font-semibold text-gray-800 mb-3">新しいクーポンを追加</h2>
-          <form action={addCouponBound} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">タイトル <span className="text-red-500">*</span></label>
-              <input name="title" required className={INPUT} placeholder="例: オープン記念 10%OFF" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">説明</label>
-              <input name="description" className={INPUT} placeholder="例: ご来店のお客様全員に適用" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">割引内容 <span className="text-red-500">*</span></label>
-                <input name="discount" required className={INPUT} placeholder="例: 10%OFF" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">クーポンコード <span className="text-red-500">*</span></label>
-                <input name="code" required className={INPUT} placeholder="例: OPEN2026" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">有効期限 <span className="text-red-500">*</span></label>
-              <input name="expiryDate" type="date" required className={INPUT} />
-            </div>
-            <input type="hidden" name="imageUrl" value="" />
-            <SubmitButton label="追加する" loadingLabel="追加中..." />
-          </form>
+          <CouponFormClient action={addCouponBound} />
         </section>
       </div>
     </div>
