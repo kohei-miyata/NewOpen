@@ -128,6 +128,7 @@ export const getCoupons = unstable_cache(
       .from("coupons")
       .select("*")
       .eq("is_active", true)
+      .gte("expiry_date", todayJST())
       .order("expiry_date", { ascending: true });
 
     if (error) throw new Error(error.message);
@@ -145,6 +146,7 @@ export const getCouponsWithLocation = unstable_cache(
       .from("coupons")
       .select("*, stores(lat, lng, image_url)")
       .eq("is_active", true)
+      .gte("expiry_date", todayJST())
       .order("expiry_date", { ascending: true });
 
     if (error) throw new Error(error.message);

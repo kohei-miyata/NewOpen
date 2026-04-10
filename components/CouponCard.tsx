@@ -93,6 +93,9 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
               {isLoggedIn ? coupon.code : "ログインで表示"}
             </span>
           </div>
+          <p className={`text-xs mt-1.5 ${daysLeft <= 0 ? "text-red-500 font-semibold" : daysLeft <= 7 ? "text-orange-500" : "text-gray-400"}`}>
+            期限: {coupon.expiryDate}{daysLeft <= 0 ? "（期限切れ）" : ""}
+          </p>
         </div>
       </button>
 
