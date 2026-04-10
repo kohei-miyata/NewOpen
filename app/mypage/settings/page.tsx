@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { KeyIcon, TrashIcon, ChevronRightIcon, UserIcon } from "@heroicons/react/24/outline";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import EmailNotificationToggle from "@/components/EmailNotificationToggle";
 
 export default async function SettingsPage() {
   const supabase = await createSupabaseServerClient();
@@ -9,6 +10,7 @@ export default async function SettingsPage() {
   if (!user) redirect("/auth/login");
 
   const displayName = (user.user_metadata?.display_name as string) || null;
+  const emailNotifications = (user.user_metadata?.email_notifications as boolean) ?? false;
 
   return (
     <div className="max-w-xl mx-auto px-4 py-10 space-y-6">
@@ -28,6 +30,9 @@ export default async function SettingsPage() {
           </div>
           <ChevronRightIcon className="w-4 h-4 text-gray-300" />
         </Link>
+
+        {/* メール通知 */}
+        <EmailNotificationToggle defaultEnabled={emailNotifications} />
 
         {/* パスワード変更 */}
         <Link

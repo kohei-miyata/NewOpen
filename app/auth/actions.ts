@@ -135,6 +135,13 @@ export async function resetPassword(formData: FormData): Promise<{ error?: strin
   redirect("/auth/reset-password?success=1");
 }
 
+export async function updateEmailNotifications(enabled: boolean): Promise<{ error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.updateUser({ data: { email_notifications: enabled } });
+  if (error) return { error: "設定の更新に失敗しました" };
+  return {};
+}
+
 export async function updateDisplayName(formData: FormData): Promise<{ error?: string }> {
   const display_name = (formData.get("display_name") as string)?.trim();
   if (!display_name) return { error: "お名前を入力してください" };

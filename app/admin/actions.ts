@@ -41,7 +41,7 @@ export async function approveStore(storeId: string) {
 
   const { data: storeRow } = await admin
     .from("stores")
-    .select("id, name, owner_id")
+    .select("id, name, category, address, open_date, owner_id")
     .eq("id", storeId)
     .single();
   if (!storeRow) throw new Error("店舗が見つかりません");
@@ -70,6 +70,41 @@ export async function approveStore(storeId: string) {
         store_id: storeId, subject, body, recipient_email: ownerEmail,
       }).then(null, console.error);
     }
+  }
+
+  // 通知希望の一般ユーザーへ一斉送信
+  const { data: { users: allUsers } } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  const notifyUsers = allUsers.filter(
+    (u) => u.user_metadata?.email_notifications === true
+      && u.user_metadata?.role !== "owner"
+      && u.user_metadata?.role !== "admin"
+      && u.email
+  );
+
+  if (notifyUsers.length > 0) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    const notifySubject = `【NEW OPEN】新しいお店がオープンしました！「${storeRow.name}」`;
+    const notifyHtml = `
+      <p>NEW OPEN をご利用いただきありがとうございます。</p>
+      <p>新しいお店の掲載が開始されました。</p>
+      <table style="border-collapse:collapse;margin:16px 0;">
+        <tr><td style="color:#888;padding:4px 12px 4px 0;font-size:14px;">店舗名</td><td style="font-size:14px;font-weight:bold;">${storeRow.name}</td></tr>
+        <tr><td style="color:#888;padding:4px 12px 4px 0;font-size:14px;">カテゴリ</td><td style="font-size:14px;">${storeRow.category ?? ""}</td></tr>
+        <tr><td style="color:#888;padding:4px 12px 4px 0;font-size:14px;">住所</td><td style="font-size:14px;">${storeRow.address ?? ""}</td></tr>
+        <tr><td style="color:#888;padding:4px 12px 4px 0;font-size:14px;">オープン日</td><td style="font-size:14px;">${storeRow.open_date ?? ""}</td></tr>
+      </table>
+      <p><a href="${siteUrl}/stores/${storeRow.id}" style="background:#f97316;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">店舗の詳細を見る →</a></p>
+      <hr style="margin:24px 0;">
+      <p style="font-size:12px;color:#888;">
+        NEW OPEN — あなたの街の新規オープン情報<br>
+        メール通知の停止は<a href="${siteUrl}/mypage/settings" style="color:#f97316;">マイページの設定</a>から行えます。
+      </p>
+    `;
+    await Promise.allSettled(
+      notifyUsers.map((u) =>
+        sendMail({ to: u.email!, subject: notifySubject, html: notifyHtml })
+      )
+    );
   }
 
   revalidatePath("/admin/owners");
