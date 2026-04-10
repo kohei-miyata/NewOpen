@@ -41,11 +41,13 @@ export async function signup(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const role = (formData.get("role") as string) === "owner" ? "owner" : "user";
+  const display_name = (formData.get("display_name") as string)?.trim() || null;
   const gender = (formData.get("gender") as string) || null;
   const birthdate = (formData.get("birthdate") as string) || null;
   const supabase = await createSupabaseServerClient();
 
   const metadata: Record<string, string> = { role };
+  if (display_name) metadata.display_name = display_name;
   if (gender) metadata.gender = gender;
   if (birthdate) metadata.birthdate = birthdate;
 
@@ -131,6 +133,17 @@ export async function resetPassword(formData: FormData): Promise<{ error?: strin
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: toJapaneseAuthError(error.message) };
   redirect("/auth/reset-password?success=1");
+}
+
+export async function updateDisplayName(formData: FormData): Promise<{ error?: string }> {
+  const display_name = (formData.get("display_name") as string)?.trim();
+  if (!display_name) return { error: "お名前を入力してください" };
+  if (display_name.length > 50) return { error: "お名前は50文字以内で入力してください" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.updateUser({ data: { display_name } });
+  if (error) return { error: "更新に失敗しました。しばらく時間をおいてから再試行してください。" };
+  redirect("/mypage/change-name?success=1");
 }
 
 export async function deleteAccount(): Promise<{ error?: string }> {

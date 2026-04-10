@@ -19,6 +19,7 @@ export default async function MypagePage() {
   if (!user) redirect("/auth/login");
 
   const role = (user.user_metadata?.role as string) ?? "user";
+  const displayName = (user.user_metadata?.display_name as string) || null;
   const likedCount = (await getLikedStores(user.id)).length;
 
   const roleLabel = role === "owner" ? "オーナー" : role === "admin" ? "管理者" : "一般ユーザー";
@@ -38,7 +39,8 @@ export default async function MypagePage() {
             <UserCircleIcon className="w-8 h-8 text-orange-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-gray-900 truncate">{user.email}</p>
+            {displayName && <p className="font-bold text-gray-900 truncate">{displayName}</p>}
+            <p className={`truncate ${displayName ? "text-sm text-gray-500" : "font-bold text-gray-900"}`}>{user.email}</p>
             <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 ${roleBadgeClass}`}>
               {roleLabel}
             </span>

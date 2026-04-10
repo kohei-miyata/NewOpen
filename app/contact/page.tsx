@@ -13,8 +13,8 @@ export default async function ContactPage({
 
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const defaultName  = (user?.user_metadata?.full_name as string | undefined) ?? "";
   const defaultEmail = user?.email ?? "";
+  const defaultName = (user?.user_metadata?.display_name as string) ?? "";
 
   if (sp.success) {
     return (
@@ -58,7 +58,7 @@ export default async function ContactPage({
           <p className="text-sm text-gray-500 mb-6">
             上記で解決しない場合はこちらからお送りください。
           </p>
-          <ContactForm serverError={sp.error} defaultName={defaultName} defaultEmail={defaultEmail} />
+          <ContactForm serverError={sp.error} defaultEmail={defaultEmail} defaultName={defaultName} />
         </section>
 
       </div>

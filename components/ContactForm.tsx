@@ -11,11 +11,11 @@ type Errors = Partial<Record<"name" | "email" | "message", string>>;
 
 interface Props {
   serverError?: string;
-  defaultName?: string;
   defaultEmail?: string;
+  defaultName?: string;
 }
 
-export default function ContactForm({ serverError, defaultName, defaultEmail }: Props) {
+export default function ContactForm({ serverError, defaultEmail, defaultName }: Props) {
   const [errors, setErrors] = useState<Errors>({});
   const isLoggedIn = !!(defaultName && defaultEmail);
 
@@ -68,12 +68,20 @@ export default function ContactForm({ serverError, defaultName, defaultEmail }: 
 
       {isLoggedIn ? (
         /* ログイン済み：名前・メールを隠しフィールドで送信、表示のみ */
-        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-600 space-y-1">
-          <input type="hidden" name="name" value={defaultName} />
+        <>
           <input type="hidden" name="email" value={defaultEmail} />
-          <p><span className="text-gray-400 text-xs">お名前</span><br />{defaultName}</p>
-          <p><span className="text-gray-400 text-xs">メールアドレス</span><br />{defaultEmail}</p>
-        </div>
+          <input type="hidden" name="name" value={defaultName} />
+          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-600 space-y-2">
+            <div>
+              <p className="text-xs text-gray-400 mb-0.5">お名前</p>
+              <p>{defaultName}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 mb-0.5">送信元メールアドレス</p>
+              <p>{defaultEmail}</p>
+            </div>
+          </div>
+        </>
       ) : (
         <>
           <div>

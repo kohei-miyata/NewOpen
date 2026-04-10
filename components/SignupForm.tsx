@@ -40,6 +40,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
   const [isPending, setIsPending] = useState(false);
   const [termsScrolled, setTermsScrolled] = useState(false);
   const [errors, setErrors] = useState<{
+    name?: string;
     email?: string;
     password?: string;
     confirm?: string;
@@ -51,10 +52,13 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
 
   function validate(fd: FormData): boolean {
     const e: typeof errors = {};
+    const name     = (fd.get("display_name") as string).trim();
     const email    = (fd.get("email") as string).trim();
     const password = fd.get("password") as string;
     const confirm  = fd.get("confirm") as string;
 
+    if (!name)  e.name  = "お名前を入力してください";
+    if (name.length > 50) e.name = "お名前は50文字以内で入力してください";
     if (!email) {
       e.email = "メールアドレスを入力してください";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -135,6 +139,19 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
           ))}
         </div>
         <input type="hidden" name="role" value={role} />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          お名前 <span className="text-red-500">*</span>
+        </label>
+        <input
+          name="display_name" autoComplete="name"
+          className={errors.name ? INPUT_ERROR : INPUT_NORMAL}
+          placeholder="山田 太郎"
+          onChange={() => setErrors((p) => ({ ...p, name: undefined }))}
+        />
+        {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
       </div>
 
       <div>
