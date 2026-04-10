@@ -9,11 +9,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { title: "クーポン一覧 | NEW OPEN" };
 
 interface Props {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; showUsed?: string }>;
 }
 
 export default async function CouponsPage({ searchParams }: Props) {
-  const { q, category } = await searchParams;
+  const { q, category, showUsed } = await searchParams;
 
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -60,7 +60,7 @@ export default async function CouponsPage({ searchParams }: Props) {
           {/* カテゴリフィルター */}
           <div className="flex flex-wrap gap-2">
             <a
-              href={q ? `/coupons?q=${encodeURIComponent(q)}` : "/coupons"}
+              href={`/coupons?${new URLSearchParams({ ...(q ? { q } : {}), ...(showUsed ? { showUsed } : {}) }).toString()}`}
               className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                 !category
                   ? "bg-orange-500 text-white border-orange-500"
@@ -72,7 +72,7 @@ export default async function CouponsPage({ searchParams }: Props) {
             {CATEGORIES.map((cat) => (
               <a
                 key={cat}
-                href={`/coupons?${new URLSearchParams({ ...(q ? { q } : {}), category: cat }).toString()}`}
+                href={`/coupons?${new URLSearchParams({ ...(q ? { q } : {}), category: cat, ...(showUsed ? { showUsed } : {}) }).toString()}`}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                   category === cat
                     ? "bg-orange-500 text-white border-orange-500"
@@ -85,25 +85,42 @@ export default async function CouponsPage({ searchParams }: Props) {
           </div>
         </form>
 
-        {/* 件数表示 */}
-        <p className="text-sm text-gray-500 mb-4">
-          {keyword || category ? (
-            <>
-              <span className="font-bold text-gray-800">{coupons.length}</span> 件のクーポンが見つかりました
-              <a href="/coupons" className="ml-3 text-orange-500 hover:underline text-xs">
-                フィルターをクリア
-              </a>
-            </>
-          ) : (
-            <><span className="font-bold text-gray-800">{coupons.length}</span> 件のクーポン</>
+        {/* 件数・使用済みトグル */}
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-gray-500">
+            {keyword || category ? (
+              <>
+                <span className="font-bold text-gray-800">{coupons.length}</span> 件のクーポンが見つかりました
+                <a href="/coupons" className="ml-3 text-orange-500 hover:underline text-xs">フィルターをクリア</a>
+              </>
+            ) : (
+              <><span className="font-bold text-gray-800">{coupons.length}</span> 件のクーポン</>
+            )}
+          </p>
+          {user && (
+            <a
+              href={`/coupons?${new URLSearchParams({
+                ...(q ? { q } : {}),
+                ...(category ? { category } : {}),
+                ...(showUsed !== "1" ? { showUsed: "1" } : {}),
+              }).toString()}`}
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                showUsed === "1"
+                  ? "bg-gray-200 text-gray-700 border-gray-300"
+                  : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
+              }`}
+            >
+              {showUsed === "1" ? "使用済みを非表示" : "使用済みを表示"}
+            </a>
           )}
-        </p>
+        </div>
 
         {/* 位置情報ソート付きグリッド */}
         <CouponsWithLocation
           coupons={coupons}
           usedIds={usedCouponIds}
           isLoggedIn={!!user}
+          showUsed={showUsed === "1"}
         />
 
         <div className="mt-14">

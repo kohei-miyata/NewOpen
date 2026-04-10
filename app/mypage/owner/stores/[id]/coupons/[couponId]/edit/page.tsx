@@ -46,6 +46,7 @@ export default async function EditCouponPage({ params }: Props) {
             code: coupon.code,
             expiryDate: coupon.expiryDate,
             combinable: coupon.combinable,
+            imageUrl: coupon.imageUrl,
           }}
         />
       </div>

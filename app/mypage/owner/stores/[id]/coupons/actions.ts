@@ -24,7 +24,7 @@ export async function addCoupon(storeId: string, formData: FormData) {
     discount: (formData.get("discount") as string).trim(),
     expiryDate: formData.get("expiryDate") as string,
     code: (formData.get("code") as string).trim(),
-    imageUrl: (formData.get("imageUrl") as string)?.trim() ?? "",
+    imageUrl: (formData.get("imageUrl") as string)?.trim() || store.imageUrl || "",
     isActive: true,
     combinable: formData.get("combinable") === "true",
   }, supabase);

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import DatePicker from "@/components/DatePicker";
 import SubmitButton from "@/components/SubmitButton";
+import ImageUpload from "@/components/ImageUpload";
 
 const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
 
@@ -15,6 +16,7 @@ interface Props {
     code?: string;
     expiryDate?: string;
     combinable?: boolean;
+    imageUrl?: string;
   };
 }
 
@@ -76,7 +78,9 @@ export default function CouponFormClient({ action, defaultValues }: Props) {
           {combinable ? "他のクーポンと同時に使用できます" : "他のクーポンとの同時使用はできません"}
         </p>
       </div>
-      <input type="hidden" name="imageUrl" value="" />
+      <div>
+        <ImageUpload name="imageUrl" label="クーポン画像（任意）" defaultValue={defaultValues?.imageUrl} />
+      </div>
       <SubmitButton label="追加する" loadingLabel="追加中..." />
     </form>
   );

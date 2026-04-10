@@ -18,9 +18,10 @@ interface Props {
   coupons: CouponWithLocation[];
   usedIds: Set<string>;
   isLoggedIn: boolean;
+  showUsed?: boolean;
 }
 
-export default function CouponsWithLocation({ coupons, usedIds, isLoggedIn }: Props) {
+export default function CouponsWithLocation({ coupons, usedIds, isLoggedIn, showUsed = false }: Props) {
   const [sorted, setSorted] = useState<CouponWithLocation[]>(coupons);
   const [locating, setLocating] = useState(false);
   const [granted, setGranted] = useState(false);
@@ -71,20 +72,26 @@ export default function CouponsWithLocation({ coupons, usedIds, isLoggedIn }: Pr
         <p className="text-xs text-gray-400 mb-3">位置情報を取得できませんでした。デフォルト順で表示します。</p>
       )}
 
-      {sorted.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-sm">該当するクーポンが見つかりませんでした</p>
-          <a href="/coupons" className="text-orange-500 hover:underline text-sm mt-2 inline-block">
-            すべてのクーポンを見る →
-          </a>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sorted.map((coupon) => (
-            <CouponCard key={coupon.id} coupon={coupon} isUsed={usedIds.has(coupon.id)} isLoggedIn={isLoggedIn} />
-          ))}
-        </div>
-      )}
+      {(() => {
+        const visible = showUsed ? sorted : sorted.filter((c) => !usedIds.has(c.id));
+        if (visible.length === 0) return (
+          <div className="text-center py-16 text-gray-400">
+            <p className="text-sm">
+              {sorted.length > 0 ? "未使用のクーポンはありません" : "該当するクーポンが見つかりませんでした"}
+            </p>
+            <a href="/coupons" className="text-orange-500 hover:underline text-sm mt-2 inline-block">
+              すべてのクーポンを見る →
+            </a>
+          </div>
+        );
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {visible.map((coupon) => (
+              <CouponCard key={coupon.id} coupon={coupon} isUsed={usedIds.has(coupon.id)} isLoggedIn={isLoggedIn} />
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }
