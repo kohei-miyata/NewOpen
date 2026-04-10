@@ -1,95 +1,84 @@
-"use client";
-
-import { useState, useTransition } from "react";
+import { redirect } from "next/navigation";
 import Link from "next/link";
-import { MegaphoneIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
-import { sendNewsletter } from "@/app/admin/actions";
+import type { Metadata } from "next";
+import { MegaphoneIcon } from "@heroicons/react/24/outline";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import NewsletterForm from "@/components/NewsletterForm";
 
-export default function NewsletterPage() {
-  const [subject, setSubject]   = useState("");
-  const [body, setBody]         = useState("");
-  const [result, setResult]     = useState<{ sent?: number; error?: string } | null>(null);
-  const [isPending, startTransition] = useTransition();
+export const metadata: Metadata = { title: "メルマガ配信 | 管理者" };
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setResult(null);
-    const fd = new FormData();
-    fd.set("subject", subject);
-    fd.set("body", body);
-    startTransition(async () => {
-      const res = await sendNewsletter(fd);
-      setResult(res);
-      if (!res.error) { setSubject(""); setBody(""); }
-    });
-  }
+export default async function NewsletterPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.app_metadata?.role !== "admin") redirect("/");
+
+  const admin = createSupabaseAdminClient();
+
+  // 通知希望ユーザー数
+  const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  const notifyCount = users.filter((u) => u.user_metadata?.email_notifications === true).length;
+
+  // 送信履歴
+  const { data: history } = await admin
+    .from("newsletter_history")
+    .select("*")
+    .order("sent_at", { ascending: false })
+    .limit(30);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
       <div>
         <Link href="/admin" className="text-sm text-gray-500 hover:text-orange-500 transition-colors">← 管理画面に戻る</Link>
         <h1 className="text-2xl font-bold text-gray-900 mt-1 flex items-center gap-2">
           <MegaphoneIcon className="w-6 h-6 text-orange-500" /> メルマガ配信
         </h1>
-        <p className="text-xs text-gray-400 mt-1">メール通知をオンにしているユーザー全員に一斉送信します</p>
+        <p className="text-sm text-gray-500 mt-1">
+          現在 <span className="font-bold text-orange-500">{notifyCount} 人</span> が通知をオンにしています
+        </p>
       </div>
 
-      {result?.sent !== undefined && !result.error && (
-        <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
-          <CheckCircleIcon className="w-5 h-5 text-green-500 shrink-0" />
-          <p className="text-sm text-green-800 font-medium">{result.sent} 件のメール送信が完了しました</p>
-        </div>
-      )}
-      {result?.error && (
-        <p className="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-xl border border-red-200">{result.error}</p>
-      )}
+      {/* 送信フォーム */}
+      <NewsletterForm />
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            件名 <span className="text-red-500">*</span>
-          </label>
-          <input
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="例：【NEW OPEN】今月のおすすめ新規オープン店舗"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            本文 <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={10}
-            placeholder="メール本文を入力してください。改行はそのまま反映されます。"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors resize-none"
-          />
-          <p className="text-xs text-gray-400 mt-1">末尾に「通知停止はマイページ設定から」の文が自動付加されます</p>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg px-4 py-3 text-xs text-gray-500 space-y-1">
-          <p className="font-semibold text-gray-700">送信前の確認</p>
-          <p>・送信後の取り消しはできません</p>
-          <p>・件名の先頭に「【NEW OPEN】」を含めることを推奨します</p>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isPending || !subject.trim() || !body.trim()}
-          className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {isPending ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              送信中...
-            </span>
-          ) : "一斉送信する"}
-        </button>
-      </form>
+      {/* 送信履歴 */}
+      <section>
+        <h2 className="text-base font-bold text-gray-800 mb-3">送信履歴</h2>
+        {!history || history.length === 0 ? (
+          <p className="text-sm text-gray-400 bg-white rounded-xl border border-gray-100 p-6 text-center">
+            送信履歴はまだありません
+          </p>
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+            {history.map((h) => (
+              <details key={h.id} className="group">
+                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none hover:bg-gray-50 transition-colors">
+                  <div className="flex-1 min-w-0 pr-4">
+                    <p className="text-sm font-medium text-gray-900 truncate">{h.subject}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {new Date(h.sent_at).toLocaleString("ja-JP", {
+                        year: "numeric", month: "2-digit", day: "2-digit",
+                        hour: "2-digit", minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-xs font-bold bg-orange-100 text-orange-600 px-2.5 py-1 rounded-full">
+                      {h.sent_count} 件送信
+                    </span>
+                    <span className="text-gray-300 text-xs group-open:rotate-180 transition-transform">▼</span>
+                  </div>
+                </summary>
+                <div className="px-5 pb-4 pt-0">
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed bg-gray-50 rounded-lg px-4 py-3">
+                    {h.body}
+                  </p>
+                </div>
+              </details>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

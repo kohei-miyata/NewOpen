@@ -200,6 +200,10 @@ export async function sendNewsletter(formData: FormData): Promise<{ sent: number
   const failed = results.length - sent;
 
   if (failed > 0) console.error(`[sendNewsletter] ${failed}件 送信失敗`);
+
+  await admin.from("newsletter_history").insert({ subject, body, sent_count: sent }).then(null, console.error);
+
+  revalidatePath("/admin/newsletter");
   return { sent };
 }
 
