@@ -18,24 +18,27 @@ export default function ImageUpload({ name, label, defaultValue = "", onUpload }
   async function toJpeg(file: File): Promise<File> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      const url = URL.createObjectURL(file);
+      const objectUrl = URL.createObjectURL(file);
       img.onload = () => {
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(objectUrl);
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        if (!w || !h) { reject(new Error("サイズ取得失敗")); return; }
         const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext("2d")!.drawImage(img, 0, 0);
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
         canvas.toBlob(
           (blob) => {
-            if (!blob) { reject(new Error("変換に失敗しました")); return; }
+            if (!blob || blob.size < 100) { reject(new Error("変換に失敗しました")); return; }
             resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
           },
           "image/jpeg",
           0.92
         );
       };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("画像を読み込めませんでした")); };
-      img.src = url;
+      img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("読み込み失敗")); };
+      img.src = objectUrl;
     });
   }
 
@@ -43,11 +46,12 @@ export default function ImageUpload({ name, label, defaultValue = "", onUpload }
     setError("");
     setUploading(true);
 
-    // HEIC/HEIFはJPEGに変換（iPhone対応）
-    const needsConvert = file.type === "image/heic" || file.type === "image/heif"
-      || /\.heic$/i.test(file.name) || /\.heif$/i.test(file.name);
-    if (needsConvert) {
-      try { file = await toJpeg(file); } catch { /* 変換失敗時はそのまま試みる */ }
+    // すべての画像をcanvas経由でJPEGに変換（HEIC/HEIFを含むiOS対応）
+    // 変換失敗した場合はオリジナルのままアップロードを試みる
+    try {
+      file = await toJpeg(file);
+    } catch {
+      // 変換失敗 → オリジナルのまま続行
     }
 
     const fd = new FormData();

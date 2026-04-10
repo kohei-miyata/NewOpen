@@ -5,7 +5,7 @@ import { signup } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import TermsContent from "@/components/TermsContent";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import DatePicker from "@/components/DatePicker";
+import BirthdatePicker from "@/components/BirthdatePicker";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
@@ -97,6 +97,13 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
     }
 
     setErrors(e);
+    if (Object.keys(e).length > 0) {
+      // 最初のエラーフィールドへスクロール
+      setTimeout(() => {
+        const el = document.querySelector<HTMLElement>("[data-field-error='true']");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
+    }
     return Object.keys(e).length === 0;
   }
 
@@ -149,7 +156,19 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         <input type="hidden" name="role" value={role} />
       </div>
 
-      <div>
+      {/* Google登録 — 一般ユーザーのみ、フォームより先に表示 */}
+      {role === "user" && (
+        <>
+          <GoogleAuthButton label="Googleで登録" />
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">またはメールアドレスで登録</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+        </>
+      )}
+
+      <div data-field-error={!!errors.name || undefined}>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           お名前 <span className="text-red-500">*</span>
         </label>
@@ -162,7 +181,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
       </div>
 
-      <div>
+      <div data-field-error={!!errors.email || undefined}>
         <label className="block text-sm font-medium text-gray-700 mb-1">メールアドレス</label>
         <input
           name="email" type="email" autoComplete="email"
@@ -172,7 +191,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
       </div>
 
-      <div>
+      <div data-field-error={!!errors.password || undefined}>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           パスワード <span className="text-gray-400 font-normal">（英数字8文字以上）</span>
         </label>
@@ -194,7 +213,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
       </div>
 
-      <div>
+      <div data-field-error={!!errors.confirm || undefined}>
         <label className="block text-sm font-medium text-gray-700 mb-1">パスワード（確認）</label>
         <div className="relative">
           <input
@@ -215,7 +234,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
       </div>
 
       {/* 性別 */}
-      <div>
+      <div data-field-error={!!errors.gender || undefined}>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           性別 <span className="text-red-500">*</span>
         </label>
@@ -234,15 +253,14 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
       </div>
 
       {/* 生年月日 */}
-      <div>
+      <div data-field-error={!!errors.birthdate || undefined}>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           生年月日 <span className="text-red-500">*</span>
         </label>
-        <DatePicker
+        <BirthdatePicker
           name="birthdate"
-          maxDate={new Date()}
           onChange={() => setErrors((p) => ({ ...p, birthdate: undefined }))}
-          className={errors.birthdate ? "ring-1 ring-red-400 rounded-lg" : ""}
+          className={errors.birthdate ? "error" : ""}
         />
         {errors.birthdate && <p className="text-xs text-red-500 mt-1">{errors.birthdate}</p>}
       </div>
@@ -286,16 +304,6 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         ) : "登録する"}
       </button>
 
-      {role === "user" && (
-        <>
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">または</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-          <GoogleAuthButton label="Googleで登録" />
-        </>
-      )}
     </form>
   );
 }
