@@ -44,6 +44,12 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
   const { data: stores } = await db.from("stores").select("id, name, category, address, views, likes, open_date, owner_id").order("likes", { ascending: false });
   const storeList = stores ?? [];
 
+  // オーナー別登録店舗数
+  const storeCountByOwner = storeList.reduce<Record<string, number>>((acc, s) => {
+    if (s.owner_id) acc[s.owner_id] = (acc[s.owner_id] ?? 0) + 1;
+    return acc;
+  }, {});
+
   // いいね上位
   const topLiked = [...storeList].sort((a, b) => b.likes - a.likes).slice(0, 10);
 
@@ -138,6 +144,7 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">メールアドレス</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">ロール</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">ステータス</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">登録店舗数</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">登録日</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">最終ログイン</th>
                 <th className="px-4 py-3"></th>
@@ -164,6 +171,12 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
                     }`}>
                       {isBanned ? "BAN" : "有効"}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-700">
+                    {u.user_metadata?.role === "owner"
+                      ? <span className="font-bold">{storeCountByOwner[u.id] ?? 0}</span>
+                      : <span className="text-gray-300">—</span>
+                    }
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
                     {u.created_at ? new Date(u.created_at).toLocaleDateString("ja-JP") : "-"}
