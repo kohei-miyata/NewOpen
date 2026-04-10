@@ -6,6 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { approveStore, rejectStore, setPendingStore } from "@/app/admin/actions";
 import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
 import { BuildingStorefrontIcon } from "@heroicons/react/24/outline";
+import { ApproveSubmitButton, RejectSubmitButton, PendingSubmitButton } from "@/components/AdminActionButtons";
 
 export const metadata: Metadata = { title: "店舗審査管理 | 管理者" };
 
@@ -130,9 +131,7 @@ export default async function AdminOwnersPage() {
                     <td className="px-4 py-3 text-xs text-gray-500">{emailCountMap[store.id] ?? 0}</td>
                     <td className="px-4 py-3">
                       <form action={setPendingStore.bind(null, store.id)}>
-                        <button type="submit" className="text-xs text-gray-500 border border-gray-200 px-2 py-1 rounded-full hover:bg-gray-100 transition-colors">
-                          審査待ちに戻す
-                        </button>
+                        <PendingSubmitButton />
                       </form>
                     </td>
                   </tr>
@@ -187,12 +186,7 @@ function StoreReviewCard({
 
       {/* 承認ボタン */}
       <form action={approveStore.bind(null, store.id)}>
-        <button
-          type="submit"
-          className="w-full bg-green-500 text-white text-sm font-bold py-2 rounded-lg hover:bg-green-600 transition-colors"
-        >
-          ✓ 承認する（自動でオーナーにメール送信）
-        </button>
+        <ApproveSubmitButton />
       </form>
 
       {/* 否認フォーム */}
@@ -235,12 +229,7 @@ function StoreReviewCard({
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-red-500 text-white text-sm font-bold py-2 rounded-lg hover:bg-red-600 transition-colors"
-          >
-            否認してメールを送信
-          </button>
+          <RejectSubmitButton />
         </form>
       </details>
     </div>
