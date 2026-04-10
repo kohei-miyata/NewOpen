@@ -77,6 +77,18 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
   // いいね総数
   const { count: totalLikes } = await db.from("store_likes").select("*", { count: "exact", head: true });
 
+  // 審査待ち店舗数
+  const { count: pendingStoreCount } = await admin
+    .from("stores")
+    .select("*", { count: "exact", head: true })
+    .eq("approval_status", "pending");
+
+  // 未対応お問い合わせ数（返信履歴がない）
+  const { data: allContacts } = await admin.from("contacts").select("id");
+  const { data: repliedContactIds } = await admin.from("contact_replies").select("contact_id");
+  const repliedIds = new Set((repliedContactIds ?? []).map((r) => r.contact_id));
+  const unansweredContactCount = (allContacts ?? []).filter((c) => !repliedIds.has(c.id)).length;
+
   // クーポン使用状況（adminクライアントでRLS回避）
   const { data: allCoupons } = await db
     .from("coupons")
@@ -428,13 +440,27 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
           href="/admin/owners"
           className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
         >
-          <BuildingStorefrontIcon className="w-4 h-4" /> 店舗審査管理 →
+          <BuildingStorefrontIcon className="w-4 h-4" />
+          店舗審査管理
+          {(pendingStoreCount ?? 0) > 0 && (
+            <span className="ml-1 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {pendingStoreCount}
+            </span>
+          )}
+          →
         </Link>
         <Link
           href="/admin/contacts"
           className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
         >
-          <EnvelopeIcon className="w-4 h-4" /> お問い合わせ一覧を見る →
+          <EnvelopeIcon className="w-4 h-4" />
+          お問い合わせ一覧
+          {unansweredContactCount > 0 && (
+            <span className="ml-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {unansweredContactCount}
+            </span>
+          )}
+          →
         </Link>
       </section>
 
