@@ -70,7 +70,7 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={coupon.imageUrl || "/placeholder.png"}
+          src={coupon.imageUrl || "/placeholder.svg"}
           alt={coupon.storeName}
           className="w-28 h-28 object-cover flex-shrink-0"
         />

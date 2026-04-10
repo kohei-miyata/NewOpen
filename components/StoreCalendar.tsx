@@ -166,7 +166,7 @@ export default function StoreCalendar({ stores, comingSoon = [] }: Props) {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={store.imageUrl || "/placeholder.png"}
+                      src={store.imageUrl || "/placeholder.svg"}
                       alt={store.name}
                       className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                     />
