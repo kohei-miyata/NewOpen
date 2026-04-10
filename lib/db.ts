@@ -95,32 +95,40 @@ export async function getStoreOwnerId(storeId: string): Promise<string | null> {
   return data?.owner_id ?? null;
 }
 
-export async function getStoreById(id: string): Promise<Store | undefined> {
-  const { data, error } = await getSupabaseClient()
-    .from("stores")
-    .select("*")
-    .eq("id", id)
-    .single();
+export const getStoreById = unstable_cache(
+  async (id: string): Promise<Store | undefined> => {
+    const { data, error } = await getSupabaseClient()
+      .from("stores")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-  if (error || !data) return undefined;
-  return toStore(data);
-}
+    if (error || !data) return undefined;
+    return toStore(data);
+  },
+  ["store-by-id"],
+  { revalidate: 30, tags: ["store"] }
+);
 
-export async function getRankedStores(limit?: number): Promise<Store[]> {
-  const today = todayJST();
-  let query = getSupabaseClient()
-    .from("stores")
-    .select("*")
-    .lte("open_date", today)
-    .eq("approval_status", "approved")
-    .order("likes", { ascending: false });
+export const getRankedStores = unstable_cache(
+  async (limit?: number): Promise<Store[]> => {
+    const today = todayJST();
+    let query = getSupabaseClient()
+      .from("stores")
+      .select("*")
+      .lte("open_date", today)
+      .eq("approval_status", "approved")
+      .order("likes", { ascending: false });
 
-  if (limit) query = query.limit(limit);
+    if (limit) query = query.limit(limit);
 
-  const { data, error } = await query;
-  if (error) throw new Error(error.message);
-  return (data ?? []).map(toStore).filter((s) => isWithinThreeYears(s.openDate));
-}
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(toStore).filter((s) => isWithinThreeYears(s.openDate));
+  },
+  ["ranked-stores"],
+  { revalidate: 60, tags: ["store"] }
+);
 
 export const getCoupons = unstable_cache(
   async (): Promise<Coupon[]> => {
@@ -209,19 +217,23 @@ export async function createStore(
   return toStore(data);
 }
 
-export async function getTodayOpenStores(): Promise<Store[]> {
-  const today = todayJST();
-  const { data, error } = await getSupabaseClient()
-    .from("stores")
-    .select("*")
-    .eq("open_date", today)
-    .eq("status", "active")
-    .eq("approval_status", "approved")
-    .order("name", { ascending: true });
+export const getTodayOpenStores = unstable_cache(
+  async (): Promise<Store[]> => {
+    const today = todayJST();
+    const { data, error } = await getSupabaseClient()
+      .from("stores")
+      .select("*")
+      .eq("open_date", today)
+      .eq("status", "active")
+      .eq("approval_status", "approved")
+      .order("name", { ascending: true });
 
-  if (error) throw new Error(error.message);
-  return (data ?? []).map(toStore);
-}
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(toStore);
+  },
+  ["today-open-stores"],
+  { revalidate: 300, tags: ["store"] }
+);
 
 export async function getComingSoonStores(): Promise<Store[]> {
   const today = todayJST();

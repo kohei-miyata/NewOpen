@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { updateStore, createStore, deleteStore, getStoreOwnerId, getStoreById } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -121,6 +121,7 @@ export async function newOwnerStore(
     return { error: e instanceof Error ? e.message : "登録に失敗しました" };
   }
 
+  revalidateTag("store");
   redirect(`/stores/${storeId}`);
 }
 
@@ -140,5 +141,6 @@ export async function removeStore(storeId: string): Promise<{ error?: string }> 
   }
 
   revalidatePath("/mypage/owner");
+  revalidateTag("store");
   return {};
 }
