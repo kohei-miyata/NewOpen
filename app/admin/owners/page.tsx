@@ -5,10 +5,13 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { approveStore, rejectStore, setPendingStore } from "@/app/admin/actions";
 import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
-import { BuildingStorefrontIcon } from "@heroicons/react/24/outline";
+import { BuildingStorefrontIcon, ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { ApproveSubmitButton, RejectSubmitButton, PendingSubmitButton } from "@/components/AdminActionButtons";
 
 export const metadata: Metadata = { title: "店舗審査管理 | 管理者" };
+
+type SortKey = "name" | "category" | "owner" | "created_at" | "status" | "email_count";
+type SortDir = "asc" | "desc";
 
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   pending:  { label: "審査中",  cls: "bg-yellow-100 text-yellow-700" },
@@ -16,7 +19,15 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   rejected: { label: "否認",    cls: "bg-red-100    text-red-600"    },
 };
 
-export default async function AdminOwnersPage() {
+export default async function AdminOwnersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string; dir?: string }>;
+}) {
+  const { sort, dir } = await searchParams;
+  const sortKey = (sort as SortKey) || "created_at";
+  const sortDir = (dir as SortDir) || "desc";
+
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || user.app_metadata?.role !== "admin") redirect("/");
@@ -48,8 +59,21 @@ export default async function AdminOwnersPage() {
     emailCountMap[r.store_id] = (emailCountMap[r.store_id] ?? 0) + 1;
   });
 
-  const pending  = (stores ?? []).filter((s) => s.approval_status === "pending");
-  const others   = (stores ?? []).filter((s) => s.approval_status !== "pending");
+  const pending = (stores ?? []).filter((s) => s.approval_status === "pending");
+
+  const rawOthers = (stores ?? []).filter((s) => s.approval_status !== "pending");
+  const others = [...rawOthers].sort((a, b) => {
+    let av: string, bv: string;
+    switch (sortKey) {
+      case "name":        av = a.name;                          bv = b.name; break;
+      case "category":    av = a.category;                      bv = b.category; break;
+      case "owner":       av = ownerEmailMap[a.owner_id] ?? ""; bv = ownerEmailMap[b.owner_id] ?? ""; break;
+      case "status":      av = a.approval_status;               bv = b.approval_status; break;
+      case "email_count": av = String(emailCountMap[a.id] ?? 0).padStart(6, "0"); bv = String(emailCountMap[b.id] ?? 0).padStart(6, "0"); break;
+      default:            av = a.created_at;                    bv = b.created_at;
+    }
+    return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -99,13 +123,36 @@ export default async function AdminOwnersPage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">店舗名</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">カテゴリ</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">オーナー</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">登録日</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">ステータス</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">メール数</th>
-                <th className="px-4 py-3"></th>
+                {(
+                  [
+                    { key: "name",        label: "店舗名" },
+                    { key: "category",    label: "カテゴリ" },
+                    { key: "owner",       label: "オーナー" },
+                    { key: "created_at",  label: "登録日" },
+                    { key: "status",      label: "ステータス" },
+                    { key: "email_count", label: "メール数" },
+                  ] as { key: SortKey; label: string }[]
+                ).map(({ key, label }) => {
+                  const active = sortKey === key;
+                  const nextDir = active && sortDir === "asc" ? "desc" : "asc";
+                  return (
+                    <th key={key} className="text-left px-4 py-3 text-xs font-semibold text-gray-500">
+                      <Link
+                        href={`/admin/owners?sort=${key}&dir=${nextDir}`}
+                        className={`inline-flex items-center gap-0.5 hover:text-orange-500 transition-colors ${active ? "text-orange-500" : ""}`}
+                      >
+                        {label}
+                        {active
+                          ? sortDir === "asc"
+                            ? <ChevronUpIcon className="w-3 h-3" />
+                            : <ChevronDownIcon className="w-3 h-3" />
+                          : <span className="w-3 h-3 opacity-0"><ChevronUpIcon className="w-3 h-3" /></span>
+                        }
+                      </Link>
+                    </th>
+                  );
+                })}
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">

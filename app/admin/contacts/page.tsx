@@ -8,7 +8,14 @@ import ContactReplyForm from "@/components/ContactReplyForm";
 
 export const metadata: Metadata = { title: "お問い合わせ一覧 | 管理者" };
 
-export default async function AdminContactsPage() {
+export default async function AdminContactsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>;
+}) {
+  const { filter } = await searchParams;
+  const showUnansweredOnly = filter === "unanswered";
+
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || user.app_metadata?.role !== "admin") redirect("/");
@@ -32,6 +39,12 @@ export default async function AdminContactsPage() {
     repliesByContact[r.contact_id].push(r);
   });
 
+  const allContacts = contacts ?? [];
+  const unansweredCount = allContacts.filter((c) => !repliesByContact[c.id]?.length).length;
+  const displayContacts = showUnansweredOnly
+    ? allContacts.filter((c) => !repliesByContact[c.id]?.length)
+    : allContacts;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -41,19 +54,48 @@ export default async function AdminContactsPage() {
             <EnvelopeIcon className="w-6 h-6 text-orange-500" /> お問い合わせ一覧
           </h1>
         </div>
-        <span className="text-sm text-gray-500">{contacts?.length ?? 0} 件</span>
+        <span className="text-sm text-gray-500">{displayContacts.length} 件</span>
+      </div>
+
+      {/* フィルター */}
+      <div className="flex gap-2">
+        <Link
+          href="/admin/contacts"
+          className={`text-sm px-4 py-1.5 rounded-full border transition-colors ${
+            !showUnansweredOnly
+              ? "bg-orange-500 text-white border-orange-500"
+              : "bg-white text-gray-600 border-gray-300 hover:border-orange-400"
+          }`}
+        >
+          すべて（{allContacts.length}）
+        </Link>
+        <Link
+          href="/admin/contacts?filter=unanswered"
+          className={`text-sm px-4 py-1.5 rounded-full border transition-colors ${
+            showUnansweredOnly
+              ? "bg-red-500 text-white border-red-500"
+              : "bg-white text-gray-600 border-gray-300 hover:border-red-400"
+          }`}
+        >
+          未返信（{unansweredCount}）
+        </Link>
       </div>
 
       <div className="space-y-4">
-        {(contacts ?? []).map((c) => {
+        {displayContacts.map((c) => {
           const replies = repliesByContact[c.id] ?? [];
           return (
-            <div key={c.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div key={c.id} className={`bg-white rounded-xl shadow-sm overflow-hidden border ${replies.length === 0 ? "border-red-200" : "border-gray-100"}`}>
               {/* 問い合わせ内容 */}
               <div className="px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-semibold text-gray-900">{c.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-gray-900">{c.name}</p>
+                      {replies.length === 0 && (
+                        <span className="text-xs font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">未返信</span>
+                      )}
+                    </div>
                     <a href={`mailto:${c.email}`} className="text-xs text-orange-500 hover:underline">{c.email}</a>
                     {(c.company || c.department) && (
                       <p className="text-xs text-gray-400 mt-0.5">

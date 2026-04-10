@@ -19,7 +19,7 @@ const SNS_FIELDS = [
   { name: "sns_google_maps", icon: "/icons/maps.svg",      placeholder: "Google マップ URL" },
 ];
 
-type Errors = Partial<Record<"name" | "address" | "openDate" | "description", string>>;
+type Errors = Partial<Record<"name" | "address" | "openDate" | "description" | "imageUrl", string>>;
 type ActionState = { error?: string } | null;
 type StoreAction = (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 
@@ -82,7 +82,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
   }
 
   useEffect(() => {
-    const firstErrorKey = (["name", "address", "openDate", "description"] as const).find(
+    const firstErrorKey = (["name", "address", "openDate", "imageUrl", "description"] as const).find(
       (k) => errors[k]
     );
     if (!firstErrorKey) return;
@@ -107,6 +107,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       e.address = "市区町村まで入力してください（例: 東京都渋谷区〇〇1-2-3）";
     }
     if (!isEdit && !openDate)                     e.openDate    = "オープン日を選択してください";
+    if (!isEdit && !(fd.get("imageUrl") as string)) e.imageUrl = "メイン画像をアップロードしてください";
     if (!description || description.length < 10) e.description = "説明は10文字以上で入力してください";
     if (description.length > 500)     e.description = "説明は500文字以内で入力してください";
 
@@ -266,7 +267,15 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
         </div>
 
         {/* メイン画像 */}
-        <ImageUpload name="imageUrl" label="メイン画像" defaultValue={defaultValues?.imageUrl} />
+        <div data-field="imageUrl">
+          <ImageUpload
+            name="imageUrl"
+            label={isEdit ? "メイン画像" : "メイン画像 *"}
+            defaultValue={defaultValues?.imageUrl}
+            onUpload={() => setErrors((p) => ({ ...p, imageUrl: undefined }))}
+          />
+          {errors.imageUrl && <p className="text-xs text-red-500 mt-1">{errors.imageUrl}</p>}
+        </div>
 
         {/* サブ写真（並び替え対応） */}
         <div>
