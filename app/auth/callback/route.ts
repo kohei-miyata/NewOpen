@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type User } from "@supabase/supabase-js";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const type = searchParams.get("type");
+  const token_hash = searchParams.get("token_hash");
+  const type = searchParams.get("type") ?? "";
 
-  if (!code) {
+  if (!code && !token_hash) {
     const fallback = type === "recovery"
       ? `${origin}/auth/reset-password`
       : `${origin}/`;
@@ -34,7 +35,23 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  // token_hash フロー: PKCE不要、別ブラウザでも動作する
+  // code フロー: 同一ブラウザのPKCE code_verifierが必要
+  let authUser: User | null = null;
+  let error: { message: string } | null = null;
+
+  if (token_hash && type) {
+    const result = await supabase.auth.verifyOtp({
+      token_hash,
+      type: type as Parameters<typeof supabase.auth.verifyOtp>[0]["type"],
+    });
+    authUser = result.data?.user ?? null;
+    error = result.error;
+  } else if (code) {
+    const result = await supabase.auth.exchangeCodeForSession(code);
+    authUser = result.data?.user ?? null;
+    error = result.error;
+  }
 
   if (error) {
     const errUrl = type === "recovery"
@@ -49,7 +66,7 @@ export async function GET(request: NextRequest) {
   if (type === "recovery") {
     redirectTo = `${origin}/auth/reset-password`;
   } else {
-    const user = data.user;
+    const user = authUser;
     let role = user?.user_metadata?.role as string | undefined;
 
     // Google OAuth 新規ユーザーは role 未設定 → "user" を付与

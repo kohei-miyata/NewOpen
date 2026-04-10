@@ -48,6 +48,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
     confirm?: string;
     terms?: string;
     birthdate?: string;
+    gender?: string;
   }>({});
   const loadedAt = useRef<number>(0);
   useEffect(() => { loadedAt.current = Date.now(); }, []);
@@ -81,8 +82,13 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
 
     if (!(fd.get("terms") as string)) e.terms = "利用規約への同意が必要です";
 
+    const gender = fd.get("gender") as string;
+    if (!gender) e.gender = "性別を選択してください";
+
     const birthdate = fd.get("birthdate") as string;
-    if (birthdate) {
+    if (!birthdate) {
+      e.birthdate = "生年月日を入力してください";
+    } else {
       const d = new Date(birthdate);
       const now = new Date();
       const age = now.getFullYear() - d.getFullYear() - (now < new Date(now.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
@@ -211,21 +217,26 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
       {/* 性別 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          性別 <span className="text-gray-400 font-normal">（任意）</span>
+          性別 <span className="text-red-500">*</span>
         </label>
-        <select name="gender" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors">
-          <option value="">選択しない</option>
+        <select
+          name="gender"
+          className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors ${errors.gender ? "border-red-400 bg-red-50 focus:border-red-400" : "border-gray-300 focus:border-orange-400"}`}
+          onChange={() => setErrors((p) => ({ ...p, gender: undefined }))}
+        >
+          <option value="">選択してください</option>
           <option value="male">男性</option>
           <option value="female">女性</option>
           <option value="other">その他</option>
           <option value="prefer_not_to_say">回答しない</option>
         </select>
+        {errors.gender && <p className="text-xs text-red-500 mt-1">{errors.gender}</p>}
       </div>
 
       {/* 生年月日 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          生年月日 <span className="text-gray-400 font-normal">（任意）</span>
+          生年月日 <span className="text-red-500">*</span>
         </label>
         <DatePicker
           name="birthdate"

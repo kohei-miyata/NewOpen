@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SignupForm from "@/components/SignupForm";
+import ScrollToTop from "@/components/ScrollToTop";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 
 export default async function SignupPage({
@@ -12,6 +13,7 @@ export default async function SignupPage({
   if (sp.success) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center px-4">
+        <ScrollToTop />
         <div className="text-center">
           <div className="mb-4 flex justify-center"><EnvelopeIcon className="w-12 h-12 text-orange-500" /></div>
           <h2 className="text-lg font-bold text-gray-900">確認メールを送信しました</h2>
@@ -19,8 +21,8 @@ export default async function SignupPage({
           <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-left">
             <p className="text-xs font-semibold text-amber-800 mb-1">ご注意</p>
             <p className="text-xs text-amber-700">
-              メールのリンクは、<span className="font-bold">このページを開いたブラウザと同じブラウザ</span>で開いてください。
-              別のブラウザやスマートフォンで開くとログインできない場合があります。
+              メールが届かない場合は迷惑メールフォルダをご確認ください。
+              リンクの有効期限は24時間です。
             </p>
           </div>
           <Link href="/auth/login" className="inline-block mt-6 text-orange-500 hover:underline text-sm">

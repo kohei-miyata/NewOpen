@@ -15,12 +15,17 @@ export async function POST(req: Request) {
     "image/png": "png",
     "image/webp": "webp",
     "image/gif": "gif",
+    "image/heic": "heic",
+    "image/heif": "heif",
   };
   const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
   if (!ALLOWED_TYPES[file.type]) {
     return NextResponse.json({ error: "JPG・PNG・WebP・GIF形式の画像のみアップロードできます" }, { status: 400 });
   }
+
+  // HEIC/HEIFはマジックバイト検証をスキップ（フォーマット多様）
+  const isHeic = file.type === "image/heic" || file.type === "image/heif";
   if (file.size > MAX_SIZE) {
     return NextResponse.json({ error: "ファイルサイズは10MB以下にしてください" }, { status: 400 });
   }
@@ -32,7 +37,8 @@ export async function POST(req: Request) {
   const isWebp = header[0] === 0x52 && header[1] === 0x49 && header[2] === 0x46 && header[3] === 0x46 &&
                  header[8] === 0x57 && header[9] === 0x45 && header[10] === 0x42 && header[11] === 0x50;
   const isGif  = header[0] === 0x47 && header[1] === 0x49 && header[2] === 0x46 && header[3] === 0x38;
-  const magicOk = (file.type === "image/jpeg" && isJpeg)
+  const magicOk = isHeic
+               || (file.type === "image/jpeg" && isJpeg)
                || (file.type === "image/png"  && isPng)
                || (file.type === "image/webp" && isWebp)
                || (file.type === "image/gif"  && isGif);
