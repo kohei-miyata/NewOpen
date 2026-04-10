@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1080px; overflow: hidden; }
+  .card {
+    width: 1080px; height: 1080px;
+    background: linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #fde68a 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  }
+  /* ドットパターン（TOPページと同じ） */
+  .card::before {
+    content: '';
+    position: absolute; inset: 0; opacity: 0.1; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 50%, white 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, white 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .dot { display: none; }
+
+  .logo-wrap {
+    display: flex; align-items: center; gap: 20px; margin-bottom: 60px;
+  }
+  .logo-circle {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    border: 3px solid rgba(255,255,255,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px; font-weight: 900; color: white;
+    font-family: 'Arial Black', Arial, sans-serif;
+  }
+  .logo-text {
+    font-size: 72px; font-weight: 900; color: white; letter-spacing: 4px;
+    font-family: 'Arial Black', Arial, sans-serif;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .catch {
+    font-size: 52px; font-weight: 900; color: white; text-align: center;
+    line-height: 1.4; letter-spacing: 2px;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    margin-bottom: 50px;
+  }
+  .sub {
+    font-size: 26px; color: rgba(255,255,255,0.85); text-align: center;
+    line-height: 1.8; margin-bottom: 60px;
+  }
+  .url-badge {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 50px; padding: 16px 48px;
+    font-size: 24px; color: white; font-weight: 700; letter-spacing: 1px;
+  }
+  .tag {
+    position: absolute; top: 60px; right: 60px;
+    background: white; color: #f97316; border-radius: 50px;
+    padding: 12px 32px; font-size: 22px; font-weight: 900;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <!-- 装飾ドット -->
+  <div class="dot" style="width:300px;height:300px;top:-80px;left:-80px;"></div>
+  <div class="dot" style="width:200px;height:200px;bottom:100px;right:-60px;"></div>
+  <div class="dot" style="width:120px;height:120px;bottom:200px;left:100px;"></div>
+  <div class="dot" style="width:80px;height:80px;top:200px;right:200px;"></div>
+
+  <div class="tag">#新規オープン</div>
+
+  <div class="logo-wrap">
+    <div class="logo-circle">N</div>
+    <div class="logo-text">EW OPEN</div>
+  </div>
+
+  <div class="catch">あなたの街の<br>新規オープン情報を<br>いち早くチェック</div>
+
+  <div class="sub">
+    レストラン・カフェ・スイーツ・美容院・ショップ…<br>
+    新しいお店の情報が毎日更新
+  </div>
+
+  <div class="url-badge">new-open.vercel.app</div>
+</div>
+</body>
+</html>
