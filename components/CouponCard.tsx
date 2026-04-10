@@ -65,8 +65,8 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
     <>
       {/* カード */}
       <button
-        onClick={() => setOpen(true)}
-        className={`w-full text-left bg-white rounded-xl overflow-hidden shadow-sm border transition-shadow hover:shadow-md flex ${used ? "opacity-60" : "border-gray-100"}`}
+        onClick={() => !used && setOpen(true)}
+        className={`w-full text-left bg-white rounded-xl overflow-hidden shadow-sm border flex ${used ? "opacity-50 cursor-default border-gray-100" : "border-gray-100 hover:shadow-md transition-shadow cursor-pointer"}`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
