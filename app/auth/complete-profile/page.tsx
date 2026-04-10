@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useActionState } from "react";
+import Link from "next/link";
 import { completeProfile } from "./actions";
 import BirthdatePicker from "@/components/BirthdatePicker";
 import ScrollToTop from "@/components/ScrollToTop";
 
 const SELECT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
-const SELECT_ERROR = "w-full border border-red-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-400 bg-red-50 transition-colors";
 
 export default function CompleteProfilePage() {
   const [state, action, isPending] = useActionState(completeProfile, undefined);
@@ -78,7 +78,7 @@ export default function CompleteProfilePage() {
 
           <p className="text-center text-xs text-gray-400">
             後で設定する場合は{" "}
-            <a href="/" className="text-orange-500 hover:underline">スキップ</a>
+            <Link href="/" className="text-orange-500 hover:underline">スキップ</Link>
           </p>
         </form>
       </div>
