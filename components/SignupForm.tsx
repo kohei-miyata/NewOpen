@@ -123,6 +123,7 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         if (isSuspiciousBot(fd) || !validate(fd)) { e.preventDefault(); return; }
         setIsPending(true);
       }}
+      noValidate
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4"
     >
       {/* ハニーポット: botが入力するが人間には見えない */}
