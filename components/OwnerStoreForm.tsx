@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useActionState, useRef } from "react";
 import ImageUpload from "@/components/ImageUpload";
+import SnsPostEmbed from "@/components/SnsPostEmbed";
 import type { Store } from "@/types";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -40,6 +41,11 @@ interface PreviewData {
   imageUrl: string;
   status: string;
   tags: string;
+  photos: (string | undefined)[];
+  sns: Record<string, string>;
+  postTwitterUrl: string;
+  postInstagramUrl: string;
+  postTiktokUrl: string;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -118,8 +124,16 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
       hoursText:   (fd.get("hoursText")   as string).trim(),
       description: (fd.get("description") as string).trim(),
       imageUrl:    (fd.get("imageUrl")    as string) || defaultValues?.imageUrl || "",
-      status:      (fd.get("status")      as string) || "active",
-      tags:        (fd.get("tags")        as string).trim(),
+      status:           (fd.get("status")             as string) || "active",
+      tags:             (fd.get("tags")               as string).trim(),
+      photos,
+      sns: Object.fromEntries(
+        SNS_FIELDS.map((f) => [f.name.replace("sns_", ""), (fd.get(f.name) as string).trim()])
+          .filter(([, v]) => v)
+      ),
+      postTwitterUrl:   (fd.get("post_twitter_url")   as string).trim(),
+      postInstagramUrl: (fd.get("post_instagram_url") as string).trim(),
+      postTiktokUrl:    (fd.get("post_tiktok_url")    as string).trim(),
     });
     setShowPreview(true);
   }
@@ -461,6 +475,21 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
                 <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{previewData.description}</p>
               </div>
 
+              {/* サブ写真 */}
+              {previewData.photos.some(Boolean) && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-2">写真</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {previewData.photos.filter(Boolean).map((url, i) => (
+                      <div key={i} className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt={`写真${i + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* タグ */}
               {previewData.tags && (
                 <div className="flex flex-wrap gap-2">
@@ -470,6 +499,51 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
                     </span>
                   ))}
                 </div>
+              )}
+
+              {/* SNSリンク */}
+              {Object.keys(previewData.sns).length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-2">SNS・公式サイト</p>
+                  <div className="flex flex-wrap gap-2">
+                    {SNS_FIELDS.filter((f) => previewData.sns[f.name.replace("sns_", "")]).map((f) => (
+                      <a
+                        key={f.name}
+                        href={previewData.sns[f.name.replace("sns_", "")]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-sm bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:shadow-sm transition-shadow text-gray-700"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={f.icon} alt="" className="w-4 h-4" />
+                        <span>{f.placeholder.replace(" URL", "")}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 地図（住所ベース） */}
+              {previewData.address && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-2">アクセス</p>
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(previewData.address)}&output=embed&hl=ja`}
+                    className="w-full rounded-xl border border-gray-200"
+                    style={{ height: 240 }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              )}
+
+              {/* SNS最新投稿 */}
+              {(previewData.postTwitterUrl || previewData.postInstagramUrl || previewData.postTiktokUrl) && (
+                <SnsPostEmbed
+                  twitterPostUrl={previewData.postTwitterUrl || null}
+                  instagramPostUrl={previewData.postInstagramUrl || null}
+                  tiktokPostUrl={previewData.postTiktokUrl || null}
+                />
               )}
 
               {/* 審査メモ */}
