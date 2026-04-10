@@ -1022,3 +1022,12 @@ mail1043.onamae.ne.jp
 インスタグラム
 info@newopen.site
 -6ZM$4uaH6BQ&5@jT9t@V/UyUE-s_Ui$3d=-xj7+
+
+GCP
+クライアントID
+298447426270-q242n8qbuj3bi4nhlcve7qps1b7aphv5.apps.googleusercontent.com
+シークレット
+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
+
+resend
+https://resend.com/emails
