@@ -65,6 +65,14 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const defaultSns = defaultValues?.snsLinks as Record<string, string> | undefined;
+  const [snsValues, setSnsValues] = useState<Record<string, string>>(
+    Object.fromEntries(SNS_FIELDS.map((f) => [f.name, defaultSns?.[f.name.replace("sns_", "")] ?? ""]))
+  );
+  const [postTwitterUrl, setPostTwitterUrl]     = useState(defaultValues?.twitterPostUrl   ?? "");
+  const [postInstagramUrl, setPostInstagramUrl] = useState(defaultValues?.instagramPostUrl ?? "");
+  const [postTiktokUrl, setPostTiktokUrl]       = useState(defaultValues?.tiktokPostUrl    ?? "");
+
   function movePhoto(from: number, to: number) {
     setPhotos((prev) => {
       const next = [...prev];
@@ -128,12 +136,12 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
       tags:             (fd.get("tags")               as string).trim(),
       photos,
       sns: Object.fromEntries(
-        SNS_FIELDS.map((f) => [f.name.replace("sns_", ""), (fd.get(f.name) as string).trim()])
+        SNS_FIELDS.map((f) => [f.name.replace("sns_", ""), snsValues[f.name].trim()])
           .filter(([, v]) => v)
       ),
-      postTwitterUrl:   (fd.get("post_twitter_url")   as string).trim(),
-      postInstagramUrl: (fd.get("post_instagram_url") as string).trim(),
-      postTiktokUrl:    (fd.get("post_tiktok_url")    as string).trim(),
+      postTwitterUrl:   postTwitterUrl.trim(),
+      postInstagramUrl: postInstagramUrl.trim(),
+      postTiktokUrl:    postTiktokUrl.trim(),
     });
     setShowPreview(true);
   }
@@ -143,8 +151,6 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
   useEffect(() => {
     if (state?.error) setSubmitting(false);
   }, [state]);
-
-  const sns = defaultValues?.snsLinks ?? {};
 
   return (
     <>
@@ -334,7 +340,8 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
                 <img src={f.icon} alt="" className="w-5 h-5 shrink-0" />
                 <input
                   name={f.name}
-                  defaultValue={(sns as Record<string, string>)[f.name.replace("sns_", "")] ?? ""}
+                  value={snsValues[f.name]}
+                  onChange={(e) => setSnsValues((p) => ({ ...p, [f.name]: e.target.value }))}
                   placeholder={f.placeholder}
                   className={`${INPUT_NORMAL} flex-1`}
                 />
@@ -352,7 +359,8 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
               <img src="/icons/x.png" alt="" className="w-5 h-5 shrink-0" />
               <input
                 name="post_twitter_url"
-                defaultValue={defaultValues?.twitterPostUrl ?? ""}
+                value={postTwitterUrl}
+                onChange={(e) => setPostTwitterUrl(e.target.value)}
                 placeholder="X (Twitter) æŠ•ç¨¿URL ä¾‹: https://x.com/user/status/..."
                 className={`${INPUT_NORMAL} flex-1`}
               />
@@ -362,7 +370,8 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
               <img src="/icons/instagram.svg" alt="" className="w-5 h-5 shrink-0" />
               <input
                 name="post_instagram_url"
-                defaultValue={defaultValues?.instagramPostUrl ?? ""}
+                value={postInstagramUrl}
+                onChange={(e) => setPostInstagramUrl(e.target.value)}
                 placeholder="Instagram æŠ•ç¨¿URL ä¾‹: https://www.instagram.com/p/..."
                 className={`${INPUT_NORMAL} flex-1`}
               />
@@ -372,7 +381,8 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
               <img src="/icons/tiktok.png" alt="" className="w-5 h-5 shrink-0" />
               <input
                 name="post_tiktok_url"
-                defaultValue={defaultValues?.tiktokPostUrl ?? ""}
+                value={postTiktokUrl}
+                onChange={(e) => setPostTiktokUrl(e.target.value)}
                 placeholder="TikTok æŠ•ç¨¿URL ä¾‹: https://www.tiktok.com/@user/video/..."
                 className={`${INPUT_NORMAL} flex-1`}
               />
