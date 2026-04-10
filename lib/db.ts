@@ -143,18 +143,23 @@ export const getCouponsWithLocation = unstable_cache(
   async (): Promise<CouponWithLocation[]> => {
     const { data, error } = await getSupabaseClient()
       .from("coupons")
-      .select("*, stores(lat, lng)")
+      .select("*, stores(lat, lng, image_url)")
       .eq("is_active", true)
       .order("expiry_date", { ascending: true });
 
     if (error) throw new Error(error.message);
-    return (data ?? []).map((row) => ({
-      ...toCoupon(row),
+    return (data ?? []).map((row) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      lat: (row.stores as any)?.lat ?? null,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      lng: (row.stores as any)?.lng ?? null,
-    }));
+      const store = row.stores as any;
+      const coupon = toCoupon(row);
+      return {
+        ...coupon,
+        // imageUrl が空なら店舗のメイン画像をフォールバック
+        imageUrl: coupon.imageUrl || store?.image_url || "",
+        lat: store?.lat ?? null,
+        lng: store?.lng ?? null,
+      };
+    });
   },
   ["coupons-with-location"],
   { revalidate: 60 }
