@@ -108,19 +108,41 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
+  const { pathname } = request.nextUrl;
+
+  // auth系・API・静的ファイルは全ガードをスキップ
+  const isAuthPath    = pathname.startsWith("/auth/");
+  const isApiPath     = pathname.startsWith("/api/");
+  const isPublicAsset = pathname.startsWith("/_next/") || pathname.startsWith("/icons/") || pathname.startsWith("/public/");
+
   // ログイン済みユーザーが /auth/login or /auth/signup にアクセスしたらトップへ
-  if (user && (request.nextUrl.pathname.startsWith("/auth/login") || request.nextUrl.pathname.startsWith("/auth/signup"))) {
+  if (user && (pathname.startsWith("/auth/login") || pathname.startsWith("/auth/signup"))) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   // BANユーザーは /banned 以外アクセス不可
   if (
     user?.user_metadata?.status === "banned" &&
-    !request.nextUrl.pathname.startsWith("/banned") &&
-    !request.nextUrl.pathname.startsWith("/auth/logout") &&
-    !request.nextUrl.pathname.startsWith("/api")
+    !pathname.startsWith("/banned") &&
+    !pathname.startsWith("/auth/logout") &&
+    !isApiPath
   ) {
     return NextResponse.redirect(new URL("/banned", request.url));
+  }
+
+  if (user && !isAuthPath && !isApiPath && !isPublicAsset) {
+    // メール未認証ガード（メール/パスワード登録のみ対象）
+    // Google OAuthはemail_confirmed_atが自動でセットされるため対象外
+    const isEmailUser = user.app_metadata?.provider === "email";
+    if (isEmailUser && !user.email_confirmed_at && !pathname.startsWith("/banned")) {
+      return NextResponse.redirect(new URL("/auth/signup?success=1", request.url));
+    }
+
+    // プロフィール未完了ガード（メール確認済み or Googleユーザー）
+    const profileDone = pathname === "/auth/complete-profile";
+    if (!profileDone && !user.user_metadata?.gender) {
+      return NextResponse.redirect(new URL("/auth/complete-profile", request.url));
+    }
   }
 
   return supabaseResponse;
