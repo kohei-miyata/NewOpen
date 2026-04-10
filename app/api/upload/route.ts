@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
+
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
     "image/heic": "heic",
     "image/heif": "heif",
   };
-  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_SIZE = 4 * 1024 * 1024; // 4MB（Vercel無料枠のボディ上限対策）
 
   if (!ALLOWED_TYPES[file.type]) {
     return NextResponse.json({ error: "JPG・PNG・WebP・GIF形式の画像のみアップロードできます" }, { status: 400 });
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
   // HEIC/HEIFはマジックバイト検証をスキップ（フォーマット多様）
   const isHeic = file.type === "image/heic" || file.type === "image/heif";
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "ファイルサイズは10MB以下にしてください" }, { status: 400 });
+    return NextResponse.json({ error: "ファイルサイズは4MB以下にしてください" }, { status: 400 });
   }
 
   // マジックバイト検証（クライアントの file.type 偽装対策）

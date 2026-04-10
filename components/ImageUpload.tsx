@@ -15,30 +15,41 @@ export default function ImageUpload({ name, label, defaultValue = "", onUpload }
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  async function toJpeg(file: File): Promise<File> {
+  const MAX_PX = 1920; // リサイズ上限（Vercel 4.5MB制限対策）
+
+  // FileReader経由でcanvas変換・リサイズ
+  // URL.createObjectURL は iOS Safari で HEIC に使うとエラーになるため FileReader を使用
+  async function toResizedJpeg(file: File): Promise<File> {
     return new Promise((resolve, reject) => {
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        const w = img.naturalWidth;
-        const h = img.naturalHeight;
-        if (!w || !h) { reject(new Error("サイズ取得失敗")); return; }
-        const canvas = document.createElement("canvas");
-        canvas.width = w;
-        canvas.height = h;
-        canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
-        canvas.toBlob(
-          (blob) => {
-            if (!blob || blob.size < 100) { reject(new Error("変換に失敗しました")); return; }
-            resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
-          },
-          "image/jpeg",
-          0.92
-        );
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("読み込み失敗"));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("画像変換失敗"));
+        img.onload = () => {
+          let { naturalWidth: w, naturalHeight: h } = img;
+          if (!w || !h) { reject(new Error("サイズ取得失敗")); return; }
+          // 最大辺が MAX_PX を超えていれば縮小
+          if (w > MAX_PX || h > MAX_PX) {
+            if (w > h) { h = Math.round((h / w) * MAX_PX); w = MAX_PX; }
+            else       { w = Math.round((w / h) * MAX_PX); h = MAX_PX; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+          canvas.toBlob(
+            (blob) => {
+              if (!blob || blob.size < 100) { reject(new Error("変換失敗")); return; }
+              resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+            },
+            "image/jpeg",
+            0.88
+          );
+        };
+        img.src = reader.result as string;
       };
-      img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("読み込み失敗")); };
-      img.src = objectUrl;
+      reader.readAsDataURL(file);
     });
   }
 
@@ -46,12 +57,11 @@ export default function ImageUpload({ name, label, defaultValue = "", onUpload }
     setError("");
     setUploading(true);
 
-    // すべての画像をcanvas経由でJPEGに変換（HEIC/HEIFを含むiOS対応）
-    // 変換失敗した場合はオリジナルのままアップロードを試みる
+    // 全画像をリサイズ・JPEG変換してからアップロード（413エラー対策 + HEIC対応）
     try {
-      file = await toJpeg(file);
+      file = await toResizedJpeg(file);
     } catch {
-      // 変換失敗 → オリジナルのまま続行
+      // 変換失敗 → オリジナルのまま試みる
     }
 
     const fd = new FormData();
