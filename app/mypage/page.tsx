@@ -10,6 +10,7 @@ import {
   BuildingStorefrontIcon,
   ChevronRightIcon,
   UserCircleIcon,
+  PencilIcon,
 } from "@heroicons/react/24/outline";
 
 
@@ -45,6 +46,13 @@ export default async function MypagePage() {
               {roleLabel}
             </span>
           </div>
+          <Link
+            href="/mypage/settings"
+            className="flex-shrink-0 text-gray-400 hover:text-orange-500 transition-colors p-1"
+            aria-label="設定"
+          >
+            <PencilIcon className="w-5 h-5" />
+          </Link>
           {role === "owner" && (
             <Link
               href="/mypage/owner"
