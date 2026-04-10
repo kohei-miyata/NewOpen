@@ -27,6 +27,19 @@ function toJapaneseAuthError(message: string): string {
   return "エラーが発生しました。しばらく時間をおいてから再試行してください";
 }
 
+export async function signInWithGoogle() {
+  const supabase = await createSupabaseServerClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${siteUrl}/auth/callback`,
+    },
+  });
+  if (error) redirect(`/auth/login?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);
+  if (data.url) redirect(data.url);
+}
+
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;

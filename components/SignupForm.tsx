@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { signup } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import TermsContent from "@/components/TermsContent";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
@@ -276,6 +277,17 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
           </span>
         ) : "登録する"}
       </button>
+
+      {role === "user" && (
+        <>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">または</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+          <GoogleAuthButton label="Googleで登録（一般ユーザー）" />
+        </>
+      )}
     </form>
   );
 }

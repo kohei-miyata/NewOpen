@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { login } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
 
 const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors";
 const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
@@ -93,6 +94,14 @@ export default function LoginForm({ serverError }: { serverError?: string }) {
           </span>
         ) : "ログイン"}
       </button>
+
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="text-xs text-gray-400">または</span>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
+
+      <GoogleAuthButton label="Googleでログイン" />
     </form>
   );
 }
