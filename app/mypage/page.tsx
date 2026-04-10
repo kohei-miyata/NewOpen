@@ -41,7 +41,7 @@ export default async function MypagePage() {
             {displayName && <p className="font-bold text-gray-900 truncate">{displayName}</p>}
             <p className={`truncate ${displayName ? "text-sm text-gray-500" : "font-bold text-gray-900"}`}>{user.email}</p>
             {roleLabel && (
-              <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 ${roleBadgeClass}`}>
+              <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 whitespace-nowrap ${roleBadgeClass}`}>
                 {roleLabel}
               </span>
             )}
@@ -56,7 +56,7 @@ export default async function MypagePage() {
           {role === "owner" && (
             <Link
               href="/mypage/owner"
-              className="flex-shrink-0 bg-orange-500 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-orange-600 transition-colors"
+              className="flex-shrink-0 bg-orange-500 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-orange-600 transition-colors whitespace-nowrap"
             >
               オーナー管理 →
             </Link>
@@ -64,7 +64,7 @@ export default async function MypagePage() {
           {role === "admin" && (
             <Link
               href="/admin"
-              className="flex-shrink-0 bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-700 transition-colors"
+              className="flex-shrink-0 bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-700 transition-colors whitespace-nowrap"
             >
               管理画面 →
             </Link>

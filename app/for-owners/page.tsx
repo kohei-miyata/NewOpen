@@ -23,7 +23,7 @@ const MERITS = [
 const STEPS = [
   { step: "1", label: "アカウント登録", sub: "オーナーとして無料登録" },
   { step: "2", label: "店舗情報を入力", sub: "写真・SNS・営業時間など" },
-  { step: "3", label: "掲載スタート", sub: "すぐに公開されます" },
+  { step: "3", label: "掲載スタート", sub: "審査承認後公開されます" },
 ];
 
 import { OWNER_FAQS as FAQS } from "@/lib/faqs";

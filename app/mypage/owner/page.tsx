@@ -64,7 +64,7 @@ export default async function OwnerMypagePage() {
                 return (
                 <div
                   key={store.id}
-                  className={`rounded-xl border shadow-sm p-4 flex items-center justify-between gap-4 ${expired ? "bg-gray-50 border-gray-200 opacity-60" : "bg-white border-gray-100"}`}
+                  className={`rounded-xl border shadow-sm p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 ${expired ? "bg-gray-50 border-gray-200 opacity-60" : "bg-white border-gray-100"}`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {store.imageUrl && (
@@ -98,7 +98,7 @@ export default async function OwnerMypagePage() {
                       <p className="text-xs text-orange-500 mt-0.5">{store.category} · オープン {store.openDate}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2 shrink-0 flex-wrap justify-end">
+                  <div className="flex gap-2 flex-wrap">
                     <Link
                       href={`/stores/${store.id}`}
                       className="text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-full hover:border-orange-400 hover:text-orange-500 transition-colors"
