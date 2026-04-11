@@ -8,14 +8,14 @@ import SubmitButton from "@/components/SubmitButton";
 import CouponFormClient from "@/components/CouponFormClient";
 import { TicketIcon } from "@heroicons/react/24/outline";
 
-const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
-
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ welcome?: string }>;
 }
 
-export default async function OwnerCouponsPage({ params }: Props) {
+export default async function OwnerCouponsPage({ params, searchParams }: Props) {
   const { id: storeId } = await params;
+  const { welcome } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
@@ -68,6 +68,17 @@ export default async function OwnerCouponsPage({ params }: Props) {
             ← 戻る
           </Link>
         </div>
+
+        {/* 店舗登録完了後のウェルカムバナー */}
+        {welcome && (
+          <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-4 space-y-1">
+            <p className="text-sm font-bold text-orange-800 flex items-center gap-1.5">
+              <TicketIcon className="w-4 h-4 shrink-0" />
+              店舗登録が完了しました！オープン記念クーポンを作成しましょう
+            </p>
+            <p className="text-xs text-orange-700">クーポンを登録すると店舗詳細ページに表示され、ユーザーが来店するきっかけになります。</p>
+          </div>
+        )}
 
         {/* 使用状況サマリー */}
         {coupons.length > 0 && (

@@ -122,7 +122,7 @@ export async function newOwnerStore(
   }
 
   revalidateTag("store");
-  redirect(`/stores/${storeId}`);
+  redirect(`/mypage/owner/stores/${storeId}/coupons?welcome=1`);
 }
 
 export async function removeStore(storeId: string): Promise<{ error?: string }> {
