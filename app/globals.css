@@ -8,6 +8,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* iOS Safari の入力フォーカス時自動ズーム防止（font-size 16px 以上でズームが起きない） */
+@supports (-webkit-touch-callout: none) {
+  input, select, textarea { font-size: max(16px, 1em); }
+}
+
 /* date input のカレンダーアイコンをオレンジに */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(54%) sepia(76%) saturate(800%) hue-rotate(9deg) brightness(101%) contrast(101%);

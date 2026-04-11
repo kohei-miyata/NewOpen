@@ -78,7 +78,7 @@ export default function StoreCalendar({ stores, comingSoon = [] }: Props) {
           <div
             key={d}
             className={`text-center text-xs font-semibold py-1 ${
-              i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-400"
+              i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : "text-gray-500"
             }`}
           >
             {d}
@@ -111,8 +111,8 @@ export default function StoreCalendar({ stores, comingSoon = [] }: Props) {
                 ${!isSelected && isToday ? "ring-2 ring-orange-400 ring-inset" : ""}
                 ${!isSelected && hasStores ? "hover:bg-orange-50 cursor-pointer" : ""}
                 ${!hasStores ? "cursor-default opacity-60" : ""}
-                ${!isSelected && dayOfWeek === 0 ? "text-red-400" : ""}
-                ${!isSelected && dayOfWeek === 6 ? "text-blue-400" : ""}
+                ${!isSelected && dayOfWeek === 0 ? "text-red-500" : ""}
+                ${!isSelected && dayOfWeek === 6 ? "text-blue-500" : ""}
                 ${!isSelected && dayOfWeek !== 0 && dayOfWeek !== 6 && !isToday ? "text-gray-700" : ""}
               `}
             >
@@ -123,7 +123,7 @@ export default function StoreCalendar({ stores, comingSoon = [] }: Props) {
                     isSelected
                       ? "bg-white/30 text-white"
                       : isFuture
-                      ? "bg-orange-100 text-orange-500"
+                      ? "bg-orange-100 text-orange-700"
                       : "bg-orange-500 text-white"
                   }`}
                 >
@@ -136,7 +136,7 @@ export default function StoreCalendar({ stores, comingSoon = [] }: Props) {
       </div>
 
       {/* 凡例 */}
-      <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-50 text-xs text-gray-400">
+      <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-50 text-xs text-gray-600">
         <span className="flex items-center gap-1">
           <span className="inline-block w-4 h-4 rounded-full bg-orange-500" />
           オープン済み
@@ -151,7 +151,7 @@ export default function StoreCalendar({ stores, comingSoon = [] }: Props) {
       {selectedDay && (
         <div className="mt-4 pt-4 border-t border-gray-100">
           {selectedStores.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-2">この日のオープン情報はありません</p>
+            <p className="text-sm text-gray-500 text-center py-2">この日のオープン情報はありません</p>
           ) : (
             <>
               <p className="text-xs font-semibold text-gray-500 mb-2">

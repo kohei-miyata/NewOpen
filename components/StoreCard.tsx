@@ -35,12 +35,12 @@ export default function StoreCard({ store, rank }: Props) {
               </span>
             )}
             {store.status === "active" && isNew && (
-              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-orange-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 NEW
               </span>
             )}
             {store.status === "active" && isComingSoon && (
-              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 SOON
               </span>
             )}

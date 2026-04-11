@@ -89,7 +89,7 @@ export default function CouponCard({ coupon, isUsed: initialUsed = false, isLogg
           </div>
           <div className="flex items-center justify-between mt-2">
             <span className="text-orange-500 font-bold text-sm">{coupon.discount}</span>
-            <span className="text-xs text-gray-400 font-mono bg-gray-50 px-2 py-0.5 rounded border border-dashed border-gray-300">
+            <span className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-0.5 rounded border border-dashed border-gray-300">
               {isLoggedIn ? coupon.code : "ログインで表示"}
             </span>
           </div>
