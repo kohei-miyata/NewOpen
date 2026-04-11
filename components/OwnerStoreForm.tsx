@@ -271,9 +271,11 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
 
         {/* メイン画像 */}
         <div data-field="imageUrl">
+          <p className="text-sm font-medium text-gray-700 mb-1">
+            メイン画像{!isEdit && <span className="text-red-500 ml-0.5">*</span>}
+          </p>
           <ImageUpload
             name="imageUrl"
-            label={isEdit ? "メイン画像" : "メイン画像 *"}
             defaultValue={defaultValues?.imageUrl}
             onUpload={() => setErrors((p) => ({ ...p, imageUrl: undefined }))}
           />
