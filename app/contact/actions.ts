@@ -24,39 +24,39 @@ export async function submitContact(formData: FormData) {
 
   if (error) redirect(`/contact?error=${encodeURIComponent(error.message)}`);
 
-  try {
-    const adminEmail = process.env.ADMIN_EMAIL ?? process.env.MAIL_FROM ?? "info@newopen.site";
-    await Promise.allSettled([
-      // ユーザーへの自動返信
-      sendMail({
-        to: email,
-        subject: "【NEW OPEN】お問い合わせを受け付けました",
-        html: `
-          <p>${name} 様</p>
-          <p>お問い合わせいただきありがとうございます。<br>
-          内容を確認の上、担当者よりご連絡いたします。</p>
-          <hr>
-          <p><strong>お問い合わせ内容</strong></p>
-          <p>${message.replace(/\n/g, "<br>")}</p>
-          <hr>
-          <p style="font-size:12px;color:#888;">NEW OPEN — あなたの街の新規オープン情報</p>
-        `,
-      }),
-      // 運営への通知
-      sendMail({
-        to: adminEmail,
-        subject: `【NEW OPEN】お問い合わせ：${name}`,
-        html: `
-          <p><strong>氏名：</strong>${name}</p>
-          <p><strong>メール：</strong>${email}</p>
-          ${company    ? `<p><strong>会社名：</strong>${company}</p>`   : ""}
-          ${department ? `<p><strong>部署：</strong>${department}</p>` : ""}
-          <p><strong>内容：</strong></p>
-          <p>${message.replace(/\n/g, "<br>")}</p>
-        `,
-      }),
-    ]);
-  } catch {}
+  const adminEmail = (process.env.ADMIN_EMAIL ?? process.env.MAIL_FROM ?? "info@newopen.site").trim();
+  const results = await Promise.allSettled([
+    // ユーザーへの自動返信
+    sendMail({
+      to: email,
+      subject: "【NEW OPEN】お問い合わせを受け付けました",
+      html: `
+        <p>${name} 様</p>
+        <p>お問い合わせいただきありがとうございます。<br>
+        内容を確認の上、担当者よりご連絡いたします。</p>
+        <hr>
+        <p><strong>お問い合わせ内容</strong></p>
+        <p>${message.replace(/\n/g, "<br>")}</p>
+        <hr>
+        <p style="font-size:12px;color:#888;">NEW OPEN — あなたの街の新規オープン情報</p>
+      `,
+    }),
+    // 運営への通知
+    sendMail({
+      to: adminEmail,
+      subject: `【NEW OPEN】お問い合わせ：${name}`,
+      html: `
+        <p><strong>氏名：</strong>${name}</p>
+        <p><strong>メール：</strong>${email}</p>
+        ${company    ? `<p><strong>会社名：</strong>${company}</p>`   : ""}
+        ${department ? `<p><strong>部署：</strong>${department}</p>` : ""}
+        <p><strong>内容：</strong></p>
+        <p>${message.replace(/\n/g, "<br>")}</p>
+      `,
+    }),
+  ]);
+  if (results[0].status === "rejected") console.error("[contact] user mail failed:", results[0].reason);
+  if (results[1].status === "rejected") console.error("[contact] admin mail failed:", results[1].reason, "to:", adminEmail);
 
   redirect("/contact?success=1");
 }
