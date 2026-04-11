@@ -9,13 +9,27 @@ interface Props {
   onUpload?: (url: string) => void;
 }
 
+function isHeicFile(file: File): boolean {
+  if (file.type === "image/heic" || file.type === "image/heif") return true;
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  return ext === "heic" || ext === "heif";
+}
+
 export default function ImageUpload({ name, label, defaultValue = "", onUpload }: Props) {
   const [url, setUrl] = useState(defaultValue);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const MAX_PX = 1920; // リサイズ上限（Vercel 4.5MB制限対策）
+  const MAX_PX = 1920;
+
+  // HEICをheic2anyでJPEG Blobに変換（PCブラウザ対応）
+  async function heicToJpegFile(file: File): Promise<File> {
+    const heic2any = (await import("heic2any")).default;
+    const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.88 });
+    const outBlob = Array.isArray(blob) ? blob[0] : blob;
+    return new File([outBlob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" });
+  }
 
   // FileReader経由でcanvas変換・リサイズ
   // URL.createObjectURL は iOS Safari で HEIC に使うとエラーになるため FileReader を使用
@@ -29,7 +43,6 @@ export default function ImageUpload({ name, label, defaultValue = "", onUpload }
         img.onload = () => {
           let { naturalWidth: w, naturalHeight: h } = img;
           if (!w || !h) { reject(new Error("サイズ取得失敗")); return; }
-          // 最大辺が MAX_PX を超えていれば縮小
           if (w > MAX_PX || h > MAX_PX) {
             if (w > h) { h = Math.round((h / w) * MAX_PX); w = MAX_PX; }
             else       { w = Math.round((w / h) * MAX_PX); h = MAX_PX; }
@@ -57,11 +70,22 @@ export default function ImageUpload({ name, label, defaultValue = "", onUpload }
     setError("");
     setUploading(true);
 
-    // 全画像をリサイズ・JPEG変換してからアップロード（413エラー対策 + HEIC対応）
+    // HEICはPCブラウザがネイティブ復号できないため heic2any で先に変換
+    if (isHeicFile(file)) {
+      try {
+        file = await heicToJpegFile(file);
+      } catch {
+        setError("HEIC画像の変換に失敗しました。JPEG形式に変換してから再度お試しください。");
+        setUploading(false);
+        return;
+      }
+    }
+
+    // 全画像をリサイズ・JPEG変換してからアップロード（413エラー対策）
     try {
       file = await toResizedJpeg(file);
     } catch {
-      // 変換失敗 → オリジナルのまま試みる
+      // 変換失敗 → そのまま試みる
     }
 
     const fd = new FormData();
