@@ -1,8 +1,15 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import ContactForm from "@/components/ContactForm";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { CONTACT_FAQS as FAQS } from "@/lib/faqs";
+
+export const metadata: Metadata = {
+  title: "お問い合わせ",
+  description: "NewOpenへのご意見・ご要望・掲載に関するお問い合わせはこちらからどうぞ。",
+  robots: { index: false, follow: false },
+};
 
 export default async function ContactPage({
   searchParams,

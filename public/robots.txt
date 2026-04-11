@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /mypage/
+Disallow: /auth/
+Disallow: /api/
+
+Sitemap: https://newopen.site/sitemap.xml

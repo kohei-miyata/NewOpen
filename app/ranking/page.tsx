@@ -1,8 +1,14 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getRankedStores } from "@/lib/db";
 import StoreCard from "@/components/StoreCard";
 import PageHeader from "@/components/PageHeader";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
+
+export const metadata: Metadata = {
+  title: "人気ランキング",
+  description: "NewOpenで最も注目を集めている新規オープン店舗のランキングです。いいね数・閲覧数をもとにした人気店をチェックしましょう。",
+};
 
 const MEDAL_COLORS = [
   "bg-yellow-400 text-white",
