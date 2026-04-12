@@ -7,6 +7,7 @@ import { addCoupon, removeCoupon, toggleCoupon } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 import CouponFormClient from "@/components/CouponFormClient";
 import { TicketIcon } from "@heroicons/react/24/outline";
+import ScrollToTop from "@/components/ScrollToTop";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -55,6 +56,7 @@ export default async function OwnerCouponsPage({ params, searchParams }: Props) 
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      <ScrollToTop />
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
         <div className="flex items-center justify-between">
           <div>
@@ -71,12 +73,26 @@ export default async function OwnerCouponsPage({ params, searchParams }: Props) 
 
         {/* 店舗登録完了後のウェルカムバナー */}
         {welcome && (
-          <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-4 space-y-1">
+          <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-4 space-y-3">
             <p className="text-sm font-bold text-orange-800 flex items-center gap-1.5">
               <TicketIcon className="w-4 h-4 shrink-0" />
               店舗登録が完了しました！限定クーポンを作成しましょう
             </p>
             <p className="text-xs text-orange-700">クーポンを登録すると店舗詳細ページに表示され、ユーザーが来店するきっかけになります。</p>
+            <div className="flex gap-2 pt-1">
+              <Link
+                href="/mypage/owner"
+                className="flex-1 text-center text-sm border border-orange-300 text-orange-600 font-medium py-2 rounded-lg hover:bg-orange-100 transition-colors"
+              >
+                スキップ
+              </Link>
+              <a
+                href="#coupon-form"
+                className="flex-1 text-center text-sm bg-orange-500 text-white font-bold py-2 rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                クーポンを登録する
+              </a>
+            </div>
           </div>
         )}
 
@@ -169,7 +185,7 @@ export default async function OwnerCouponsPage({ params, searchParams }: Props) 
 
         {/* 新規クーポン追加フォーム */}
         <section>
-          <h2 className="text-base font-semibold text-gray-800 mb-3">新しいクーポンを追加</h2>
+          <h2 id="coupon-form" className="text-base font-semibold text-gray-800 mb-3">新しいクーポンを追加</h2>
           <CouponFormClient action={addCouponBound} />
         </section>
       </div>
