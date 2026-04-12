@@ -38,6 +38,7 @@ function toStore(row: any): Store {
     tiktokPostUrl: row.tiktok_post_url ?? null,
     status: (row.status ?? "active") as Store["status"],
     approvalStatus: (row.approval_status ?? "approved") as Store["approvalStatus"],
+    ownerId: row.owner_id ?? null,
   };
 }
 
@@ -134,9 +135,10 @@ export const getCoupons = unstable_cache(
   async (): Promise<Coupon[]> => {
     const { data, error } = await getSupabaseClient()
       .from("coupons")
-      .select("*")
+      .select("*, stores!inner(approval_status)")
       .eq("is_active", true)
       .gte("expiry_date", todayJST())
+      .eq("stores.approval_status", "approved")
       .order("expiry_date", { ascending: true });
 
     if (error) throw new Error(error.message);
@@ -152,9 +154,10 @@ export const getCouponsWithLocation = unstable_cache(
   async (): Promise<CouponWithLocation[]> => {
     const { data, error } = await getSupabaseClient()
       .from("coupons")
-      .select("*, stores(lat, lng, image_url)")
+      .select("*, stores!inner(lat, lng, image_url, approval_status)")
       .eq("is_active", true)
       .gte("expiry_date", todayJST())
+      .eq("stores.approval_status", "approved")
       .order("expiry_date", { ascending: true });
 
     if (error) throw new Error(error.message);
@@ -176,7 +179,7 @@ export const getCouponsWithLocation = unstable_cache(
 );
 
 export async function createStore(
-  payload: Omit<Store, "id" | "views" | "likes" | "approvalStatus"> & { ownerId?: string },
+  payload: Omit<Store, "id" | "views" | "likes" | "approvalStatus" | "ownerId"> & { ownerId?: string },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client?: any
 ): Promise<Store> {

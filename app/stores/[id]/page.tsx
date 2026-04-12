@@ -67,6 +67,13 @@ export default async function StoreDetailPage({ params }: Props) {
   if (!store) notFound();
 
   const { data: { user } } = await supabase.auth.getUser();
+
+  // 未承認店舗はオーナー本人・管理者以外は404
+  const role = user?.user_metadata?.role as string | undefined;
+  const isOwner = user?.id === store.ownerId;
+  const isAdmin = role === "admin";
+  if (store.approvalStatus !== "approved" && !isOwner && !isAdmin) notFound();
+
   const [likedIds, coupons, usedCouponIds] = await Promise.all([
     user ? getUserLikedStoreIds(user.id) : Promise.resolve(new Set<string>()),
     getCouponsByStoreId(id),

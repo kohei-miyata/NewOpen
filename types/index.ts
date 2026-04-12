@@ -34,6 +34,7 @@ export interface Store {
   tiktokPostUrl: string | null;
   status: StoreStatus;
   approvalStatus: ApprovalStatus;
+  ownerId: string | null;
 }
 
 export interface Coupon {
