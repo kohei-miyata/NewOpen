@@ -12,16 +12,8 @@ import AreaLinks from "@/components/AreaLinks";
 import AreaRanking from "@/components/AreaRanking";
 import HeroSearch from "@/components/HeroSearch";
 import type { Category } from "@/types";
-import {
-  CalendarDaysIcon,
-  SparklesIcon,
-  TicketIcon,
-  HeartIcon,
-  BuildingStorefrontIcon,
-  TagIcon,
-  MapPinIcon,
-  TrophyIcon,
-} from "@heroicons/react/24/outline";
+import { FaCalendarAlt, FaCalendarCheck, FaTicketAlt, FaHeart, FaStore, FaTags, FaTrophy } from "react-icons/fa";
+import { MdOutlineNewReleases, MdOutlineLocationOn } from "react-icons/md";
 
 export const metadata: Metadata = {
   title: "NewOpen | あなたの街の新規オープン情報",
@@ -139,7 +131,7 @@ export default async function Home() {
           <section>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <SparklesIcon className="w-6 h-6 text-orange-500" />
+                <MdOutlineNewReleases className="w-6 h-6 text-orange-500" />
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">本日オープン</h2>
                   <p className="text-xs text-gray-500">今日オープンしたばかりのお店</p>
@@ -160,7 +152,7 @@ export default async function Home() {
             <section key="thisWeek">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
+                  <FaCalendarCheck className="text-orange-500" size={22} />
                   <div>
                     <h2 className="text-xl font-bold text-gray-900">今週オープン予定</h2>
                     <p className="text-xs text-gray-500">今週中にオープンするお店</p>
@@ -194,7 +186,7 @@ export default async function Home() {
         {/* ── オープンカレンダー ── */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
+            <FaCalendarAlt className="text-orange-500" size={22} />
             <div>
               <h2 className="text-xl font-bold text-gray-900">オープンカレンダー</h2>
               <p className="text-xs text-gray-500">日付をタップしてオープン店舗を確認</p>
@@ -206,7 +198,7 @@ export default async function Home() {
         {/* ── カテゴリショートカット ── */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <TagIcon className="w-6 h-6 text-orange-500" />
+            <FaTags className="text-orange-500" size={22} />
             <div>
               <h2 className="text-xl font-bold text-gray-900">カテゴリから探す</h2>
               <p className="text-xs text-gray-500">気になるジャンルのお店をチェック</p>
@@ -219,7 +211,7 @@ export default async function Home() {
         {topAreas.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-4">
-              <MapPinIcon className="w-6 h-6 text-orange-500" />
+              <MdOutlineLocationOn className="text-orange-500" size={24} />
               <div>
                 <h2 className="text-xl font-bold text-gray-900">エリアから探す</h2>
                 <p className="text-xs text-gray-500">都道府県別の新規オープン店舗</p>
@@ -234,7 +226,7 @@ export default async function Home() {
           <section>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <TicketIcon className="w-6 h-6 text-orange-500" />
+                <FaTicketAlt className="text-orange-500" size={22} />
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">お得なクーポン</h2>
                   <p className="text-xs text-gray-500">新規オープン記念の特別クーポン</p>
@@ -256,7 +248,7 @@ export default async function Home() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <HeartIcon className="w-6 h-6 text-orange-500" />
+              <FaHeart className="text-orange-500" size={22} />
               <div>
                 <h2 className="text-xl font-bold text-gray-900">全国応援ランキング TOP3</h2>
                 <p className="text-xs text-gray-500">いいねで開店を応援しよう！</p>
@@ -277,7 +269,7 @@ export default async function Home() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <TrophyIcon className="w-6 h-6 text-orange-500" />
+              <FaTrophy className="text-orange-500" size={22} />
               <div>
                 <h2 className="text-xl font-bold text-gray-900">エリア別ランキング</h2>
                 <p className="text-xs text-gray-500">地域ごとの人気店をチェック</p>
@@ -293,7 +285,7 @@ export default async function Home() {
         {/* ── オーナー向け誘導バナー（一般ユーザーには非表示） ── */}
         {!isGeneral && <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-8 text-center">
           <div className="flex justify-center mb-3">
-            <BuildingStorefrontIcon className="w-8 h-8 text-orange-400" />
+            <FaStore className="text-orange-400" size={28} />
           </div>
           <p className="text-xs text-orange-400 font-bold mb-2 tracking-wide">店舗オーナー様へ</p>
           <h2 className="text-xl sm:text-2xl font-extrabold mb-2">新規オープンを無料で掲載しませんか？</h2>
