@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const FEATURES = [
   { Icon: MapIcon, title: "エリアから探す", desc: "渋谷・新宿・銀座など、街や駅名で新規オープン店舗を絞り込んで検索。" },
   { Icon: TagIcon, title: "カテゴリで絞り込む", desc: "レストラン・カフェ・スイーツ・美容院・ジムなど9カテゴリから探せる。" },
-  { Icon: TicketIcon, title: "お得なクーポン", desc: "オープン記念クーポンをGETして、お得に新しいお店を体験しよう。" },
+  { Icon: TicketIcon, title: "お得なクーポン", desc: "限定クーポンをGETして、お得に新しいお店を体験しよう。" },
   { Icon: CalendarDaysIcon, title: "オープン前から掲載", desc: "「まもなくオープン」として30日前から告知。話題を先取りしよう。" },
   { Icon: ClockIcon, title: "3年間継続掲載", desc: "オープンから3年間、一般公開されます。期間終了後もオーナーのマイページから確認・管理が可能です。" },
   { Icon: CurrencyYenIcon, title: "すべて完全無料", desc: "掲載・編集・クーポン発行・SNS埋め込みもすべて0円。" },

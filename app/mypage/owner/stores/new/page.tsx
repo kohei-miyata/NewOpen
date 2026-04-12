@@ -46,7 +46,7 @@ export default async function OwnerNewStorePage({
               </li>
               <li className="flex items-start gap-2">
                 <TicketIcon className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />
-                <span><span className="font-semibold">クーポン発行</span> — 店舗登録後にオープン記念クーポンを作成・管理できます。クーポンコードの使用状況もリアルタイムで確認できます。</span>
+                <span><span className="font-semibold">クーポン発行</span> — 店舗登録後に限定クーポンを作成・管理できます。クーポンコードの使用状況もリアルタイムで確認できます。</span>
               </li>
               <li className="flex items-start gap-2">
                 <ChartBarIcon className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />

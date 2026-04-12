@@ -74,7 +74,7 @@ export default async function OwnerCouponsPage({ params, searchParams }: Props) 
           <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-4 space-y-1">
             <p className="text-sm font-bold text-orange-800 flex items-center gap-1.5">
               <TicketIcon className="w-4 h-4 shrink-0" />
-              店舗登録が完了しました！オープン記念クーポンを作成しましょう
+              店舗登録が完了しました！限定クーポンを作成しましょう
             </p>
             <p className="text-xs text-orange-700">クーポンを登録すると店舗詳細ページに表示され、ユーザーが来店するきっかけになります。</p>
           </div>
@@ -123,8 +123,8 @@ export default async function OwnerCouponsPage({ params, searchParams }: Props) 
                           {daysUntilExpiry(coupon.expiryDate) <= 0
                             ? " （期限切れ）"
                             : daysUntilExpiry(coupon.expiryDate) <= 30
-                            ? ` （残り${daysUntilExpiry(coupon.expiryDate)}日）`
-                            : ""}
+                              ? ` （残り${daysUntilExpiry(coupon.expiryDate)}日）`
+                              : ""}
                         </span>
                         <span className="flex items-center gap-0.5 bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">
                           <TicketIcon className="w-3 h-3" />
@@ -140,11 +140,10 @@ export default async function OwnerCouponsPage({ params, searchParams }: Props) 
                         <SubmitButton
                           label={coupon.isActive ? "無効にする" : "有効にする"}
                           loadingLabel="変更中..."
-                          className={`text-xs border px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                            coupon.isActive
+                          className={`text-xs border px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${coupon.isActive
                               ? "border-gray-200 text-gray-600 hover:border-orange-400 hover:text-orange-500"
                               : "border-green-200 text-green-600 hover:bg-green-50"
-                          }`}
+                            }`}
                         />
                       </form>
                       <Link

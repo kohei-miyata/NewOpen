@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const MERITS = [
   { Icon: MegaphoneIcon, title: "無料で掲載できる", desc: "基本掲載は完全無料。オープン前から「まもなくオープン」として告知できます。" },
   { Icon: CameraIcon, title: "SNS投稿を埋め込み", desc: "X・Instagram・TikTokの最新投稿を店舗ページに自動表示。フォロワー獲得にも。" },
-  { Icon: TicketIcon, title: "クーポンで集客", desc: "オープン記念クーポンを発行して、初来店のハードルを下げましょう。" },
+  { Icon: TicketIcon, title: "クーポンで集客", desc: "限定クーポンを発行して、初来店のハードルを下げましょう。" },
   { Icon: CalendarDaysIcon, title: "3年間継続掲載", desc: "オープンから3年間、情報が残り続けます。他サービスとの差別化ポイントです。" },
   { Icon: MapPinIcon, title: "エリア検索で露出", desc: "ユーザーがエリア・カテゴリで検索した際に表示。地元のお客様に届きます。" },
   { Icon: PencilSquareIcon, title: "いつでも編集可能", desc: "営業時間・写真・SNSリンクなど、オーナーページからいつでも更新できます。" },

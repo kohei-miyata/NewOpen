@@ -37,7 +37,7 @@ export default async function CouponsPage({ searchParams }: Props) {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <PageHeader title="お得なクーポン" description="新規オープン店舗限定のオープン記念クーポン一覧。期限切れ前にお早めに！" />
+        <PageHeader title="お得なクーポン" description="新規オープン店舗限定の限定クーポン一覧。期限切れ前にお早めに！" />
 
         {/* 検索・フィルター */}
         <form method="GET" className="mb-6 space-y-3">
@@ -61,11 +61,10 @@ export default async function CouponsPage({ searchParams }: Props) {
           <div className="flex flex-wrap gap-2">
             <a
               href={`/coupons?${new URLSearchParams({ ...(q ? { q } : {}), ...(showUsed ? { showUsed } : {}) }).toString()}`}
-              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                !category
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${!category
                   ? "bg-orange-500 text-white border-orange-500"
                   : "bg-white text-gray-600 border-gray-300 hover:border-orange-400 hover:text-orange-500"
-              }`}
+                }`}
             >
               すべて
             </a>
@@ -73,11 +72,10 @@ export default async function CouponsPage({ searchParams }: Props) {
               <a
                 key={cat}
                 href={`/coupons?${new URLSearchParams({ ...(q ? { q } : {}), category: cat, ...(showUsed ? { showUsed } : {}) }).toString()}`}
-                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                  category === cat
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${category === cat
                     ? "bg-orange-500 text-white border-orange-500"
                     : "bg-white text-gray-600 border-gray-300 hover:border-orange-400 hover:text-orange-500"
-                }`}
+                  }`}
               >
                 {cat}
               </a>
@@ -104,11 +102,10 @@ export default async function CouponsPage({ searchParams }: Props) {
                 ...(category ? { category } : {}),
                 ...(showUsed !== "1" ? { showUsed: "1" } : {}),
               }).toString()}`}
-              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                showUsed === "1"
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${showUsed === "1"
                   ? "bg-gray-200 text-gray-700 border-gray-300"
                   : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
-              }`}
+                }`}
             >
               {showUsed === "1" ? "使用済みを非表示" : "使用済みを表示"}
             </a>
