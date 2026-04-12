@@ -76,6 +76,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/coming-soon", request.url));
   }
 
+  // COMING_SOON が無効のときに /coming-soon へ直アクセスしたらトップへ
+  if (
+    process.env.COMING_SOON !== "true" &&
+    request.nextUrl.pathname === "/coming-soon"
+  ) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   // 管理画面IPチェック
   if (isAdminBlocked(request)) {
     return NextResponse.redirect(new URL("/", request.url));
@@ -120,6 +128,14 @@ export async function middleware(request: NextRequest) {
   // ログイン済みユーザーが /auth/login or /auth/signup にアクセスしたらトップへ
   if (user && (pathname.startsWith("/auth/login") || pathname.startsWith("/auth/signup"))) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // 未ログインユーザーが保護パスにアクセスしたらログインへ（next付き）
+  const isProtected = pathname.startsWith("/mypage") || pathname.startsWith("/admin");
+  if (!user && isProtected && !isApiPath) {
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   // BANユーザーは /banned 以外アクセス不可

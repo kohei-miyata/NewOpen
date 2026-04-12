@@ -27,9 +27,12 @@ function sortByDistance(stores: Store[], lat: number, lng: number): Store[] {
 interface Props {
   allStores: Store[];
   comingSoon: Store[];
+  innerOrder?: Array<"coming_soon" | "latest">;
+  isLoggedIn?: boolean;
+  likedStoreIds?: Set<string>;
 }
 
-export default function TopStoresSections({ allStores, comingSoon }: Props) {
+export default function TopStoresSections({ allStores, comingSoon, innerOrder = ["coming_soon", "latest"], isLoggedIn = false, likedStoreIds = new Set() }: Props) {
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [granted, setGranted] = useState(false);
   const [denied, setDenied] = useState(false);
@@ -51,60 +54,62 @@ export default function TopStoresSections({ allStores, comingSoon }: Props) {
   const recentSorted = userPos ? sortByDistance(allStores, userPos.lat, userPos.lng).slice(0, 4) : allStores.slice(0, 4);
   const comingSoonSorted = userPos ? sortByDistance(comingSoon, userPos.lat, userPos.lng).slice(0, 4) : comingSoon.slice(0, 4);
 
+  const comingSoonSection = comingSoon.length > 0 ? (
+    <section key="coming_soon">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <ClockIcon className="w-5 h-5 text-orange-500" />まもなくオープン
+          </h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "30日以内にオープン予定のお店"}
+          </p>
+        </div>
+        <Link href="/stores?filter=coming_soon" className="text-sm text-orange-500 hover:underline">
+          すべて見る →
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {comingSoonSorted.map((store) => (
+          <StoreCard key={store.id} store={store} isLoggedIn={isLoggedIn} initialLiked={likedStoreIds.has(store.id)} />
+        ))}
+      </div>
+    </section>
+  ) : null;
+
+  const latestSection = (
+    <section key="latest">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <SparklesIcon className="w-5 h-5 text-orange-500" />最新オープン
+          </h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "新しくオープンしたお店をチェック"}
+          </p>
+        </div>
+        <Link href="/stores" className="text-sm text-orange-500 hover:underline">
+          すべて見る →
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {recentSorted.map((store) => (
+          <StoreCard key={store.id} store={store} isLoggedIn={isLoggedIn} initialLiked={likedStoreIds.has(store.id)} />
+        ))}
+      </div>
+    </section>
+  );
+
+  const sectionMap = { coming_soon: comingSoonSection, latest: latestSection };
+
   return (
     <>
-      {/* 位置情報拒否メッセージ */}
       {denied && (
         <p className="text-xs text-gray-400 -mt-2 mb-2">
           現在地の利用が拒否されています。再度許可するにはアドレスバー横のアイコンから位置情報を「許可」に変更してください。
         </p>
       )}
-
-      {/* まもなくオープン */}
-      {comingSoon.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <ClockIcon className="w-5 h-5 text-orange-500" />まもなくオープン
-              </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "30日以内にオープン予定のお店"}
-              </p>
-            </div>
-            <Link href="/stores?filter=coming_soon" className="text-sm text-orange-500 hover:underline">
-              すべて見る →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {comingSoonSorted.map((store) => (
-              <StoreCard key={store.id} store={store} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 最新オープン */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <SparklesIcon className="w-5 h-5 text-orange-500" />最新オープン
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {granted ? <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />現在地に近い順</span> : "新しくオープンしたお店をチェック"}
-            </p>
-          </div>
-          <Link href="/stores" className="text-sm text-orange-500 hover:underline">
-            すべて見る →
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {recentSorted.map((store) => (
-            <StoreCard key={store.id} store={store} />
-          ))}
-        </div>
-      </section>
+      {innerOrder.map((key) => sectionMap[key])}
     </>
   );
 }

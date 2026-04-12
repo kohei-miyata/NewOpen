@@ -12,13 +12,15 @@ interface Props {
   isLoggedIn: boolean;
 }
 
-export default function LikeButton({ storeId, initialLikes, initialLiked, isLoggedIn }: Props) {
+export default function CardLikeButton({ storeId, initialLikes, initialLiked, isLoggedIn }: Props) {
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(initialLiked);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  async function handleClick() {
+  async function handleClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     if (!isLoggedIn) {
       router.push("/auth/login");
       return;
@@ -46,16 +48,16 @@ export default function LikeButton({ storeId, initialLikes, initialLiked, isLogg
     <button
       onClick={handleClick}
       disabled={loading}
-      title={isLoggedIn ? undefined : "ログインしていいねできます"}
-      className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-sm transition-colors shadow ${
+      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-bold shadow transition-colors ${
         liked
           ? "bg-orange-500 text-white"
-          : "bg-white/90 backdrop-blur text-gray-700 hover:text-orange-500"
+          : "bg-white/90 text-gray-600 hover:bg-orange-50 hover:text-orange-500"
       }`}
     >
-      {liked ? <HeartSolid className="w-4 h-4" /> : <HeartIcon className="w-4 h-4" />}
-      <span>{liked ? "応援中" : "応援する"} {likes.toLocaleString()}</span>
-      {!isLoggedIn && <span className="text-xs opacity-60">（要ログイン）</span>}
+      {liked
+        ? <HeartSolid className="w-3.5 h-3.5" />
+        : <HeartIcon className="w-3.5 h-3.5" />
+      }
     </button>
   );
 }

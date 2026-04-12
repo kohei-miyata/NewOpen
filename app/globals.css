@@ -32,3 +32,12 @@ input[type="date"] {
 .tiptap strong { font-weight: 700; }
 .tiptap em     { font-style: italic; }
 .tiptap u      { text-decoration: underline; }
+
+/* モーダルのフェードイン＋スライドアップ */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.25s ease-out forwards;
+}

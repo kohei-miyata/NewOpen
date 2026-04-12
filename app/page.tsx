@@ -1,18 +1,26 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getStores, getRankedStores, getCoupons, getComingSoonStores, getTodayOpenStores, getUsedCouponIds } from "@/lib/db";
+import { getStores, getRankedStores, getCoupons, getComingSoonStores, getTodayOpenStores, getThisWeekOpenStores, getUsedCouponIds, getUserLikedStoreIds } from "@/lib/db";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import StoreCard from "@/components/StoreCard";
 import CouponCard from "@/components/CouponCard";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import TopStoresSections from "@/components/TopStoresSections";
 import StoreCalendar from "@/components/StoreCalendar";
+import CategoryShortcuts from "@/components/CategoryShortcuts";
+import AreaLinks from "@/components/AreaLinks";
+import AreaRanking from "@/components/AreaRanking";
+import HeroSearch from "@/components/HeroSearch";
+import type { Category } from "@/types";
 import {
   CalendarDaysIcon,
   SparklesIcon,
   TicketIcon,
   HeartIcon,
   BuildingStorefrontIcon,
+  TagIcon,
+  MapPinIcon,
+  TrophyIcon,
 } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = {
@@ -29,20 +37,50 @@ export default async function Home() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   const role = (user?.user_metadata?.role as string) ?? null;
-  const isOwner = role === "owner";
   const isGeneral = user && role !== "owner" && role !== "admin";
 
-  const [allStores, ranked, coupons, comingSoon, todayStores, usedCouponIds] = await Promise.all([
+  const [allStores, ranked, coupons, comingSoon, todayStores, thisWeekStores, usedCouponIds, likedStoreIds] = await Promise.all([
     getStores(),
     getRankedStores(10),
     getCoupons(),
     getComingSoonStores(),
     getTodayOpenStores(),
+    getThisWeekOpenStores(),
     user ? getUsedCouponIds(user.id, supabase) : Promise.resolve(new Set<string>()),
+    user ? getUserLikedStoreIds(user.id) : Promise.resolve(new Set<string>()),
   ]);
 
   const topStores = ranked.slice(0, 3);
   const latestCoupons = coupons.slice(0, 3);
+
+  // 今週オープン予定 / まもなくオープン / 最新オープン を件数の多い順に並べる
+  // TopStoresSections（まもなく＋最新）は内部順序を prop で制御
+  const geoInnerOrder: Array<"coming_soon" | "latest"> =
+    comingSoon.length >= allStores.length
+      ? ["coming_soon", "latest"]
+      : ["latest", "coming_soon"];
+
+  // 今週オープン予定と「まもなく+最新のブロック」のどちらを先に出すか
+  // ブロックの代表値 = まもなく・最新の大きい方
+  const geoBlockCount = Math.max(comingSoon.length, allStores.length);
+  const thisWeekFirst = thisWeekStores.length > geoBlockCount;
+
+  // カテゴリ別件数
+  const categoryCounts = allStores.reduce<Partial<Record<Category, number>>>((acc, s) => {
+    acc[s.category] = (acc[s.category] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  // エリア別件数（都道府県抽出）
+  const prefMap: Record<string, number> = {};
+  for (const s of allStores) {
+    const m = s.address.match(/^(.+?[都道府県])/);
+    if (m) prefMap[m[1]] = (prefMap[m[1]] ?? 0) + 1;
+  }
+  const topAreas = Object.entries(prefMap)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12)
+    .map(([prefecture, count]) => ({ prefecture, count }));
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -51,68 +89,50 @@ export default async function Home() {
       <section className="relative bg-gradient-to-br from-orange-500 via-amber-400 to-yellow-300 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none"
           style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
-        <div className="relative max-w-5xl mx-auto px-4 py-20 text-center">
-          <span className="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wide">
-            新規オープン情報プラットフォーム
-          </span>
-          <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight drop-shadow-sm flex items-center justify-center gap-3">
-            <svg width="72" height="72" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="20" fill="white" fillOpacity="0.25"/>
-              <circle cx="20" cy="20" r="17" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
-              <text x="19" y="18" textAnchor="middle" dominantBaseline="central" fontFamily="'Arial Black', Arial, sans-serif" fontWeight="900" fontSize="24" fill="white">N</text>
-            </svg>
-            EW OPEN
-          </h1>
-          <p className="mt-4 text-xl sm:text-2xl opacity-90 font-medium">
-            あなたの街の<span className="font-extrabold underline decoration-white/60 decoration-2">新規オープン</span>情報をいち早くお届け
-          </p>
-          <p className="mt-2 text-sm opacity-75">レストラン・カフェ・美容院・ジムなど、気になるお店が見つかる</p>
-          <div className="mt-8 flex gap-3 justify-center flex-wrap">
-            <Link
-              href="/stores"
-              className="bg-white text-orange-500 font-bold px-8 py-3 rounded-full hover:bg-orange-50 transition-colors shadow-lg text-sm"
-            >
-              お店を探す →
-            </Link>
-            <Link
-              href="/for-owners"
-              className="bg-white/20 backdrop-blur border border-white/40 text-white font-bold px-8 py-3 rounded-full hover:bg-white/30 transition-colors text-sm"
-            >
-              掲載を検討する
-            </Link>
+        <div className="relative max-w-5xl mx-auto px-4 py-8 sm:py-10">
+          {/* ブランド行 */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight drop-shadow-sm flex items-center gap-2">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="20" fill="white" fillOpacity="0.25"/>
+                <circle cx="20" cy="20" r="17" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
+                <text x="19" y="18" textAnchor="middle" dominantBaseline="central" fontFamily="'Arial Black', Arial, sans-serif" fontWeight="900" fontSize="24" fill="white">N</text>
+              </svg>
+              EW OPEN
+            </h1>
+            <span className="hidden sm:block text-sm opacity-80 font-medium border-l border-white/40 pl-3">
+              あなたの街の新規オープン情報
+            </span>
           </div>
 
+          {/* 検索バー ＋ クイックカテゴリ */}
+          <HeroSearch />
+
           {/* 統計バー */}
-          <div className="mt-12 flex justify-center gap-8 sm:gap-16 flex-wrap text-center">
+          <div className="mt-6 flex justify-center gap-6 sm:gap-12 flex-wrap text-center">
             <div>
-              <p className="text-3xl font-extrabold">{allStores.length}+</p>
-              <p className="text-xs opacity-75 mt-0.5">掲載店舗数</p>
+              <p className="text-xl font-extrabold">{allStores.length}+</p>
+              <p className="text-[11px] opacity-75 mt-0.5">掲載店舗</p>
             </div>
             <div>
-              <p className="text-3xl font-extrabold">{comingSoon.length}+</p>
-              <p className="text-xs opacity-75 mt-0.5">まもなくオープン</p>
+              <p className="text-xl font-extrabold">{comingSoon.length}+</p>
+              <p className="text-[11px] opacity-75 mt-0.5">まもなくオープン</p>
             </div>
             <div>
-              <p className="text-3xl font-extrabold">{coupons.length}+</p>
-              <p className="text-xs opacity-75 mt-0.5">お得なクーポン</p>
+              <p className="text-xl font-extrabold">{coupons.length}+</p>
+              <p className="text-[11px] opacity-75 mt-0.5">クーポン</p>
             </div>
+            <Link
+              href="/for-owners"
+              className="hidden sm:flex items-center gap-1 bg-white/20 backdrop-blur border border-white/30 text-white text-xs font-medium px-4 py-2 rounded-full hover:bg-white/30 transition-colors self-center"
+            >
+              掲載を検討する →
+            </Link>
           </div>
         </div>
       </section>
 
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-14">
-
-        {/* ── オープンカレンダー ── */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">オープンカレンダー</h2>
-              <p className="text-xs text-gray-500">日付をタップしてオープン店舗を確認</p>
-            </div>
-          </div>
-          <StoreCalendar stores={allStores} comingSoon={comingSoon} />
-        </section>
 
         {/* ── 本日オープン ── */}
         {todayStores.length > 0 && (
@@ -128,14 +148,86 @@ export default async function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {todayStores.map((store) => (
-                <StoreCard key={store.id} store={store} />
+                <StoreCard key={store.id} store={store} isLoggedIn={!!user} initialLiked={likedStoreIds.has(store.id)} />
               ))}
             </div>
           </section>
         )}
 
-        {/* ── まもなくオープン・最新オープン（現在地ソート） ── */}
-        <TopStoresSections allStores={allStores} comingSoon={comingSoon} />
+        {/* ── 今週オープン予定 / まもなくオープン / 最新オープン（件数順） ── */}
+        {(() => {
+          const thisWeekSection = thisWeekStores.length > 0 ? (
+            <section key="thisWeek">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">今週オープン予定</h2>
+                    <p className="text-xs text-gray-500">今週中にオープンするお店</p>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {thisWeekStores.map((store) => (
+                  <StoreCard key={store.id} store={store} isLoggedIn={!!user} initialLiked={likedStoreIds.has(store.id)} />
+                ))}
+              </div>
+            </section>
+          ) : null;
+
+          const geoSection = (
+            <TopStoresSections
+              key="geo"
+              allStores={allStores}
+              comingSoon={comingSoon}
+              innerOrder={geoInnerOrder}
+              isLoggedIn={!!user}
+              likedStoreIds={likedStoreIds}
+            />
+          );
+
+          return thisWeekFirst
+            ? <>{thisWeekSection}{geoSection}</>
+            : <>{geoSection}{thisWeekSection}</>;
+        })()}
+
+        {/* ── オープンカレンダー ── */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">オープンカレンダー</h2>
+              <p className="text-xs text-gray-500">日付をタップしてオープン店舗を確認</p>
+            </div>
+          </div>
+          <StoreCalendar stores={allStores} comingSoon={comingSoon} />
+        </section>
+
+        {/* ── カテゴリショートカット ── */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <TagIcon className="w-6 h-6 text-orange-500" />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">カテゴリから探す</h2>
+              <p className="text-xs text-gray-500">気になるジャンルのお店をチェック</p>
+            </div>
+          </div>
+          <CategoryShortcuts counts={categoryCounts} />
+        </section>
+
+        {/* ── エリア絞り込み ── */}
+        {topAreas.length > 0 && (
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <MapPinIcon className="w-6 h-6 text-orange-500" />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">エリアから探す</h2>
+                <p className="text-xs text-gray-500">都道府県別の新規オープン店舗</p>
+              </div>
+            </div>
+            <AreaLinks areas={topAreas} />
+          </section>
+        )}
 
         {/* ── クーポン ── */}
         {latestCoupons.length > 0 && (
@@ -166,8 +258,8 @@ export default async function Home() {
             <div className="flex items-center gap-2">
               <HeartIcon className="w-6 h-6 text-orange-500" />
               <div>
-                <h2 className="text-xl font-bold text-gray-900">全国いいね！ランキング TOP3</h2>
-                <p className="text-xs text-gray-500">みんなが気になっているお店</p>
+                <h2 className="text-xl font-bold text-gray-900">全国応援ランキング TOP3</h2>
+                <p className="text-xs text-gray-500">いいねで開店を応援しよう！</p>
               </div>
             </div>
             <Link href="/ranking" className="text-sm text-orange-500 hover:underline">
@@ -176,9 +268,23 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {topStores.map((store, i) => (
-              <StoreCard key={store.id} store={store} rank={i + 1} />
+              <StoreCard key={store.id} store={store} rank={i + 1} isLoggedIn={!!user} initialLiked={likedStoreIds.has(store.id)} />
             ))}
           </div>
+        </section>
+
+        {/* ── エリア別ランキング ── */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <TrophyIcon className="w-6 h-6 text-orange-500" />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">エリア別ランキング</h2>
+                <p className="text-xs text-gray-500">地域ごとの人気店をチェック</p>
+              </div>
+            </div>
+          </div>
+          <AreaRanking stores={allStores} />
         </section>
 
         {/* ── 最近見たお店 ── */}

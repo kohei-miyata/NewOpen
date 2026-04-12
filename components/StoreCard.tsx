@@ -1,12 +1,15 @@
 import Link from "next/link";
 import type { Store } from "@/types";
+import CardLikeButton from "@/components/CardLikeButton";
 
 interface Props {
   store: Store;
   rank?: number;
+  isLoggedIn?: boolean;
+  initialLiked?: boolean;
 }
 
-export default function StoreCard({ store, rank }: Props) {
+export default function StoreCard({ store, rank, isLoggedIn = false, initialLiked = false }: Props) {
   const daysAgo = Math.floor(
     (new Date().getTime() - new Date(store.openDate).getTime()) / (1000 * 60 * 60 * 24)
   );
@@ -48,11 +51,19 @@ export default function StoreCard({ store, rank }: Props) {
               {store.category}
             </span>
           </div>
-          {rank !== undefined && (
-            <div className="absolute top-2 right-2 bg-yellow-400 text-white text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center shadow">
-              {rank}
-            </div>
-          )}
+          <div className="absolute top-2 right-2 flex flex-col items-end gap-1.5">
+            {rank !== undefined && (
+              <div className="bg-yellow-400 text-white text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center shadow">
+                {rank}
+              </div>
+            )}
+            <CardLikeButton
+              storeId={store.id}
+              initialLikes={store.likes}
+              initialLiked={initialLiked}
+              isLoggedIn={isLoggedIn}
+            />
+          </div>
         </div>
         <div className="p-4">
           <h3 className="font-bold text-gray-900 text-base truncate">{store.name}</h3>

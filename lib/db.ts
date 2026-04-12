@@ -238,6 +238,25 @@ export const getTodayOpenStores = unstable_cache(
   { revalidate: 300, tags: ["store"] }
 );
 
+export const getThisWeekOpenStores = unstable_cache(
+  async (): Promise<Store[]> => {
+    const today = todayJST();
+    const in7 = new Date(Date.now() + (9 + 7 * 24) * 60 * 60 * 1000).toISOString().split("T")[0];
+    const { data, error } = await getSupabaseClient()
+      .from("stores")
+      .select("*")
+      .gt("open_date", today)
+      .lte("open_date", in7)
+      .eq("approval_status", "approved")
+      .order("open_date", { ascending: true });
+
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(toStore);
+  },
+  ["this-week-open-stores"],
+  { revalidate: 300, tags: ["store"] }
+);
+
 export async function getComingSoonStores(): Promise<Store[]> {
   const today = todayJST();
   const in30 = new Date(Date.now() + (9 + 30 * 24) * 60 * 60 * 1000).toISOString().split("T")[0];

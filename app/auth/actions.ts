@@ -43,11 +43,16 @@ export async function signInWithGoogle() {
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const next = (formData.get("next") as string | null)?.trim() || null;
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect(`/auth/login?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);
-  redirect("/");
+  if (error) {
+    const params = new URLSearchParams({ error: toJapaneseAuthError(error.message) });
+    if (next) params.set("next", next);
+    redirect(`/auth/login?${params.toString()}`);
+  }
+  redirect(next ?? "/");
 }
 
 export async function signup(formData: FormData) {

@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LocalStorageConsentBanner from "@/components/LocalStorageConsentBanner";
+import AnnouncementModal from "@/components/AnnouncementModal";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://new-open.vercel.app";
@@ -46,6 +47,7 @@ export default function RootLayout({
         <Navbar />
         {children}
         <Footer />
+        <AnnouncementModal />
         <LocalStorageConsentBanner />
         <Analytics />
       </body>

@@ -18,6 +18,7 @@ import {
   ClockIcon,
   TicketIcon,
   ArrowTopRightOnSquareIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 
 interface Props {
@@ -113,8 +114,18 @@ export default async function StoreDetailPage({ params }: Props) {
         {/* 写真ギャラリー */}
         {allPhotos.length > 0 && (
           <div className="mb-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={allPhotos[0]} alt={store.name} className="w-full h-64 object-cover rounded-xl" />
+            <div className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={allPhotos[0]} alt={store.name} className="w-full h-64 object-cover rounded-xl" />
+              <div className="absolute top-3 right-3">
+                <LikeButton
+                  storeId={store.id}
+                  initialLikes={store.likes}
+                  initialLiked={initialLiked}
+                  isLoggedIn={!!user}
+                />
+              </div>
+            </div>
             {allPhotos.length > 1 && (
               <div className="grid grid-cols-4 gap-2 mt-2">
                 {allPhotos.slice(1).map((url, i) => (
@@ -195,15 +206,20 @@ export default async function StoreDetailPage({ params }: Props) {
           />
         </div>
 
-        {/* いいねボタン */}
-        <div className="mt-4">
-          <LikeButton
-            storeId={store.id}
-            initialLikes={store.likes}
-            initialLiked={initialLiked}
-            isLoggedIn={!!user}
-          />
-        </div>
+        {/* いいねで応援（画像なし店舗 or 補足テキスト） */}
+        {allPhotos.length === 0 && (
+          <div className="mt-4 space-y-1.5">
+            <p className="text-xs text-gray-500 flex items-center gap-1">
+              <HeartIcon className="w-3.5 h-3.5 text-orange-400" />いいねで開店を応援しよう！
+            </p>
+            <LikeButton
+              storeId={store.id}
+              initialLikes={store.likes}
+              initialLiked={initialLiked}
+              isLoggedIn={!!user}
+            />
+          </div>
+        )}
 
         {/* クーポン */}
         {coupons.length > 0 && (

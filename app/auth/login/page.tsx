@@ -4,7 +4,7 @@ import LoginForm from "@/components/LoginForm";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
   const sp = await searchParams;
 
@@ -16,7 +16,7 @@ export default async function LoginPage({
           <p className="text-sm text-gray-500 mt-1">ログイン</p>
         </div>
 
-        <LoginForm serverError={sp.error} />
+        <LoginForm serverError={sp.error} next={sp.next} />
 
         <p className="text-center text-sm text-gray-500 mt-4">
           アカウントをお持ちでない方は{" "}

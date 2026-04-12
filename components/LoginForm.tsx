@@ -10,7 +10,7 @@ const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none tra
 const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
 const INPUT_ERROR = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
-export default function LoginForm({ serverError }: { serverError?: string }) {
+export default function LoginForm({ serverError, next }: { serverError?: string; next?: string }) {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -43,6 +43,7 @@ export default function LoginForm({ serverError }: { serverError?: string }) {
       }}
       className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4"
     >
+      {next && <input type="hidden" name="next" value={next} />}
       {serverError && (
         <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{serverError}</p>
       )}
