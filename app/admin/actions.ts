@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
@@ -108,6 +108,9 @@ export async function approveStore(storeId: string) {
   }
 
   revalidatePath("/admin/owners");
+  revalidateTag("store");
+  revalidateTag("coupons");
+  revalidateTag("coupons-with-location");
 }
 
 /** 否認：approval_status → rejected、メール送信 */
@@ -155,6 +158,9 @@ export async function rejectStore(formData: FormData) {
   }
 
   revalidatePath("/admin/owners");
+  revalidateTag("store");
+  revalidateTag("coupons");
+  revalidateTag("coupons-with-location");
 }
 
 /** 審査待ちに戻す */
@@ -163,6 +169,9 @@ export async function setPendingStore(storeId: string) {
   const admin = createSupabaseAdminClient();
   await admin.from("stores").update({ approval_status: "pending" }).eq("id", storeId);
   revalidatePath("/admin/owners");
+  revalidateTag("store");
+  revalidateTag("coupons");
+  revalidateTag("coupons-with-location");
 }
 
 // ─── メルマガ配信 ─────────────────────────────────────────────────────────────
