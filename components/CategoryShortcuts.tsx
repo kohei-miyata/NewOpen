@@ -1,30 +1,21 @@
 import Link from "next/link";
 import type { Category } from "@/types";
-import {
-  BuildingStorefrontIcon,
-  SunIcon,
-  CakeIcon,
-  FireIcon,
-  CloudIcon,
-  ScissorsIcon,
-  BoltIcon,
-  ShoppingBagIcon,
-  EllipsisHorizontalCircleIcon,
-} from "@heroicons/react/24/outline";
-import type { ComponentType, SVGProps } from "react";
+import { FaUtensils, FaCoffee, FaBeer, FaCut, FaDumbbell, FaShoppingBag } from "react-icons/fa";
+import { MdCake } from "react-icons/md";
+import { GiNoodles } from "react-icons/gi";
+import { BsThreeDots } from "react-icons/bs";
+import type { IconType } from "react-icons";
 
-type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { className?: string }>;
-
-const CATEGORY_CONFIG: { label: Category; icon: IconComponent }[] = [
-  { label: "レストラン", icon: BuildingStorefrontIcon },
-  { label: "カフェ",     icon: SunIcon },
-  { label: "スイーツ",   icon: CakeIcon },
-  { label: "居酒屋",     icon: FireIcon },
-  { label: "ラーメン",   icon: CloudIcon },
-  { label: "美容院",     icon: ScissorsIcon },
-  { label: "ジム",       icon: BoltIcon },
-  { label: "ショップ",   icon: ShoppingBagIcon },
-  { label: "その他",     icon: EllipsisHorizontalCircleIcon },
+const CATEGORY_CONFIG: { label: Category; icon: IconType }[] = [
+  { label: "レストラン", icon: FaUtensils },
+  { label: "カフェ",     icon: FaCoffee },
+  { label: "スイーツ",   icon: MdCake },
+  { label: "居酒屋",     icon: FaBeer },
+  { label: "ラーメン",   icon: GiNoodles },
+  { label: "美容院",     icon: FaCut },
+  { label: "ジム",       icon: FaDumbbell },
+  { label: "ショップ",   icon: FaShoppingBag },
+  { label: "その他",     icon: BsThreeDots },
 ];
 
 interface Props {
@@ -40,7 +31,7 @@ export default function CategoryShortcuts({ counts = {} }: Props) {
           href={`/stores?category=${encodeURIComponent(label)}`}
           className="flex flex-col items-center gap-1.5 bg-white rounded-xl border border-gray-100 shadow-sm py-3 px-2 hover:border-orange-300 hover:shadow-md transition-all group"
         >
-          <Icon className="w-6 h-6 text-gray-400 group-hover:text-orange-500 transition-colors" />
+          <Icon size={22} className="text-gray-400 group-hover:text-orange-500 transition-colors" />
           <span className="text-xs font-medium text-gray-700 group-hover:text-orange-500 transition-colors text-center leading-tight">
             {label}
           </span>

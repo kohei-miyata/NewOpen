@@ -2,27 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  MagnifyingGlassIcon,
-  BuildingStorefrontIcon,
-  SunIcon,
-  CakeIcon,
-  ScissorsIcon,
-  BoltIcon,
-  ShoppingBagIcon,
-  ArrowRightIcon,
-} from "@heroicons/react/24/outline";
-import type { ComponentType, SVGProps } from "react";
+import { MagnifyingGlassIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import { FaUtensils, FaCoffee, FaCut, FaDumbbell, FaShoppingBag } from "react-icons/fa";
+import { MdCake } from "react-icons/md";
+import type { IconType } from "react-icons";
 
-type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { className?: string }>;
-
-const QUICK_CATEGORIES: { label: string; icon: IconComponent }[] = [
-  { label: "レストラン", icon: BuildingStorefrontIcon },
-  { label: "カフェ",     icon: SunIcon },
-  { label: "スイーツ",   icon: CakeIcon },
-  { label: "美容院",     icon: ScissorsIcon },
-  { label: "ジム",       icon: BoltIcon },
-  { label: "ショップ",   icon: ShoppingBagIcon },
+const QUICK_CATEGORIES: { label: string; icon: IconType }[] = [
+  { label: "レストラン", icon: FaUtensils },
+  { label: "カフェ",     icon: FaCoffee },
+  { label: "スイーツ",   icon: MdCake },
+  { label: "美容院",     icon: FaCut },
+  { label: "ジム",       icon: FaDumbbell },
+  { label: "ショップ",   icon: FaShoppingBag },
 ];
 
 export default function HeroSearch() {
@@ -70,7 +61,7 @@ export default function HeroSearch() {
             onClick={() => router.push(`/stores?category=${encodeURIComponent(label)}`)}
             className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur border border-white/30 text-white text-xs font-medium px-3 py-1.5 rounded-full hover:bg-white/30 transition-colors"
           >
-            <Icon className="w-3.5 h-3.5" />
+            <Icon size={12} />
             {label}
           </button>
         ))}

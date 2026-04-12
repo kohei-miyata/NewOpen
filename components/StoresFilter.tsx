@@ -4,6 +4,23 @@ import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import type { Category } from "@/types";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { FaUtensils, FaCoffee, FaBeer, FaCut, FaDumbbell, FaShoppingBag } from "react-icons/fa";
+import { MdCake } from "react-icons/md";
+import { GiNoodles } from "react-icons/gi";
+import { BsThreeDots } from "react-icons/bs";
+import type { IconType } from "react-icons";
+
+const CATEGORY_ICONS: Partial<Record<Category, IconType>> = {
+  レストラン: FaUtensils,
+  カフェ:     FaCoffee,
+  スイーツ:   MdCake,
+  居酒屋:     FaBeer,
+  ラーメン:   GiNoodles,
+  美容院:     FaCut,
+  ジム:       FaDumbbell,
+  ショップ:   FaShoppingBag,
+  その他:     BsThreeDots,
+};
 
 interface Props {
   categories: Category[];
@@ -106,20 +123,24 @@ export default function StoresFilter({ categories, currentArea, currentCategory,
         </button>
 
         {/* カテゴリ */}
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => handleCategoryClick(cat)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              currentCategory === cat
-                ? "bg-orange-500 text-white"
-                : "bg-white border border-gray-200 text-gray-700 hover:border-orange-400 hover:text-orange-500"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
+        {categories.map((cat) => {
+          const Icon = CATEGORY_ICONS[cat];
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => handleCategoryClick(cat)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                currentCategory === cat
+                  ? "bg-orange-500 text-white"
+                  : "bg-white border border-gray-200 text-gray-700 hover:border-orange-400 hover:text-orange-500"
+              }`}
+            >
+              {Icon && <Icon size={13} />}
+              {cat}
+            </button>
+          );
+        })}
       </div>
 
       {/* アクティブフィルター表示 */}
