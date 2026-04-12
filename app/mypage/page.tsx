@@ -33,41 +33,47 @@ export default async function MypagePage() {
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
 
         {/* プロフィールヘッダー */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-            <UserCircleIcon className="w-8 h-8 text-orange-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            {displayName && <p className="font-bold text-gray-900 truncate">{displayName}</p>}
-            <p className={`truncate ${displayName ? "text-sm text-gray-500" : "font-bold text-gray-900"}`}>{user.email}</p>
-            {roleLabel && (
-              <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 whitespace-nowrap ${roleBadgeClass}`}>
-                {roleLabel}
-              </span>
-            )}
-          </div>
-          <Link
-            href="/mypage/settings"
-            className="flex-shrink-0 text-gray-400 hover:text-orange-500 transition-colors p-1"
-            aria-label="設定"
-          >
-            <PencilIcon className="w-5 h-5" />
-          </Link>
-          {role === "owner" && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <UserCircleIcon className="w-8 h-8 text-orange-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              {displayName && <p className="font-bold text-gray-900 truncate">{displayName}</p>}
+              <p className={`truncate ${displayName ? "text-sm text-gray-500" : "font-bold text-gray-900"}`}>{user.email}</p>
+              {roleLabel && (
+                <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 whitespace-nowrap ${roleBadgeClass}`}>
+                  {roleLabel}
+                </span>
+              )}
+            </div>
             <Link
-              href="/mypage/owner"
-              className="flex-shrink-0 bg-orange-500 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-orange-600 transition-colors whitespace-nowrap"
+              href="/mypage/settings"
+              className="flex-shrink-0 text-gray-400 hover:text-orange-500 transition-colors p-1"
+              aria-label="設定"
             >
-              オーナー管理 →
+              <PencilIcon className="w-5 h-5" />
             </Link>
-          )}
-          {role === "admin" && (
-            <Link
-              href="/admin"
-              className="flex-shrink-0 bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-700 transition-colors whitespace-nowrap"
-            >
-              管理画面 →
-            </Link>
+          </div>
+          {(role === "owner" || role === "admin") && (
+            <div className="mt-4">
+              {role === "owner" && (
+                <Link
+                  href="/mypage/owner"
+                  className="block w-full text-center bg-orange-500 text-white text-sm font-bold px-4 py-2.5 rounded-full hover:bg-orange-600 transition-colors"
+                >
+                  オーナー管理 →
+                </Link>
+              )}
+              {role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="block w-full text-center bg-gray-900 text-white text-sm font-bold px-4 py-2.5 rounded-full hover:bg-gray-700 transition-colors"
+                >
+                  管理画面 →
+                </Link>
+              )}
+            </div>
           )}
         </div>
 
