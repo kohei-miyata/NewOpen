@@ -74,6 +74,11 @@ export async function signup(formData: FormData) {
   });
   if (error) redirect(`/auth/signup?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);
 
+  // identities が空 = 既存メールアドレス（Supabaseはメール列挙対策でエラーを返さない）
+  if (signUpData.user && signUpData.user.identities?.length === 0) {
+    redirect(`/auth/signup?error=${encodeURIComponent("このメールアドレスはすでに登録されています")}`);
+  }
+
   // 利用規約同意エビデンスをDBに保存
   if (signUpData.user) {
     const hdrs = await headers();
