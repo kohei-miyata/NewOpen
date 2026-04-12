@@ -33,6 +33,7 @@ const COMING_SOON_OPEN_PATHS = [
   "/api/",
   "/_next/",
   "/favicon",
+  "/mypage/owner",
 ];
 
 function isComingSoonBlocked(request: NextRequest): boolean {
