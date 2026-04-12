@@ -41,7 +41,7 @@ export default function AnnouncementModal() {
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_SHOW_ANNOUNCEMENT_MODAL !== "true") return;
-    if (pathname === "/coming-soon") return;
+    if (pathname !== "/") return;
     try {
       if (!localStorage.getItem(STORAGE_KEY)) {
         setOpen(true);
