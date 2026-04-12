@@ -34,6 +34,7 @@ const COMING_SOON_OPEN_PATHS = [
   "/_next/",
   "/favicon",
   "/mypage/owner",
+  "/mypage",
 ];
 
 function isComingSoonBlocked(request: NextRequest): boolean {
