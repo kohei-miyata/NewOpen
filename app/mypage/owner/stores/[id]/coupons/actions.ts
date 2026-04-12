@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createCoupon, updateCoupon, deleteCoupon, getStoreById, getStoreOwnerId, getAllCouponsByStoreId } from "@/lib/db";
 import type { Category } from "@/types";
@@ -29,6 +29,8 @@ export async function addCoupon(storeId: string, formData: FormData) {
     combinable: formData.get("combinable") === "true",
   }, supabase);
 
+  revalidateTag("coupons");
+  revalidateTag("coupons-with-location");
   redirect(`/mypage/owner/stores/${storeId}/coupons`);
 }
 
@@ -54,6 +56,8 @@ export async function editCoupon(couponId: string, formData: FormData) {
     combinable: formData.get("combinable") === "true",
   }, supabase);
 
+  revalidateTag("coupons");
+  revalidateTag("coupons-with-location");
   redirect(`/mypage/owner/stores/${storeId}/coupons`);
 }
 
@@ -67,6 +71,8 @@ export async function toggleCoupon(couponId: string, storeId: string, isActive: 
 
   await supabase.from("coupons").update({ is_active: isActive }).eq("id", couponId);
   revalidatePath(`/mypage/owner/stores/${storeId}/coupons`);
+  revalidateTag("coupons");
+  revalidateTag("coupons-with-location");
 }
 
 export async function removeCoupon(couponId: string, storeId: string) {
@@ -82,5 +88,7 @@ export async function removeCoupon(couponId: string, storeId: string) {
   if (!coupons.find((c) => c.id === couponId)) redirect("/mypage/owner");
 
   await deleteCoupon(couponId, supabase);
+  revalidateTag("coupons");
+  revalidateTag("coupons-with-location");
   redirect(`/mypage/owner/stores/${storeId}/coupons`);
 }
