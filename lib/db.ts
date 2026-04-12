@@ -145,7 +145,7 @@ export const getCoupons = unstable_cache(
     return (data ?? []).map(toCoupon);
   },
   ["coupons"],
-  { revalidate: 60 }
+  { revalidate: 60, tags: ["coupons"] }
 );
 
 export type CouponWithLocation = Coupon & { lat: number | null; lng: number | null };
@@ -175,7 +175,7 @@ export const getCouponsWithLocation = unstable_cache(
     });
   },
   ["coupons-with-location"],
-  { revalidate: 60 }
+  { revalidate: 60, tags: ["coupons-with-location"] }
 );
 
 export async function createStore(
