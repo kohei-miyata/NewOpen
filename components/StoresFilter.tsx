@@ -27,30 +27,32 @@ interface Props {
   currentArea: string;
   currentCategory: string;
   currentFilter: string;
+  currentTag?: string;
 }
 
-export default function StoresFilter({ categories, currentArea, currentCategory, currentFilter }: Props) {
+export default function StoresFilter({ categories, currentArea, currentCategory, currentFilter, currentTag = "" }: Props) {
   const router = useRouter();
   const [area, setArea] = useState(currentArea);
   const formRef = useRef<HTMLFormElement>(null);
 
-  function buildUrl(newArea: string, newCategory: string, newFilter: string) {
+  function buildUrl(newArea: string, newCategory: string, newFilter: string, newTag = "") {
     const params = new URLSearchParams();
     if (newArea.trim()) params.set("area", newArea.trim());
     if (newCategory) params.set("category", newCategory);
     if (newFilter) params.set("filter", newFilter);
+    if (newTag) params.set("tag", newTag);
     const qs = params.toString();
     return `/stores${qs ? `?${qs}` : ""}`;
   }
 
   function handleCategoryClick(cat: string) {
     const next = currentCategory === cat ? "" : cat;
-    router.push(buildUrl(area, next, currentFilter));
+    router.push(buildUrl(area, next, currentFilter, currentTag));
   }
 
   function handleFilterToggle() {
     const next = currentFilter === "coming_soon" ? "" : "coming_soon";
-    router.push(buildUrl(area, currentCategory, next));
+    router.push(buildUrl(area, currentCategory, next, currentTag));
   }
 
   function handleReset() {
@@ -58,7 +60,7 @@ export default function StoresFilter({ categories, currentArea, currentCategory,
     router.push("/stores");
   }
 
-  const hasFilter = !!(currentArea || currentCategory || currentFilter);
+  const hasFilter = !!(currentArea || currentCategory || currentFilter || currentTag);
 
   return (
     <form
@@ -66,7 +68,7 @@ export default function StoresFilter({ categories, currentArea, currentCategory,
       className="mb-6 space-y-3"
       onSubmit={(e) => {
         e.preventDefault();
-        router.push(buildUrl(area, currentCategory, currentFilter));
+        router.push(buildUrl(area, currentCategory, currentFilter, currentTag));
       }}
     >
       {/* エリア検索バー */}
@@ -144,7 +146,7 @@ export default function StoresFilter({ categories, currentArea, currentCategory,
       </div>
 
       {/* アクティブフィルター表示 */}
-      {(currentFilter === "coming_soon" || currentCategory || currentArea) && (
+      {(currentFilter === "coming_soon" || currentCategory || currentArea || currentTag) && (
         <div className="flex gap-2 flex-wrap text-xs">
           {currentFilter === "coming_soon" && (
             <span className="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full">
@@ -159,6 +161,18 @@ export default function StoresFilter({ categories, currentArea, currentCategory,
           {currentArea && (
             <span className="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-full">
               エリア: {currentArea}
+            </span>
+          )}
+          {currentTag && (
+            <span className="bg-purple-50 text-purple-600 border border-purple-200 px-2.5 py-1 rounded-full flex items-center gap-1">
+              #{currentTag}
+              <button
+                type="button"
+                onClick={() => router.push(buildUrl(area, currentCategory, currentFilter, ""))}
+                className="ml-0.5 hover:text-purple-800"
+              >
+                ×
+              </button>
             </span>
           )}
         </div>

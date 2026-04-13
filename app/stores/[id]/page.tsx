@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getStoreById, getUserLikedStoreIds, getCouponsByStoreId, getUsedCouponIds } from "@/lib/db";
+import { getStoreById, getUserLikedStoreIds, getCouponsByStoreId, getUsedCouponIds, getRelatedStores } from "@/lib/db";
 import CouponCard from "@/components/CouponCard";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import LikeButton from "@/components/LikeButton";
@@ -11,6 +11,7 @@ import RecentlyViewedSaver from "@/components/RecentlyViewedSaver";
 import SnsPostEmbed from "@/components/SnsPostEmbed";
 import ShareButtons from "@/components/ShareButtons";
 import ScrollToTop from "@/components/ScrollToTop";
+import RelatedStores from "@/components/RelatedStores";
 import type { SnsLinks } from "@/types";
 import {
   NoSymbolIcon,
@@ -75,10 +76,11 @@ export default async function StoreDetailPage({ params }: Props) {
   const isAdmin = role === "admin";
   if (store.approvalStatus !== "approved" && !isOwner && !isAdmin) notFound();
 
-  const [likedIds, coupons, usedCouponIds] = await Promise.all([
+  const [likedIds, coupons, usedCouponIds, relatedStores] = await Promise.all([
     user ? getUserLikedStoreIds(user.id) : Promise.resolve(new Set<string>()),
     getCouponsByStoreId(id),
     user ? getUsedCouponIds(user.id) : Promise.resolve(new Set<string>()),
+    getRelatedStores(id, store.tags, store.category),
   ]);
   const initialLiked = likedIds.has(store.id);
 
@@ -170,9 +172,13 @@ export default async function StoreDetailPage({ params }: Props) {
         {store.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {store.tags.map((tag) => (
-              <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+              <Link
+                key={tag}
+                href={`/stores?tag=${encodeURIComponent(tag)}`}
+                className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full hover:bg-purple-50 hover:text-purple-600 transition-colors"
+              >
                 #{tag}
-              </span>
+              </Link>
             ))}
           </div>
         )}
@@ -254,6 +260,13 @@ export default async function StoreDetailPage({ params }: Props) {
             <MapWrapper lat={store.lat} lng={store.lng} name={store.name} />
           </div>
         )}
+
+        {/* 関連店舗 */}
+        <RelatedStores
+          stores={relatedStores}
+          isLoggedIn={!!user}
+          likedStoreIds={likedIds}
+        />
       </div>
     </div>
   );

@@ -472,3 +472,65 @@ export async function getUserLikedStoreIds(userId: string): Promise<Set<string>>
 
   return new Set((data ?? []).map((r: { store_id: string }) => r.store_id));
 }
+
+/**
+ * 関連店舗を取得する。
+ * タグが1つ以上一致する店舗を優先し、足りなければ同カテゴリで補完。
+ * 最大 `limit` 件（デフォルト4）返す。
+ */
+export async function getRelatedStores(
+  storeId: string,
+  tags: string[],
+  category: Category,
+  limit = 4
+): Promise<Store[]> {
+  const today = todayJST();
+  const result: Store[] = [];
+  const seen = new Set<string>([storeId]);
+
+  // 1. タグ一致（タグがある場合）
+  if (tags.length > 0) {
+    const { data: tagData } = await getSupabaseClient()
+      .from("stores")
+      .select("*")
+      .lte("open_date", today)
+      .eq("approval_status", "approved")
+      .neq("id", storeId)
+      .overlaps("tags", tags)
+      .order("likes", { ascending: false })
+      .limit(limit);
+
+    for (const row of tagData ?? []) {
+      const store = toStore(row);
+      if (!seen.has(store.id) && isWithinThreeYears(store.openDate)) {
+        result.push(store);
+        seen.add(store.id);
+        if (result.length >= limit) return result;
+      }
+    }
+  }
+
+  // 2. 同カテゴリで補完
+  if (result.length < limit) {
+    const { data: catData } = await getSupabaseClient()
+      .from("stores")
+      .select("*")
+      .lte("open_date", today)
+      .eq("approval_status", "approved")
+      .neq("id", storeId)
+      .eq("category", category)
+      .order("likes", { ascending: false })
+      .limit(limit);
+
+    for (const row of catData ?? []) {
+      const store = toStore(row);
+      if (!seen.has(store.id) && isWithinThreeYears(store.openDate)) {
+        result.push(store);
+        seen.add(store.id);
+        if (result.length >= limit) return result;
+      }
+    }
+  }
+
+  return result;
+}

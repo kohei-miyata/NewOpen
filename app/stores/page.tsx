@@ -18,12 +18,13 @@ export const metadata: Metadata = {
 export default async function StoresPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area?: string; category?: string; filter?: string }>;
+  searchParams: Promise<{ area?: string; category?: string; filter?: string; tag?: string }>;
 }) {
   const sp = await searchParams;
   const areaQuery = sp.area?.trim() ?? "";
   const categoryFilter = sp.category ?? "";
   const filterParam = sp.filter ?? "";
+  const tagFilter = sp.tag?.trim() ?? "";
 
   const [normalStores, comingSoonStores] = await Promise.all([
     getStores(),
@@ -43,6 +44,10 @@ export default async function StoresPage({
     stores = stores.filter((s) => s.category === categoryFilter);
   }
 
+  if (tagFilter) {
+    stores = stores.filter((s) => s.tags.includes(tagFilter));
+  }
+
   const title = filterParam === "coming_soon" ? "まもなくオープン" : "新規オープン一覧";
   const useLocation = !areaQuery && !categoryFilter && filterParam !== "coming_soon";
 
@@ -59,6 +64,7 @@ export default async function StoresPage({
           currentArea={areaQuery}
           currentCategory={categoryFilter}
           currentFilter={filterParam}
+          currentTag={tagFilter}
         />
 
         {stores.length === 0 ? (
