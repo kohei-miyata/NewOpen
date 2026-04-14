@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LocalStorageConsentBanner from "@/components/LocalStorageConsentBanner";
 import AnnouncementModal from "@/components/AnnouncementModal";
 import "./globals.css";
+
+const GA_ID = "G-P9CDN7NB5B";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://new-open.vercel.app";
 
@@ -44,6 +47,13 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+        <Script id="gtag-init" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_ID}');
+        `}</Script>
         <Navbar />
         {children}
         <Footer />
