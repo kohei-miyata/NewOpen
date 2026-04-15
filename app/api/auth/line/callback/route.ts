@@ -81,12 +81,11 @@ export async function GET(request: NextRequest) {
   }
 
   // マジックリンクでセッションを生成
-  const redirectTo = isNewUser ? `${siteUrl}/auth/complete-profile` : `${siteUrl}/`;
-
+  // redirectTo は必ず /auth/callback にして、セッション確立後にミドルウェアで振り分ける
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email: lineEmail,
-    options: { redirectTo },
+    options: { redirectTo: `${siteUrl}/auth/callback` },
   });
 
   if (linkError || !linkData?.properties?.action_link) {
