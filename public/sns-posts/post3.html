@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1080px; overflow: hidden; }
+  .card {
+    width: 1080px; height: 1080px; background: linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #fde68a 100%);
+    display: flex; flex-direction: column; align-items: center;
+    font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+    padding: 64px 80px;
+  }
+  .card::before {
+    content: '';
+    position: absolute; inset: 0; opacity: 0.1; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 50%, white 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, white 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .logo-s { font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 28px; font-weight: 900; color: white; letter-spacing: 2px;
+    margin-bottom: 16px; }
+  .title { font-size: 52px; font-weight: 900; color: white;
+    text-align: center; margin-bottom: 12px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .sub-title { font-size: 26px; color: rgba(255,255,255,0.85); font-weight: 700;
+    margin-bottom: 56px; }
+
+  .steps { width: 100%; display: flex; flex-direction: column; gap: 0; flex: 1; justify-content: center; }
+
+  .step {
+    display: flex; align-items: center; gap: 36px;
+    background: white; border-radius: 24px; padding: 36px 40px;
+    box-shadow: 0 4px 20px rgba(249,115,22,0.1);
+    border-left: 8px solid #f97316;
+  }
+  .step-num {
+    width: 72px; height: 72px; background: #f97316; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 900; color: white; flex-shrink: 0;
+  }
+  .step-body { flex: 1; }
+  .step-title { font-size: 32px; font-weight: 900; color: #111827; margin-bottom: 8px; }
+  .step-desc { font-size: 22px; color: #6b7280; }
+  .step-icon { font-size: 52px; }
+
+  .arrow {
+    text-align: center; font-size: 36px; color: #f97316;
+    margin: 12px 0; font-weight: 900;
+  }
+
+  .bottom {
+    margin-top: 40px;
+    background: rgba(0,0,0,0.15); border-radius: 50px; padding: 20px 60px;
+    font-size: 24px; font-weight: 900; color: white; letter-spacing: 1px;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-s">NEW OPEN</div>
+  <div class="title">掲載まで3ステップ</div>
+  <div class="sub-title">最短5分で完了・完全無料</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">オーナー登録</div>
+        <div class="step-desc">メールアドレスだけで登録完了</div>
+      </div>
+      <div class="step-icon">👤</div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">店舗情報を入力</div>
+        <div class="step-desc">店名・住所・カテゴリ・写真を登録</div>
+      </div>
+      <div class="step-icon">🏪</div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">掲載完了</div>
+        <div class="step-desc">即日公開・何度でも編集可能</div>
+      </div>
+      <div class="step-icon">✅</div>
+    </div>
+  </div>
+
+  <div class="bottom">new-open.vercel.app/for-owners</div>
+</div>
+</body>
+</html>

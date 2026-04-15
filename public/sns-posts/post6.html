@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1080px; overflow: hidden; }
+  .card {
+    width: 1080px; height: 1080px;
+    background: linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #fde68a 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+    padding: 70px 80px;
+  }
+  .card::before {
+    content: '';
+    position: absolute; inset: 0; opacity: 0.1; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 50%, white 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, white 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .logo {
+    position: absolute; top: 52px; left: 70px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .logo-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 900; color: white;
+    font-family: 'Arial Black', Arial, sans-serif;
+  }
+  .logo-text {
+    font-size: 32px; font-weight: 900; color: white; letter-spacing: 3px;
+    font-family: 'Arial Black', Arial, sans-serif;
+  }
+
+  .badge {
+    position: absolute; top: 52px; right: 70px;
+    background: white; color: #ea580c;
+    border-radius: 50px; padding: 12px 28px;
+    font-size: 20px; font-weight: 900;
+  }
+
+  .main-copy {
+    font-size: 58px; font-weight: 900; color: white; text-align: center;
+    line-height: 1.3; letter-spacing: 1px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    margin-bottom: 48px;
+  }
+
+  /* 店舗ページモック */
+  .mock {
+    width: 100%;
+    background: white;
+    border-radius: 24px;
+    padding: 32px 36px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .mock-header {
+    display: flex; align-items: flex-start; gap: 24px; margin-bottom: 20px;
+  }
+  .mock-img {
+    width: 140px; height: 100px; border-radius: 12px;
+    background: linear-gradient(135deg, #fed7aa, #fdba74);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+  .mock-info { flex: 1; }
+  .mock-category {
+    display: inline-block; background: #fff7ed; color: #ea580c;
+    border: 1px solid #fed7aa; border-radius: 50px;
+    font-size: 14px; font-weight: 700; padding: 4px 14px; margin-bottom: 8px;
+  }
+  .mock-name { font-size: 26px; font-weight: 900; color: #111; margin-bottom: 6px; }
+  .mock-address { font-size: 14px; color: #888; margin-bottom: 6px; }
+  .mock-open {
+    display: inline-block; background: #f97316; color: white;
+    border-radius: 50px; font-size: 13px; font-weight: 700; padding: 4px 14px;
+  }
+  .mock-row {
+    display: flex; gap: 16px; align-items: center;
+  }
+  .mock-sns {
+    display: flex; gap: 10px;
+  }
+  .sns-btn {
+    background: #f3f4f6; border-radius: 8px;
+    padding: 8px 16px; font-size: 13px; font-weight: 700; color: #555;
+  }
+  .mock-coupon {
+    margin-top: 16px; background: #fff7ed; border: 2px dashed #fb923c;
+    border-radius: 12px; padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .coupon-text { font-size: 16px; font-weight: 900; color: #ea580c; }
+  .coupon-btn {
+    background: #f97316; color: white; border-radius: 50px;
+    padding: 8px 20px; font-size: 14px; font-weight: 700;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-circle">N</div>
+    <div class="logo-text">EW OPEN</div>
+  </div>
+  <div class="badge">掲載イメージ</div>
+
+  <div class="main-copy">こんな感じで<br>掲載されます</div>
+
+  <div class="mock">
+    <div class="mock-header">
+      <div class="mock-img">☕</div>
+      <div class="mock-info">
+        <div class="mock-category">カフェ</div>
+        <div class="mock-name">カフェ サンライズ</div>
+        <div class="mock-address">📍 東京都渋谷区〇〇1-2-3</div>
+        <div class="mock-open">🎉 本日オープン</div>
+      </div>
+    </div>
+    <div class="mock-row">
+      <div class="mock-sns">
+        <div class="sns-btn">Instagram</div>
+        <div class="sns-btn">X</div>
+        <div class="sns-btn">公式サイト</div>
+      </div>
+    </div>
+    <div class="mock-coupon">
+      <div class="coupon-text">🎟 オープン記念 10%OFF クーポン</div>
+      <div class="coupon-btn">GETする</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

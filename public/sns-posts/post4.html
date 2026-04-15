@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1080px; overflow: hidden; }
+  .card {
+    width: 1080px; height: 1080px;
+    background: linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #fde68a 100%);
+    display: flex; flex-direction: column; align-items: center;
+    font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+    padding: 56px 80px;
+  }
+  .card::before {
+    content: '';
+    position: absolute; inset: 0; opacity: 0.1; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 50%, white 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, white 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .logo-s { font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 30px; font-weight: 900; color: white; letter-spacing: 2px;
+    margin-bottom: 6px; }
+  .title { font-size: 38px; font-weight: 900; color: white;
+    margin-bottom: 40px; }
+
+  /* スマホ風モック */
+  .phone {
+    width: 480px; flex: 1;
+    background: white; border-radius: 40px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+    overflow: hidden; display: flex; flex-direction: column;
+    border: 6px solid #e5e7eb;
+  }
+  .phone-bar {
+    height: 36px; background: #f3f4f6;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+  }
+  .phone-dot { width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; }
+  .phone-dot.orange { background: #f97316; }
+
+  .store-img {
+    height: 180px; background: linear-gradient(135deg, #fdba74, #f97316);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .img-placeholder { font-size: 64px; }
+
+  .store-body { padding: 20px 24px; flex: 1; }
+  .store-tags { display: flex; gap: 8px; margin-bottom: 10px; }
+  .tag-badge {
+    font-size: 16px; font-weight: 700; padding: 4px 12px; border-radius: 50px;
+  }
+  .tag-orange { background: #ffedd5; color: #ea580c; }
+  .tag-gray { background: #f3f4f6; color: #6b7280; }
+  .store-name { font-size: 28px; font-weight: 900; color: #111827; margin-bottom: 6px; }
+  .store-addr { font-size: 17px; color: #6b7280; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px; }
+  .store-hours { font-size: 17px; color: #6b7280; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 6px; }
+
+  .store-actions { display: flex; gap: 10px; }
+  .btn-like {
+    display: flex; align-items: center; gap: 8px;
+    border: 2px solid #e5e7eb; border-radius: 50px;
+    padding: 10px 20px; font-size: 17px; font-weight: 700; color: #374151;
+  }
+  .btn-coupon {
+    flex: 1; background: #f97316; color: white; border-radius: 50px;
+    padding: 10px 20px; font-size: 17px; font-weight: 700;
+    text-align: center;
+  }
+
+  .caption {
+    margin-top: 24px; font-size: 22px; color: #9a3412; font-weight: 700;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-s">NEW OPEN</div>
+  <div class="title">掲載するとこう見えます</div>
+
+  <div class="phone">
+    <div class="phone-bar">
+      <div class="phone-dot"></div>
+      <div class="phone-dot orange"></div>
+      <div class="phone-dot"></div>
+    </div>
+    <div class="store-img">
+      <div class="img-placeholder">🍰</div>
+    </div>
+    <div class="store-body">
+      <div class="store-tags">
+        <span class="tag-badge tag-orange">カフェ</span>
+        <span class="tag-badge tag-gray">オープン 2026/5/1</span>
+      </div>
+      <div class="store-name">〇〇カフェ 渋谷店</div>
+      <div class="store-addr">📍 東京都渋谷区〇〇1-2-3</div>
+      <div class="store-hours">🕐 10:00〜22:00（火曜定休）</div>
+      <div class="store-actions">
+        <div class="btn-like">♡ 23</div>
+        <div class="btn-coupon">🎟 クーポンを見る</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">写真・クーポン・SNSリンク・地図も掲載できます</div>
+</div>
+</body>
+</html>
