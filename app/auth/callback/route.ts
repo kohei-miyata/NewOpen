@@ -98,14 +98,10 @@ export async function GET(request: NextRequest) {
   }
 
   // リダイレクト先が確定してからレスポンスを1つ作成し、クッキーをセット
+  // Supabase が設定したオプションをそのまま使用する（上書きしない）
   const response = NextResponse.redirect(redirectTo);
   cookiesToSet.forEach(({ name, value, options }) => {
-    response.cookies.set(name, value, {
-      ...options,
-      maxAge: 60 * 60 * 24,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
+    response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]);
   });
 
   return response;

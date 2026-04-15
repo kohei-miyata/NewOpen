@@ -29,5 +29,9 @@ export async function completeProfile(
   });
   if (error) return { error: "保存に失敗しました。もう一度お試しください。" };
 
+  const role = user.user_metadata?.role as string | undefined;
+  if (role === "owner") {
+    redirect("/mypage/owner/stores/new?welcome=1");
+  }
   redirect("/");
 }
