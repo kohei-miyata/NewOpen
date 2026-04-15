@@ -49,7 +49,29 @@ export async function GET(request: NextRequest) {
   }
 
   const profile = await profileRes.json();
-  const lineEmail = `line_${profile.userId}@line.newopen.site`;
+
+  // LINE の id_token からメールアドレスを取得（権限申請済みの場合のみ返ってくる）
+  let realEmail: string | null = null;
+  if (tokenData.id_token) {
+    try {
+      const verifyRes = await fetch("https://api.line.me/oauth2/v2.1/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          id_token: tokenData.id_token,
+          client_id: process.env.LINE_CHANNEL_ID!,
+        }),
+      });
+      if (verifyRes.ok) {
+        const payload = await verifyRes.json();
+        if (payload.email && typeof payload.email === "string") {
+          realEmail = payload.email;
+        }
+      }
+    } catch {}
+  }
+
+  const lineEmail = realEmail ?? `line_${profile.userId}@line.newopen.site`;
 
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
