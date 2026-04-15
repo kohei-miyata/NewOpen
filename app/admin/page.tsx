@@ -141,15 +141,15 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
       <section>
         <h2 className="text-lg font-bold text-gray-900 mb-3">ユーザー一覧</h2>
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="min-w-max w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">メールアドレス</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">ロール</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">ステータス</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">登録店舗数</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">登録日</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">最終ログイン</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 w-48">ユーザー</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 whitespace-nowrap">ロール</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 whitespace-nowrap">ステータス</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 whitespace-nowrap">登録店舗数</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 whitespace-nowrap">登録日</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 whitespace-nowrap">最終ログイン</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -158,7 +158,16 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
                 const isBanned = u.user_metadata?.status === "banned";
                 return (
                 <tr key={u.id} className={`hover:bg-gray-50 ${isBanned ? "opacity-60" : ""}`}>
-                  <td className="px-4 py-3 text-gray-800">{u.email}</td>
+                  <td className="px-4 py-3 text-gray-800 max-w-[192px]">
+                    {u.user_metadata?.line_user_id ? (
+                      <span className="flex items-center gap-1.5">
+                        <span className="shrink-0 text-xs bg-[#06C755] text-white px-1.5 py-0.5 rounded font-medium">LINE</span>
+                        <span className="truncate">{(u.user_metadata?.display_name as string | undefined) ?? "LINEユーザー"}</span>
+                      </span>
+                    ) : (
+                      <span className="truncate block">{u.email}</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                       u.user_metadata?.role === "owner"
