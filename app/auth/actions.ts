@@ -41,17 +41,17 @@ export async function signInWithGoogle(role: "user" | "owner" = "user") {
 }
 
 export async function signInWithLine(role: "user" | "owner" = "user") {
-  const supabase = await createSupabaseServerClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.auth as any).signInWithOAuth({
-    provider: "custom:newopen",
-    options: {
-      redirectTo: `${siteUrl}/auth/callback?role=${role}`,
-    },
+  const channelId = process.env.LINE_CHANNEL_ID ?? "";
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: channelId,
+    redirect_uri: `${siteUrl}/api/auth/line/callback`,
+    state: `role:${role}`,
+    scope: "openid profile email",
+    nonce: Math.random().toString(36).slice(2),
   });
-  if (error) redirect(`/auth/login?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);
-  if (data?.url) redirect(data.url);
+  redirect(`https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`);
 }
 
 export async function login(formData: FormData) {
