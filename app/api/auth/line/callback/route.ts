@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email: lineEmail,
-    options: { redirectTo: `${siteUrl}/auth/callback?provider=line` },
+    options: { redirectTo: `${siteUrl}/auth/line-session` },
   });
 
   if (linkError || !linkData?.properties?.action_link) {

@@ -121,7 +121,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // auth系・API・静的ファイルは全ガードをスキップ
-  const isAuthPath    = pathname.startsWith("/auth/");
+  const isAuthPath    = pathname.startsWith("/auth/") || pathname.startsWith("/api/auth/");
   const isApiPath     = pathname.startsWith("/api/");
   const isPublicAsset = pathname.startsWith("/_next/") || pathname.startsWith("/icons/") || pathname.startsWith("/public/");
 
