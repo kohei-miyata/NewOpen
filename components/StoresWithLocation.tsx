@@ -6,6 +6,7 @@ import type { Store } from "@/types";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 const LOC_DISMISSED_KEY = "newopen_loc_dismissed";
+const LOC_GRANTED_KEY = "newopen_loc_granted";
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -43,32 +44,32 @@ export default function StoresWithLocation({ stores }: Props) {
 
     try {
       if (localStorage.getItem(LOC_DISMISSED_KEY)) { setLocationState("dismissed"); return; }
-    } catch {}
-
-    // 既に許可済みなら自動取得（バナー非表示）
-    if (!navigator.permissions) return;
-    navigator.permissions.query({ name: "geolocation" }).then((result) => {
-      if (result.state === "granted") {
+      // 以前に許可済みなら自動取得（バナー非表示）
+      if (localStorage.getItem(LOC_GRANTED_KEY)) {
         setLocationState("locating");
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             sortByLocation(pos.coords.latitude, pos.coords.longitude);
             setLocationState("granted");
           },
-          () => setLocationState("prompt"),
+          () => {
+            // 取得失敗（権限が剥奪された等）→ バナーを再表示
+            localStorage.removeItem(LOC_GRANTED_KEY);
+            setLocationState("prompt");
+          },
           { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
         );
-      } else if (result.state === "denied") {
-        setLocationState("dismissed");
+        return;
       }
-      // "prompt" のままならバナーを表示
-    }).catch(() => { /* Permissions API 非対応ブラウザは無視 */ });
+    } catch {}
+    // バナーを表示（"prompt" のまま）
   }, [sortByLocation]);
 
   function handleAllow() {
     setLocationState("locating");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        try { localStorage.setItem(LOC_GRANTED_KEY, "1"); } catch {}
         sortByLocation(pos.coords.latitude, pos.coords.longitude);
         setLocationState("granted");
       },
