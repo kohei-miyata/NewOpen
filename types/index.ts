@@ -35,6 +35,7 @@ export interface Store {
   status: StoreStatus;
   approvalStatus: ApprovalStatus;
   ownerId: string | null;
+  createdAt: string;
 }
 
 export interface Coupon {

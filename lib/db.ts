@@ -39,6 +39,7 @@ function toStore(row: any): Store {
     status: (row.status ?? "active") as Store["status"],
     approvalStatus: (row.approval_status ?? "approved") as Store["approvalStatus"],
     ownerId: row.owner_id ?? null,
+    createdAt: row.created_at ?? new Date().toISOString(),
   };
 }
 

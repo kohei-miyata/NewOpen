@@ -26,6 +26,8 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://newopen.site";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const store = await getStoreById(id);
@@ -39,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: store.name,
       description: store.description,
+      url: `${siteUrl}/stores/${id}`,
       images: store.imageUrl ? [{ url: store.imageUrl }] : [],
       type: "website",
     },
@@ -93,8 +96,35 @@ export default async function StoreDetailPage({ params }: Props) {
     ? SNS_META.filter(({ key }) => store.snsLinks![key])
     : [];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: store.name,
+    description: store.description,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: store.address,
+      addressCountry: "JP",
+    },
+    ...(store.imageUrl ? { image: store.imageUrl } : {}),
+    ...(store.openDate ? { openingDate: store.openDate } : {}),
+    ...(store.snsLinks?.website ? { url: store.snsLinks.website } : {}),
+    ...(store.snsLinks?.instagram ? { sameAs: [store.snsLinks.instagram] } : {}),
+    ...(store.lat && store.lng ? {
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: store.lat,
+        longitude: store.lng,
+      },
+    } : {}),
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ScrollToTop />
       <div className="max-w-3xl mx-auto px-4 py-8">
         <RecentlyViewedSaver storeId={store.id} />
