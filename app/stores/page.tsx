@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { getStores, getComingSoonStores } from "@/lib/db";
+import Link from "next/link";
+import { getStores, getComingSoonStores, getRankedStores } from "@/lib/db";
 import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
 import StoresWithLocation from "@/components/StoresWithLocation";
 import StoresLoadMore from "@/components/StoresLoadMore";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
+import StoreCard from "@/components/StoreCard";
 import { CATEGORIES } from "@/lib/categories";
 import type { Category } from "@/types";
 
@@ -30,6 +32,8 @@ export default async function StoresPage({
     getStores(),
     filterParam === "coming_soon" ? getComingSoonStores() : Promise.resolve([]),
   ]);
+
+  const hasFilter = !!(areaQuery || categoryFilter || tagFilter || filterParam);
 
   let stores = filterParam === "coming_soon" ? comingSoonStores : normalStores;
 
@@ -68,7 +72,7 @@ export default async function StoresPage({
         />
 
         {stores.length === 0 ? (
-          <p className="text-gray-500 text-sm py-12 text-center">該当するお店が見つかりませんでした</p>
+          <EmptyState hasFilter={hasFilter} />
         ) : useLocation ? (
           <StoresWithLocation stores={stores} />
         ) : (
@@ -79,6 +83,38 @@ export default async function StoresPage({
           <RecentlyViewedSection />
         </div>
       </div>
+    </div>
+  );
+}
+
+async function EmptyState({ hasFilter }: { hasFilter: boolean }) {
+  const ranked = await getRankedStores(4);
+
+  return (
+    <div className="py-12 space-y-10">
+      <div className="text-center space-y-3">
+        <p className="text-4xl">🔍</p>
+        <p className="text-gray-700 font-medium">該当するお店が見つかりませんでした</p>
+        {hasFilter && (
+          <Link
+            href="/stores"
+            className="inline-block mt-2 text-sm text-orange-500 border border-orange-300 rounded-full px-4 py-1.5 hover:bg-orange-50 transition-colors"
+          >
+            絞り込みをリセット
+          </Link>
+        )}
+      </div>
+
+      {ranked.length > 0 && (
+        <div className="space-y-4">
+          <p className="text-sm font-semibold text-gray-700">人気のお店</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {ranked.map((store) => (
+              <StoreCard key={store.id} store={store} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
