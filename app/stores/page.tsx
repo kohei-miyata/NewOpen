@@ -40,7 +40,10 @@ export default async function StoresPage({
   if (areaQuery) {
     const q = areaQuery.toLowerCase();
     stores = stores.filter((s) =>
-      s.address.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+      s.address.toLowerCase().includes(q) ||
+      s.name.toLowerCase().includes(q) ||
+      s.description.toLowerCase().includes(q) ||
+      s.tags.some((t) => t.toLowerCase().includes(q))
     );
   }
 
