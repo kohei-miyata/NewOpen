@@ -57,8 +57,7 @@ export async function GET(request: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  // ユーザー作成を試みる（既存なら duplicate エラー）
-  let isNewUser = false;
+  // ユーザー作成を試みる（重複エラーは無視して続行）
   const { error: createError } = await admin.auth.admin.createUser({
     email: lineEmail,
     email_confirm: true,
@@ -71,28 +70,36 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  if (!createError) {
-    isNewUser = true;
-  } else if (!/already registered|already exists|duplicate/i.test(createError.message)) {
-    // duplicate 以外のエラーは失敗
-    return NextResponse.redirect(
-      `${origin}/auth/login?error=${encodeURIComponent("アカウント作成に失敗しました")}`
-    );
+  // createError が null 以外でも重複以外は失敗
+  // ただし重複かどうかの判定はせず、generateLink の成否に委ねる
+  if (createError) {
+    // ユーザーが既に存在する場合は続行、それ以外は失敗
+    const msg = createError.message.toLowerCase();
+    const isDuplicate = msg.includes("already") || msg.includes("duplicate") || msg.includes("exists") || msg.includes("registered");
+    if (!isDuplicate) {
+      return NextResponse.redirect(
+        `${origin}/auth/login?error=${encodeURIComponent("アカウント作成に失敗しました: " + createError.message)}`
+      );
+    }
   }
 
-  // マジックリンクでセッションを生成
-  // redirectTo は必ず /auth/callback にして、セッション確立後にミドルウェアで振り分ける
+  // hashed_token を使って直接 /auth/callback に渡す（Supabase verify URLを経由しない）
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email: lineEmail,
-    options: { redirectTo: `${siteUrl}/auth/callback` },
+    options: { redirectTo: `${siteUrl}/` },
   });
 
-  if (linkError || !linkData?.properties?.action_link) {
+  if (linkError || !linkData?.properties?.hashed_token) {
     return NextResponse.redirect(
       `${origin}/auth/login?error=${encodeURIComponent("ログインに失敗しました")}`
     );
   }
 
-  return NextResponse.redirect(linkData.properties.action_link);
+  // Supabase verify URLを経由せず、token_hash を直接 /auth/callback に渡してセッションを確立する
+  const callbackUrl = new URL(`${siteUrl}/auth/callback`);
+  callbackUrl.searchParams.set("token_hash", linkData.properties.hashed_token);
+  callbackUrl.searchParams.set("type", "email");
+
+  return NextResponse.redirect(callbackUrl.toString());
 }
