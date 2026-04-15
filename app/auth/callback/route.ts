@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") ?? "";
+  const roleParam = searchParams.get("role") as "user" | "owner" | null;
 
   if (!code && !token_hash) {
     const fallback = type === "recovery"
@@ -69,18 +70,19 @@ export async function GET(request: NextRequest) {
     const user = authUser;
     let role = user?.user_metadata?.role as string | undefined;
 
-    // Google OAuth 新規ユーザーは role 未設定 → "user" を付与
-    const isNewGoogleUser = user && !role;
-    if (isNewGoogleUser) {
+    // OAuth 新規ユーザーは role 未設定 → roleParam or "user" を付与
+    const isNewOAuthUser = user && !role;
+    if (isNewOAuthUser) {
+      const assignedRole = roleParam === "owner" ? "owner" : "user";
       const adminClient = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         { auth: { autoRefreshToken: false, persistSession: false } }
       );
       await adminClient.auth.admin.updateUserById(user!.id, {
-        user_metadata: { ...user!.user_metadata, role: "user", email_notifications: true },
+        user_metadata: { ...user!.user_metadata, role: assignedRole, email_notifications: true },
       });
-      role = "user";
+      role = assignedRole;
     }
 
     // オーナーのメール確認完了 → 店舗登録へ

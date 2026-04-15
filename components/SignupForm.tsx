@@ -5,6 +5,7 @@ import { signup } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import TermsContent from "@/components/TermsContent";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
+import LineAuthButton from "@/components/LineAuthButton";
 import BirthdatePicker from "@/components/BirthdatePicker";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -157,17 +158,14 @@ export default function SignupForm({ serverError, defaultRole = "user" }: { serv
         <input type="hidden" name="role" value={role} />
       </div>
 
-      {/* Google登録 — 一般ユーザーのみ、フォームより先に表示 */}
-      {role === "user" && (
-        <>
-          <GoogleAuthButton label="Googleで登録" />
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">またはメールアドレスで登録</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-        </>
-      )}
+      {/* Google/LINE登録 */}
+      <GoogleAuthButton label="Googleで登録" role={role} />
+      <LineAuthButton label="LINEで登録" role={role} />
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="text-xs text-gray-400">またはメールアドレスで登録</span>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
 
       <div data-field-error={!!errors.name || undefined}>
         <label className="block text-sm font-medium text-gray-700 mb-1">

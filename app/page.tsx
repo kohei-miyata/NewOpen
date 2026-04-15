@@ -11,6 +11,7 @@ import CategoryShortcuts from "@/components/CategoryShortcuts";
 import AreaLinks from "@/components/AreaLinks";
 import AreaRanking from "@/components/AreaRanking";
 import HeroSearch from "@/components/HeroSearch";
+import RecommendedStores from "@/components/RecommendedStores";
 import type { Category } from "@/types";
 import { FaCalendarAlt, FaCalendarCheck, FaTicketAlt, FaHeart, FaStore, FaTags, FaTrophy } from "react-icons/fa";
 import { MdOutlineNewReleases, MdOutlineLocationOn } from "react-icons/md";
@@ -125,6 +126,14 @@ export default async function Home() {
       </section>
 
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-14">
+
+        {/* ── あなたへのおすすめ ── */}
+        <RecommendedStores
+          stores={allStores}
+          isLoggedIn={!!user}
+          likedStoreIds={likedStoreIds}
+          displayName={(user?.user_metadata?.display_name as string) ?? null}
+        />
 
         {/* ── 本日オープン ── */}
         {todayStores.length > 0 && (

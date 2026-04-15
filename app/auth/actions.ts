@@ -27,17 +27,31 @@ function toJapaneseAuthError(message: string): string {
   return "エラーが発生しました。しばらく時間をおいてから再試行してください";
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(role: "user" | "owner" = "user") {
   const supabase = await createSupabaseServerClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${siteUrl}/auth/callback`,
+      redirectTo: `${siteUrl}/auth/callback?role=${role}`,
     },
   });
   if (error) redirect(`/auth/login?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);
   if (data.url) redirect(data.url);
+}
+
+export async function signInWithLine(role: "user" | "owner" = "user") {
+  const supabase = await createSupabaseServerClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.auth as any).signInWithOAuth({
+    provider: "custom:newopen",
+    options: {
+      redirectTo: `${siteUrl}/auth/callback?role=${role}`,
+    },
+  });
+  if (error) redirect(`/auth/login?error=${encodeURIComponent(toJapaneseAuthError(error.message))}`);
+  if (data?.url) redirect(data.url);
 }
 
 export async function login(formData: FormData) {

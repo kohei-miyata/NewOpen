@@ -5,6 +5,7 @@ import Link from "next/link";
 import { login } from "@/app/auth/actions";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
+import LineAuthButton from "@/components/LineAuthButton";
 
 const INPUT = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors";
 const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
@@ -103,6 +104,7 @@ export default function LoginForm({ serverError, next }: { serverError?: string;
       </div>
 
       <GoogleAuthButton label="Googleでログイン" />
+      <LineAuthButton label="LINEでログイン" />
     </form>
   );
 }

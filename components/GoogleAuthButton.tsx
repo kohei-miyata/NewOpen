@@ -3,14 +3,14 @@
 import { useTransition } from "react";
 import { signInWithGoogle } from "@/app/auth/actions";
 
-export default function GoogleAuthButton({ label = "Googleでログイン" }: { label?: string }) {
+export default function GoogleAuthButton({ label = "Googleでログイン", role = "user" }: { label?: string; role?: "user" | "owner" }) {
   const [isPending, startTransition] = useTransition();
 
   return (
     <button
       type="button"
       disabled={isPending}
-      onClick={() => startTransition(() => signInWithGoogle())}
+      onClick={() => startTransition(() => signInWithGoogle(role))}
       className="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white text-gray-700 font-medium py-2.5 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-sm"
     >
       {isPending ? (
