@@ -30,7 +30,9 @@ export default async function OwnerMypagePage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">オーナー管理</h1>
-            <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+            {!user.user_metadata?.line_user_id && (
+              <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+            )}
           </div>
           <div className="flex gap-2">
             <Link
