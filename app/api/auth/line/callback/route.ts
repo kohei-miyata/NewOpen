@@ -110,14 +110,18 @@ export async function GET(request: NextRequest) {
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email: lineEmail,
-    options: { redirectTo: `${siteUrl}/auth/line-session` },
   });
 
   if (linkError || !linkData?.properties?.action_link) {
+    const msg = linkError?.message ?? "action_link missing";
     return NextResponse.redirect(
-      `${origin}/auth/login?error=${encodeURIComponent("ログインに失敗しました")}`
+      `${origin}/auth/login?error=${encodeURIComponent("ログインに失敗しました: " + msg)}`
     );
   }
 
-  return NextResponse.redirect(linkData.properties.action_link);
+  // Supabase の verify URL が hash トークンをつけてリダイレクトするページ
+  const verifyUrl = new URL(linkData.properties.action_link);
+  verifyUrl.searchParams.set("redirect_to", `${siteUrl}/auth/line-session`);
+
+  return NextResponse.redirect(verifyUrl.toString());
 }
