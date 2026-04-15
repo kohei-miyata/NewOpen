@@ -7,7 +7,8 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdOutlineRecommend } from "react-icons/md";
 
 const RECENTLY_VIEWED_KEY = "newopen_recently_viewed";
-const LOC_DISMISSED_KEY   = "newopen_loc_dismissed";
+const LOC_DISMISSED_KEY = "newopen_loc_dismissed";
+const LOC_GRANTED_KEY   = "newopen_loc_granted";
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -123,6 +124,21 @@ export default function RecommendedStores({ stores, isLoggedIn, likedStoreIds, d
 
     try {
       if (localStorage.getItem(LOC_DISMISSED_KEY)) { setLocationState("dismissed"); return; }
+      if (localStorage.getItem(LOC_GRANTED_KEY)) {
+        setLocationState("locating");
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            buildRecommended(pos.coords.latitude, pos.coords.longitude);
+            setLocationState("granted");
+          },
+          () => {
+            localStorage.removeItem(LOC_GRANTED_KEY);
+            setLocationState("prompt");
+          },
+          { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
+        );
+        return;
+      }
     } catch {}
 
     // バナーを表示（"prompt" のまま）
@@ -132,6 +148,7 @@ export default function RecommendedStores({ stores, isLoggedIn, likedStoreIds, d
     setLocationState("locating");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        try { localStorage.setItem(LOC_GRANTED_KEY, "1"); } catch {}
         buildRecommended(pos.coords.latitude, pos.coords.longitude);
         setLocationState("granted");
       },
