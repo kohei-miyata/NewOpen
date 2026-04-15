@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { notifyNewUser } from "@/lib/notify";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -95,6 +96,9 @@ export async function GET(request: NextRequest) {
 
   // createError が null 以外でも重複以外は失敗
   // ただし重複かどうかの判定はせず、generateLink の成否に委ねる
+  if (!createError) {
+    notifyNewUser({ email: lineEmail, role, provider: "line" }).catch(() => {});
+  }
   if (createError) {
     // ユーザーが既に存在する場合は続行、それ以外は失敗
     const msg = createError.message.toLowerCase();

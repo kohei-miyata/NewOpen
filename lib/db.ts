@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { getSupabaseClient } from "@/lib/supabase";
 import { haversineKm, type LatLng } from "@/lib/geolocation";
 import { geocodeAddress } from "@/lib/geocode";
+import { notifyNewStore } from "@/lib/notify";
 import type { Store, Coupon, Category } from "@/types";
 
 function todayJST(): string {
@@ -217,6 +218,7 @@ export async function createStore(
     .single();
 
   if (error) throw new Error(error.message);
+  notifyNewStore({ storeName: payload.name, category: payload.category }).catch(() => {});
   return toStore(data);
 }
 

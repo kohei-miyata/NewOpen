@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type User } from "@supabase/supabase-js";
+import { notifyNewUser } from "@/lib/notify";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -91,6 +92,8 @@ export async function GET(request: NextRequest) {
         },
       });
       role = assignedRole;
+      const provider = user!.app_metadata?.provider as string | undefined;
+      notifyNewUser({ email: user!.email ?? "", role: assignedRole, provider }).catch(() => {});
     }
 
     // オーナーのメール確認完了 → 店舗登録へ

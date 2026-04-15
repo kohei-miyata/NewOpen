@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import { notifyNewUser } from "@/lib/notify";
 
 function toJapaneseAuthError(message: string): string {
   if (/invalid login credentials/i.test(message))
@@ -96,6 +97,11 @@ export async function signup(formData: FormData) {
   // identities が空 = 既存メールアドレス（Supabaseはメール列挙対策でエラーを返さない）
   if (signUpData.user && signUpData.user.identities?.length === 0) {
     redirect(`/auth/signup?error=${encodeURIComponent("このメールアドレスはすでに登録されています")}`);
+  }
+
+  // Google Chat 通知
+  if (signUpData.user) {
+    notifyNewUser({ email, role, provider: "email" }).catch(() => {});
   }
 
   // 利用規約同意エビデンスをDBに保存
