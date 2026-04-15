@@ -119,6 +119,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // app_metadata の provider を line に更新
+  if (linkData.user?.id) {
+    await admin.auth.admin.updateUserById(linkData.user.id, {
+      app_metadata: { provider: "line", providers: ["line"] },
+    });
+  }
+
   // Supabase の verify URL が hash トークンをつけてリダイレクトするページ
   const verifyUrl = new URL(linkData.properties.action_link);
   verifyUrl.searchParams.set("redirect_to", `${siteUrl}/auth/line-session`);
