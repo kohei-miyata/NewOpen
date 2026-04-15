@@ -45,7 +45,24 @@ export default function StoresWithLocation({ stores }: Props) {
       if (localStorage.getItem(LOC_DISMISSED_KEY)) { setLocationState("dismissed"); return; }
     } catch {}
 
-    // バナーを表示（"prompt" のまま）
+    // 既に許可済みなら自動取得（バナー非表示）
+    if (!navigator.permissions) return;
+    navigator.permissions.query({ name: "geolocation" }).then((result) => {
+      if (result.state === "granted") {
+        setLocationState("locating");
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            sortByLocation(pos.coords.latitude, pos.coords.longitude);
+            setLocationState("granted");
+          },
+          () => setLocationState("prompt"),
+          { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
+        );
+      } else if (result.state === "denied") {
+        setLocationState("dismissed");
+      }
+      // "prompt" のままならバナーを表示
+    }).catch(() => { /* Permissions API 非対応ブラウザは無視 */ });
   }, [sortByLocation]);
 
   function handleAllow() {
