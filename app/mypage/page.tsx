@@ -40,7 +40,9 @@ export default async function MypagePage() {
             </div>
             <div className="flex-1 min-w-0">
               {displayName && <p className="font-bold text-gray-900 truncate">{displayName}</p>}
-              <p className={`truncate ${displayName ? "text-sm text-gray-500" : "font-bold text-gray-900"}`}>{user.email}</p>
+              {!user.user_metadata?.line_user_id && (
+                <p className={`truncate ${displayName ? "text-sm text-gray-500" : "font-bold text-gray-900"}`}>{user.email}</p>
+              )}
               {roleLabel && (
                 <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mt-1 whitespace-nowrap ${roleBadgeClass}`}>
                   {roleLabel}
