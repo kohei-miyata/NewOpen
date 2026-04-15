@@ -40,13 +40,18 @@ export default async function AdminOwnersPage({
     .select("id, name, category, address, open_date, approval_status, owner_id, created_at")
     .order("created_at", { ascending: false });
 
-  // owner_id → email マップ
+  // owner_id → 表示用ラベルマップ（LINEユーザーはdisplay_name、それ以外はemail）
   const ownerIds = [...new Set((stores ?? []).map((s) => s.owner_id).filter(Boolean))];
   const ownerEmailMap: Record<string, string> = {};
   await Promise.all(
     ownerIds.map(async (id) => {
       const { data } = await admin.auth.admin.getUserById(id);
-      if (data?.user?.email) ownerEmailMap[id] = data.user.email;
+      if (!data?.user) return;
+      const meta = data.user.user_metadata ?? {};
+      const isLine = !!meta.line_user_id;
+      ownerEmailMap[id] = isLine
+        ? (meta.display_name as string | undefined) ?? "LINEユーザー"
+        : (data.user.email ?? "");
     })
   );
 
@@ -184,7 +189,7 @@ export default async function AdminOwnersPage({
                       </a>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{store.category}</td>
-                    <td className="px-4 py-3 text-xs text-gray-500">{ownerEmailMap[store.owner_id] ?? "-"}</td>
+                    <td className="px-4 py-3 text-xs text-gray-500 max-w-[120px] truncate">{ownerEmailMap[store.owner_id] ?? "-"}</td>
                     <td className="px-4 py-3 text-xs text-gray-400">
                       {new Date(store.created_at).toLocaleDateString("ja-JP")}
                     </td>
