@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // state から role を取得
   const role = state.startsWith("role:owner") ? "owner" : "user";
 
   // LINE のアクセストークンを取得
@@ -50,7 +49,6 @@ export async function GET(request: NextRequest) {
   }
 
   const profile = await profileRes.json();
-  // LINE userId は一意なので email の代わりに使う
   const lineEmail = `line_${profile.userId}@line.newopen.site`;
 
   const admin = createClient(
@@ -59,36 +57,31 @@ export async function GET(request: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  // 既存ユーザーを探す
-  const { data: existingData } = await admin.auth.admin.getUserByEmail(lineEmail);
+  // ユーザー作成を試みる（既存なら duplicate エラー）
   let isNewUser = false;
+  const { error: createError } = await admin.auth.admin.createUser({
+    email: lineEmail,
+    email_confirm: true,
+    user_metadata: {
+      line_user_id: profile.userId,
+      display_name: profile.displayName,
+      avatar_url: profile.pictureUrl,
+      role,
+      email_notifications: true,
+    },
+  });
 
-  if (!existingData?.user) {
-    // 新規ユーザー作成
-    const { error: createError } = await admin.auth.admin.createUser({
-      email: lineEmail,
-      email_confirm: true,
-      user_metadata: {
-        line_user_id: profile.userId,
-        display_name: profile.displayName,
-        avatar_url: profile.pictureUrl,
-        role,
-        email_notifications: true,
-      },
-    });
-
-    if (createError) {
-      return NextResponse.redirect(
-        `${origin}/auth/login?error=${encodeURIComponent("アカウント作成に失敗しました")}`
-      );
-    }
+  if (!createError) {
     isNewUser = true;
+  } else if (!/already registered|already exists|duplicate/i.test(createError.message)) {
+    // duplicate 以外のエラーは失敗
+    return NextResponse.redirect(
+      `${origin}/auth/login?error=${encodeURIComponent("アカウント作成に失敗しました")}`
+    );
   }
 
-  // マジックリンクでセッションを生成（新規はプロフィール入力へ、既存はトップへ）
-  const redirectTo = isNewUser
-    ? `${siteUrl}/auth/complete-profile`
-    : `${siteUrl}/`;
+  // マジックリンクでセッションを生成
+  const redirectTo = isNewUser ? `${siteUrl}/auth/complete-profile` : `${siteUrl}/`;
 
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
