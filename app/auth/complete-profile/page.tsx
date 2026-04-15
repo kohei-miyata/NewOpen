@@ -2,15 +2,24 @@
 
 import { useState } from "react";
 import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import { completeProfile } from "./actions";
 import BirthdatePicker from "@/components/BirthdatePicker";
 import ScrollToTop from "@/components/ScrollToTop";
 
 const SELECT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400 transition-colors";
 
+const PROVIDER_MESSAGES: Record<string, string> = {
+  line:   "LINEアカウントで登録ありがとうございます。",
+  google: "Googleアカウントで登録ありがとうございます。",
+};
+
 export default function CompleteProfilePage() {
   const [state, action, isPending] = useActionState(completeProfile, undefined);
   const [genderTouched, setGenderTouched] = useState(false);
+  const searchParams = useSearchParams();
+  const provider = searchParams.get("provider") ?? "google";
+  const message = PROVIDER_MESSAGES[provider] ?? "アカウントの登録ありがとうございます。";
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center px-4">
@@ -27,7 +36,7 @@ export default function CompleteProfilePage() {
           className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5"
         >
           <p className="text-sm text-gray-600">
-            Googleアカウントで登録ありがとうございます。<br />
+            {message}<br />
             あと少しで完了です。
           </p>
 

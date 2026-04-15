@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") ?? "";
   const roleParam = searchParams.get("role") as "user" | "owner" | null;
+  const providerParam = searchParams.get("provider") ?? null;
 
   if (!code && !token_hash) {
     const fallback = type === "recovery"
@@ -79,8 +80,15 @@ export async function GET(request: NextRequest) {
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         { auth: { autoRefreshToken: false, persistSession: false } }
       );
+      const fullName = user!.user_metadata?.full_name as string | undefined;
+      const displayName = user!.user_metadata?.display_name as string | undefined;
       await adminClient.auth.admin.updateUserById(user!.id, {
-        user_metadata: { ...user!.user_metadata, role: assignedRole, email_notifications: true },
+        user_metadata: {
+          ...user!.user_metadata,
+          role: assignedRole,
+          email_notifications: true,
+          display_name: displayName || fullName || undefined,
+        },
       });
       role = assignedRole;
     }
@@ -93,7 +101,10 @@ export async function GET(request: NextRequest) {
     // Google OAuth 新規ユーザー → 性別・生年月日入力へ
     const needsProfile = user && !user.user_metadata?.gender;
     if (isNewOAuthUser || needsProfile) {
-      redirectTo = `${origin}/auth/complete-profile`;
+      const profileUrl = new URL(`${origin}/auth/complete-profile`);
+      const provider = providerParam ?? (user?.app_metadata?.provider === "google" ? "google" : null);
+      if (provider) profileUrl.searchParams.set("provider", provider);
+      redirectTo = profileUrl.toString();
     }
   }
 

@@ -84,6 +84,7 @@ export async function GET(request: NextRequest) {
     email: lineEmail,
     email_confirm: true,
     user_metadata: {
+      provider: "line",
       line_user_id: profile.userId,
       display_name: profile.displayName,
       avatar_url: profile.pictureUrl,
@@ -105,23 +106,18 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // hashed_token を使って直接 /auth/callback に渡す（Supabase verify URLを経由しない）
+  // Supabase の verify URL に直接リダイレクト（セッション確立後に /auth/callback へ戻る）
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email: lineEmail,
-    options: { redirectTo: `${siteUrl}/` },
+    options: { redirectTo: `${siteUrl}/auth/callback?provider=line` },
   });
 
-  if (linkError || !linkData?.properties?.hashed_token) {
+  if (linkError || !linkData?.properties?.action_link) {
     return NextResponse.redirect(
       `${origin}/auth/login?error=${encodeURIComponent("ログインに失敗しました")}`
     );
   }
 
-  // Supabase verify URLを経由せず、token_hash を直接 /auth/callback に渡してセッションを確立する
-  const callbackUrl = new URL(`${siteUrl}/auth/callback`);
-  callbackUrl.searchParams.set("token_hash", linkData.properties.hashed_token);
-  callbackUrl.searchParams.set("type", "email");
-
-  return NextResponse.redirect(callbackUrl.toString());
+  return NextResponse.redirect(linkData.properties.action_link);
 }
