@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
 
     // Google OAuth 新規ユーザー → 性別・生年月日入力へ
     const needsProfile = user && !user.user_metadata?.gender;
-    if (isNewGoogleUser || needsProfile) {
+    if (isNewOAuthUser || needsProfile) {
       redirectTo = `${origin}/auth/complete-profile`;
     }
   }
