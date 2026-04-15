@@ -13,17 +13,14 @@ export default function LineSessionPage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Supabase ブラウザクライアントが URL ハッシュのトークンを自動処理する
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.replace("/auth/login?error=" + encodeURIComponent("ログインに失敗しました"));
-        return;
-      }
+    const hash = window.location.hash.slice(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
 
-      const user = session.user;
+    const proceed = (user: { user_metadata?: Record<string, unknown> }) => {
       const needsProfile = !user.user_metadata?.gender;
       const role = user.user_metadata?.role as string | undefined;
-
       if (needsProfile) {
         router.replace("/auth/complete-profile?provider=line");
       } else if (role === "owner") {
@@ -31,7 +28,28 @@ export default function LineSessionPage() {
       } else {
         router.replace("/");
       }
-    });
+    };
+
+    if (accessToken && refreshToken) {
+      // ハッシュトークンを明示的にセッションに変換
+      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(({ data: { session }, error }) => {
+          if (error || !session) {
+            router.replace("/auth/login?error=" + encodeURIComponent("ログインに失敗しました"));
+            return;
+          }
+          window.history.replaceState(null, "", window.location.pathname);
+          proceed(session.user);
+        });
+    } else {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          router.replace("/auth/login?error=" + encodeURIComponent("ログインに失敗しました"));
+          return;
+        }
+        proceed(session.user);
+      });
+    }
   }, [router]);
 
   return (
