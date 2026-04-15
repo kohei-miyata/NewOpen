@@ -180,7 +180,7 @@ export const getCouponsWithLocation = unstable_cache(
 );
 
 export async function createStore(
-  payload: Omit<Store, "id" | "views" | "likes" | "approvalStatus" | "ownerId"> & { ownerId?: string },
+  payload: Omit<Store, "id" | "views" | "likes" | "approvalStatus" | "ownerId" | "createdAt"> & { ownerId?: string },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client?: any
 ): Promise<Store> {
