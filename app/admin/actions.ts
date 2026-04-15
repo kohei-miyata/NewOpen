@@ -1,15 +1,94 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
 import { sendMail } from "@/lib/mailer";
+import { createStore } from "@/lib/db";
+import type { Category, SnsLinks } from "@/types";
 
 async function assertAdmin() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || user.app_metadata?.role !== "admin") throw new Error("Forbidden");
+}
+
+// ─── 店舗登録（管理者代行） ───────────────────────────────────────────────────
+
+export type AdminStoreFormState = { error?: string } | null;
+
+function parseAdminStoreFormData(formData: FormData) {
+  const name        = formData.get("name") as string;
+  const category    = formData.get("category") as Category;
+  const address     = formData.get("address") as string;
+  const openDate    = formData.get("openDate") as string;
+  const description = formData.get("description") as string;
+  const hoursText   = (formData.get("hoursText") as string) || null;
+  const imageUrl    = (formData.get("imageUrl") as string) || "";
+  const tagsRaw     = (formData.get("tags") as string) || "";
+
+  const photos: string[] = [];
+  for (let i = 1; i <= 5; i++) {
+    const url = (formData.get(`photo${i}`) as string)?.trim();
+    if (url) photos.push(url);
+  }
+
+  const tags = tagsRaw.split(/[,、]/).map((t) => t.trim()).filter(Boolean);
+
+  const snsLinks: SnsLinks = {};
+  const website    = (formData.get("sns_website")    as string)?.trim();
+  const instagram  = (formData.get("sns_instagram")  as string)?.trim();
+  const twitter    = (formData.get("sns_twitter")    as string)?.trim();
+  const tiktok     = (formData.get("sns_tiktok")     as string)?.trim();
+  const line       = (formData.get("sns_line")        as string)?.trim();
+  const googleMaps = (formData.get("sns_google_maps") as string)?.trim();
+  if (website)    snsLinks.website     = website;
+  if (instagram)  snsLinks.instagram   = instagram;
+  if (twitter)    snsLinks.twitter     = twitter;
+  if (tiktok)     snsLinks.tiktok      = tiktok;
+  if (line)       snsLinks.line        = line;
+  if (googleMaps) snsLinks.google_maps = googleMaps;
+
+  const twitterPostUrl   = (formData.get("post_twitter_url")   as string)?.trim() || null;
+  const instagramPostUrl = (formData.get("post_instagram_url") as string)?.trim() || null;
+  const tiktokPostUrl    = (formData.get("post_tiktok_url")    as string)?.trim() || null;
+
+  const statusRaw = (formData.get("status") as string) || "active";
+  const status = ["active", "temporarily_closed", "closed"].includes(statusRaw)
+    ? (statusRaw as "active" | "temporarily_closed" | "closed")
+    : "active" as const;
+
+  return {
+    name, category, address, openDate, description, hoursText, imageUrl,
+    photos, tags,
+    snsLinks: Object.keys(snsLinks).length > 0 ? snsLinks : null,
+    twitterPostUrl, instagramPostUrl, tiktokPostUrl, status,
+  };
+}
+
+export async function newAdminStore(
+  _prevState: AdminStoreFormState,
+  formData: FormData
+): Promise<AdminStoreFormState> {
+  await assertAdmin();
+  const admin = createSupabaseAdminClient();
+
+  const payload = parseAdminStoreFormData(formData);
+
+  if (!payload.address?.trim()) return { error: "住所を入力してください" };
+  if (!/[都道府県]/.test(payload.address)) return { error: "都道府県から入力してください" };
+  if (!/[市区町村郡]/.test(payload.address)) return { error: "市区町村まで入力してください" };
+
+  try {
+    await createStore({ ...payload, lat: null, lng: null, ownerId: undefined }, admin);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "登録に失敗しました" };
+  }
+
+  revalidateTag("store");
+  redirect("/admin/owners");
 }
 
 // ─── ユーザー管理 ────────────────────────────────────────────────────────────
@@ -161,6 +240,32 @@ export async function rejectStore(formData: FormData) {
   revalidateTag("store");
   revalidateTag("coupons");
   revalidateTag("coupons-with-location");
+}
+
+/** オーナーをメールアドレスで紐付ける */
+export async function setStoreOwner(_prev: unknown, formData: FormData): Promise<{ error?: string }> {
+  await assertAdmin();
+  const admin = createSupabaseAdminClient();
+
+  const storeId = formData.get("storeId") as string;
+  const email   = (formData.get("email") as string)?.trim().toLowerCase();
+
+  if (!email) {
+    await admin.from("stores").update({ owner_id: null }).eq("id", storeId);
+    revalidatePath("/admin/owners");
+    return {};
+  }
+
+  const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  const target = users.find((u) => u.email?.toLowerCase() === email);
+  if (!target) return { error: "ユーザーが見つかりません" };
+
+  const { error } = await admin.from("stores").update({ owner_id: target.id }).eq("id", storeId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/owners");
+  revalidateTag("store");
+  return {};
 }
 
 /** 審査待ちに戻す */

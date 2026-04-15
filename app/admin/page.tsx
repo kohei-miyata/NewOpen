@@ -137,6 +137,45 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
         ))}
       </div>
 
+      {/* クイックリンク */}
+      <section className="flex flex-wrap gap-3">
+        <Link
+          href="/admin/owners"
+          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
+        >
+          <BuildingStorefrontIcon className="w-4 h-4" />
+          店舗審査管理
+          {(pendingStoreCount ?? 0) > 0 && (
+            <span className="ml-1 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {pendingStoreCount}
+            </span>
+          )}
+          →
+        </Link>
+        <Link
+          href="/admin/newsletter"
+          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
+        >
+          <MegaphoneIcon className="w-4 h-4" />
+          メルマガ配信
+          <span className="ml-1 text-xs text-gray-400">（通知ON: {emailNotifyCount}人）</span>
+          →
+        </Link>
+        <Link
+          href="/admin/contacts"
+          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
+        >
+          <EnvelopeIcon className="w-4 h-4" />
+          お問い合わせ一覧
+          {unansweredContactCount > 0 && (
+            <span className="ml-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {unansweredContactCount}
+            </span>
+          )}
+          →
+        </Link>
+      </section>
+
       {/* ユーザー一覧 */}
       <section>
         <h2 className="text-lg font-bold text-gray-900 mb-3">ユーザー一覧</h2>
@@ -469,45 +508,6 @@ const generalUsers = users.filter((u) => u.user_metadata?.role !== "owner" && u.
             <p className="text-xs text-gray-400 mt-1">未ログインユーザー</p>
           </div>
         </div>
-      </section>
-
-      {/* クイックリンク */}
-      <section className="flex flex-wrap gap-3">
-        <Link
-          href="/admin/owners"
-          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
-        >
-          <BuildingStorefrontIcon className="w-4 h-4" />
-          店舗審査管理
-          {(pendingStoreCount ?? 0) > 0 && (
-            <span className="ml-1 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-              {pendingStoreCount}
-            </span>
-          )}
-          →
-        </Link>
-        <Link
-          href="/admin/newsletter"
-          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
-        >
-          <MegaphoneIcon className="w-4 h-4" />
-          メルマガ配信
-          <span className="ml-1 text-xs text-gray-400">（通知ON: {emailNotifyCount}人）</span>
-          →
-        </Link>
-        <Link
-          href="/admin/contacts"
-          className="inline-flex items-center gap-2 bg-white border border-gray-100 shadow-sm rounded-xl px-5 py-3 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-500 transition-colors"
-        >
-          <EnvelopeIcon className="w-4 h-4" />
-          お問い合わせ一覧
-          {unansweredContactCount > 0 && (
-            <span className="ml-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-              {unansweredContactCount}
-            </span>
-          )}
-          →
-        </Link>
       </section>
 
       {/* 全店舗一覧 */}

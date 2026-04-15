@@ -7,6 +7,7 @@ import { approveStore, rejectStore, setPendingStore } from "@/app/admin/actions"
 import { REJECTION_TEMPLATES } from "@/lib/rejection-templates";
 import { BuildingStorefrontIcon, ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { ApproveSubmitButton, RejectSubmitButton, PendingSubmitButton } from "@/components/AdminActionButtons";
+import { SetOwnerForm } from "@/components/SetOwnerForm";
 
 export const metadata: Metadata = { title: "店舗審査管理 | 管理者" };
 
@@ -95,9 +96,17 @@ export default async function AdminOwnersPage({
           </h1>
           <p className="text-xs text-gray-400 mt-1">新規登録店舗を3営業日以内に審査し、結果をメールでお伝えします</p>
         </div>
-        <div className="text-right">
-          <p className="text-2xl font-extrabold text-yellow-600">{pending.length}</p>
-          <p className="text-xs text-gray-400">審査待ち</p>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/stores/new"
+            className="text-sm font-medium px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors whitespace-nowrap"
+          >
+            + 店舗を代行登録
+          </Link>
+          <div className="text-right">
+            <p className="text-2xl font-extrabold text-yellow-600">{pending.length}</p>
+            <p className="text-xs text-gray-400">審査待ち</p>
+          </div>
         </div>
       </div>
 
@@ -189,7 +198,10 @@ export default async function AdminOwnersPage({
                       </a>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{store.category}</td>
-                    <td className="px-4 py-3 text-xs text-gray-500 max-w-[120px] truncate">{ownerEmailMap[store.owner_id] ?? "-"}</td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
+                      <div className="max-w-[120px] truncate">{ownerEmailMap[store.owner_id] ?? "-"}</div>
+                      <SetOwnerForm storeId={store.id} currentOwner={ownerEmailMap[store.owner_id] ?? ""} />
+                    </td>
                     <td className="px-4 py-3 text-xs text-gray-400">
                       {new Date(store.created_at).toLocaleDateString("ja-JP")}
                     </td>
@@ -250,6 +262,7 @@ function StoreReviewCard({
             登録日：{new Date(store.created_at).toLocaleDateString("ja-JP")} ／
             送信メール：{emailCount} 件
           </p>
+          <SetOwnerForm storeId={store.id} currentOwner={ownerEmail} />
         </div>
         <span className="shrink-0 text-xs font-bold px-2 py-1 rounded-full bg-yellow-100 text-yellow-700">審査中</span>
       </div>
