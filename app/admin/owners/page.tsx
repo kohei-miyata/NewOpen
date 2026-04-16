@@ -212,9 +212,17 @@ export default async function AdminOwnersPage({
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{emailCountMap[store.id] ?? 0}</td>
                     <td className="px-4 py-3">
-                      <form action={setPendingStore.bind(null, store.id)}>
-                        <PendingSubmitButton />
-                      </form>
+                      <div className="flex items-center gap-2">
+                        <form action={setPendingStore.bind(null, store.id)}>
+                          <PendingSubmitButton />
+                        </form>
+                        <Link
+                          href={`/admin/stores/${store.id}/edit`}
+                          className="text-xs px-2 py-1 border border-gray-300 rounded text-gray-600 hover:border-orange-400 hover:text-orange-500 transition-colors whitespace-nowrap"
+                        >
+                          編集
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -267,10 +275,18 @@ function StoreReviewCard({
         <span className="shrink-0 text-xs font-bold px-2 py-1 rounded-full bg-yellow-100 text-yellow-700">審査中</span>
       </div>
 
-      {/* 承認ボタン */}
-      <form action={approveStore.bind(null, store.id)}>
-        <ApproveSubmitButton />
-      </form>
+      {/* 操作ボタン */}
+      <div className="flex items-center gap-2">
+        <form action={approveStore.bind(null, store.id)}>
+          <ApproveSubmitButton />
+        </form>
+        <Link
+          href={`/admin/stores/${store.id}/edit`}
+          className="text-sm px-3 py-1.5 border border-gray-300 rounded-lg text-gray-600 hover:border-orange-400 hover:text-orange-500 transition-colors"
+        >
+          編集
+        </Link>
+      </div>
 
       {/* 否認フォーム */}
       <details className="group">

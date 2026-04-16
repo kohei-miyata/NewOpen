@@ -91,6 +91,34 @@ export async function newAdminStore(
   redirect("/admin/owners");
 }
 
+export async function editAdminStore(
+  storeId: string,
+  _prevState: AdminStoreFormState,
+  formData: FormData
+): Promise<AdminStoreFormState> {
+  await assertAdmin();
+  const admin = createSupabaseAdminClient();
+
+  const { data: existing } = await admin.from("stores").select("open_date").eq("id", storeId).single();
+  if (!existing) return { error: "店舗が見つかりません" };
+
+  const payload = parseAdminStoreFormData(formData);
+
+  if (!payload.address?.trim()) return { error: "住所を入力してください" };
+  if (!/[都道府県]/.test(payload.address)) return { error: "都道府県から入力してください" };
+  if (!/[市区町村郡]/.test(payload.address)) return { error: "市区町村まで入力してください" };
+
+  const { updateStore } = await import("@/lib/db");
+  try {
+    await updateStore(storeId, { ...payload, openDate: existing.open_date }, admin);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "保存に失敗しました" };
+  }
+
+  revalidateTag("store");
+  redirect("/admin/owners");
+}
+
 // ─── ユーザー管理 ────────────────────────────────────────────────────────────
 
 export async function banUser(userId: string) {
