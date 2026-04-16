@@ -196,7 +196,7 @@ export default async function StoreDetailPage({ params }: Props) {
           </div>
         )}
 
-        <p className="mt-5 text-gray-700 leading-relaxed">{store.description}</p>
+        <p className="mt-5 text-gray-700 leading-relaxed whitespace-pre-line">{store.description}</p>
 
         {/* タグ */}
         {store.tags.length > 0 && (

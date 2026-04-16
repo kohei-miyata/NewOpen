@@ -78,7 +78,8 @@ export async function editStore(
     getStoreOwnerId(storeId),
     getStoreById(storeId),
   ]);
-  if (ownerId !== user.id) redirect("/mypage/owner");
+  const isAdmin = user.app_metadata?.role === "admin";
+  if (ownerId !== user.id && !isAdmin) redirect("/mypage/owner");
   if (!existingStore) redirect("/mypage/owner");
 
   const payload = parseStoreFormData(formData);
