@@ -25,14 +25,24 @@ import {
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://newopen.site";
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { id } = await params;
+  const { preview } = await searchParams;
   const store = await getStoreById(id);
   if (!store) return { title: "店舗が見つかりません | NewOpen" };
+
+  if (preview === "true") {
+    return {
+      title: `${store.name} | NewOpen`,
+      robots: { index: false, follow: false },
+    };
+  }
+
   return {
     title: `${store.name} | NewOpen`,
     description: store.description,

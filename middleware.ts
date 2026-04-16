@@ -35,13 +35,15 @@ const COMING_SOON_OPEN_PATHS = [
   "/favicon",
   "/mypage/owner",
   "/mypage",
-  "/stores/",
 ];
 
 function isComingSoonBlocked(request: NextRequest): boolean {
   if (process.env.COMING_SOON !== "true") return false;
 
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // ?preview=true の場合は通す
+  if (searchParams.get("preview") === "true") return false;
 
   // 許可パスは通す
   if (COMING_SOON_OPEN_PATHS.some((p) => pathname.startsWith(p))) return false;
