@@ -12,6 +12,7 @@ import SnsPostEmbed from "@/components/SnsPostEmbed";
 import ShareButtons from "@/components/ShareButtons";
 import ScrollToTop from "@/components/ScrollToTop";
 import RelatedStores from "@/components/RelatedStores";
+import PhotoGallery from "@/components/PhotoLightbox";
 import type { SnsLinks } from "@/types";
 import {
   NoSymbolIcon,
@@ -144,30 +145,18 @@ export default async function StoreDetailPage({ params }: Props) {
         )}
 
         {/* 写真ギャラリー */}
-        {allPhotos.length > 0 && (
-          <div className="mb-6">
-            <div className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={allPhotos[0]} alt={store.name} className="w-full h-64 object-cover rounded-xl" />
-              <div className="absolute top-3 right-3">
-                <LikeButton
-                  storeId={store.id}
-                  initialLikes={store.likes}
-                  initialLiked={initialLiked}
-                  isLoggedIn={!!user}
-                />
-              </div>
-            </div>
-            {allPhotos.length > 1 && (
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {allPhotos.slice(1).map((url, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={i} src={url} alt={`${store.name} ${i + 2}`} className="w-full h-20 object-cover rounded-lg" />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        <PhotoGallery
+          photos={allPhotos}
+          storeName={store.name}
+          likeButton={
+            <LikeButton
+              storeId={store.id}
+              initialLikes={store.likes}
+              initialLiked={initialLiked}
+              isLoggedIn={!!user}
+            />
+          }
+        />
 
         {/* ヘッダー */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
