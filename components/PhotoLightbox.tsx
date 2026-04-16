@@ -114,7 +114,7 @@ export function PhotoLightbox({ photos, storeName, initialIndex = 0, onClose }: 
   );
 }
 
-// ギャラリー本体（クリックでモーダルを開く）
+// ギャラリー本体（スワイプ切り替え + クリックでモーダル拡大）
 export default function PhotoGallery({
   photos,
   storeName,
@@ -124,33 +124,64 @@ export default function PhotoGallery({
   storeName: string;
   likeButton: React.ReactNode;
 }) {
+  const [current, setCurrent] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+
+  const prev = useCallback(() => setCurrent((i) => (i - 1 + photos.length) % photos.length), [photos.length]);
+  const next = useCallback(() => setCurrent((i) => (i + 1) % photos.length), [photos.length]);
+
+  const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
+    touchStartX.current = null;
+  };
 
   if (photos.length === 0) return null;
 
   return (
     <div className="mb-6">
-      <div className="relative">
+      <div
+        className="relative"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={photos[0]}
-          alt={storeName}
+          src={photos[current]}
+          alt={`${storeName} ${current + 1}`}
           className="w-full h-64 object-cover rounded-xl cursor-pointer"
-          onClick={() => setLightboxIndex(0)}
+          onClick={() => setLightboxIndex(current)}
         />
         <div className="absolute top-3 right-3">{likeButton}</div>
+
+        {/* インジケーター */}
+        {photos.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+                className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/50"}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* サムネイル */}
       {photos.length > 1 && (
         <div className="grid grid-cols-4 gap-2 mt-2">
-          {photos.slice(1).map((url, i) => (
+          {photos.map((url, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               key={i}
               src={url}
-              alt={`${storeName} ${i + 2}`}
-              className="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-              onClick={() => setLightboxIndex(i + 1)}
+              alt={`${storeName} ${i + 1}`}
+              className={`w-full h-20 object-cover rounded-lg cursor-pointer transition-opacity ${i === current ? "ring-2 ring-orange-400" : "hover:opacity-90"}`}
+              onClick={() => setCurrent(i)}
             />
           ))}
         </div>
