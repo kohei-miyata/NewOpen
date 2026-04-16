@@ -151,7 +151,10 @@ export async function approveStore(storeId: string) {
     }
   }
 
-  // 通知希望の一般ユーザーへ一斉送信
+  // 通知希望の一般ユーザーへ一斉送信（無効にする場合は false に変更）
+  const NOTIFY_USERS_ON_APPROVE = false;
+  if (!NOTIFY_USERS_ON_APPROVE) return;
+
   const { data: { users: allUsers } } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const notifyUsers = allUsers.filter(
     (u) => u.user_metadata?.email_notifications === true
