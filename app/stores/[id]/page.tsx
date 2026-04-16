@@ -24,6 +24,7 @@ import {
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://newopen.site";
@@ -63,8 +64,9 @@ const SNS_META: { key: keyof SnsLinks; label: string; color: string }[] = [
   { key: "google_maps", label: "Google マップ", color: "text-red-500" },
 ];
 
-export default async function StoreDetailPage({ params }: Props) {
+export default async function StoreDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { preview } = await searchParams;
   const [store, supabase] = await Promise.all([
     getStoreById(id),
     createSupabaseServerClient(),
@@ -73,11 +75,13 @@ export default async function StoreDetailPage({ params }: Props) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 未承認店舗はオーナー本人・管理者以外は404
+  // 未承認店舗はオーナー本人・管理者・プレビュートークン一致以外は404
+  const previewToken = process.env.STORE_PREVIEW_TOKEN;
+  const isValidPreview = previewToken && preview === previewToken;
   const role = user?.user_metadata?.role as string | undefined;
   const isOwner = user?.id === store.ownerId;
   const isAdmin = role === "admin";
-  if (store.approvalStatus !== "approved" && !isOwner && !isAdmin) notFound();
+  if (store.approvalStatus !== "approved" && !isOwner && !isAdmin && !isValidPreview) notFound();
 
   const [likedIds, coupons, usedCouponIds, relatedStores] = await Promise.all([
     user ? getUserLikedStoreIds(user.id) : Promise.resolve(new Set<string>()),
