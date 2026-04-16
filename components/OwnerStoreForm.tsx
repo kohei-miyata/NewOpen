@@ -452,17 +452,30 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
             </div>
 
             <div className="p-6 space-y-5">
-              {/* メイン画像 */}
-              {previewData.imageUrl && (
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-gray-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={previewData.imageUrl}
-                    alt={previewData.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              {/* ギャラリー（メイン＋サブ） */}
+              {(() => {
+                const allPhotos = [
+                  ...(previewData.imageUrl ? [previewData.imageUrl] : []),
+                  ...previewData.photos.filter(Boolean) as string[],
+                ];
+                if (allPhotos.length === 0) return null;
+                return (
+                  <div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={allPhotos[0]} alt={previewData.name} className="w-full h-64 object-cover rounded-xl" />
+                    {allPhotos.length > 1 && (
+                      <div className="flex justify-center mt-2 py-1 overflow-x-auto">
+                        <div className="flex gap-2">
+                          {allPhotos.map((url, i) => (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img key={i} src={url} alt={`${previewData.name} ${i + 1}`} className="shrink-0 w-20 h-20 object-cover rounded-lg" />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* 基本情報 */}
               <div>
@@ -506,20 +519,6 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
                 <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{previewData.description}</p>
               </div>
 
-              {/* サブ写真 */}
-              {previewData.photos.some(Boolean) && (
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 mb-2">写真</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {previewData.photos.filter(Boolean).map((url, i) => (
-                      <div key={i} className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt={`写真${i + 1}`} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* タグ */}
               {previewData.tags && (
