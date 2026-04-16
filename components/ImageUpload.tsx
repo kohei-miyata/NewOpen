@@ -7,6 +7,7 @@ interface Props {
   label?: string;
   defaultValue?: string;
   onUpload?: (url: string) => void;
+  onClear?: () => void;
 }
 
 function isHeicFile(file: File): boolean {
@@ -15,7 +16,7 @@ function isHeicFile(file: File): boolean {
   return ext === "heic" || ext === "heif";
 }
 
-export default function ImageUpload({ name, label, defaultValue = "", onUpload }: Props) {
+export default function ImageUpload({ name, label, defaultValue = "", onUpload, onClear }: Props) {
   const [url, setUrl] = useState(defaultValue);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -149,7 +150,7 @@ export default function ImageUpload({ name, label, defaultValue = "", onUpload }
       {url && (
         <button
           type="button"
-          onClick={() => { setUrl(""); if (inputRef.current) inputRef.current.value = ""; }}
+          onClick={() => { setUrl(""); if (inputRef.current) inputRef.current.value = ""; onClear?.(); }}
           className="text-xs text-red-500 hover:underline"
         >
           削除

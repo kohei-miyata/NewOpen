@@ -134,7 +134,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
       openDate:    (fd.get("openDate")    as string) || defaultValues?.openDate || "",
       hoursText:   (fd.get("hoursText")   as string).trim(),
       description: (fd.get("description") as string).trim(),
-      imageUrl:    (fd.get("imageUrl")    as string) || defaultValues?.imageUrl || "",
+      imageUrl:    (fd.get("imageUrl")    as string) || "",
       status:           (fd.get("status")             as string) || "active",
       tags:             (fd.get("tags")               as string).trim(),
       photos,
@@ -314,6 +314,13 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "ä
                       setPhotos((prev) => {
                         const next = [...prev];
                         next[i] = newUrl;
+                        return next;
+                      })
+                    }
+                    onClear={() =>
+                      setPhotos((prev) => {
+                        const next = [...prev];
+                        next[i] = undefined;
                         return next;
                       })
                     }
