@@ -173,17 +173,19 @@ export default function PhotoGallery({
 
       {/* サムネイル */}
       {photos.length > 1 && (
-        <div className="flex gap-2 mt-2 overflow-x-auto">
-          {photos.map((url, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={i}
-              src={url}
-              alt={`${storeName} ${i + 1}`}
-              className={`shrink-0 w-20 h-20 object-cover rounded-lg cursor-pointer transition-opacity ${i === current ? "ring-2 ring-orange-400" : "hover:opacity-90"}`}
-              onClick={() => setCurrent(i)}
-            />
-          ))}
+        <div className="flex justify-center mt-2 py-1 overflow-x-auto">
+          <div className="flex gap-2">
+            {photos.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={i}
+                src={url}
+                alt={`${storeName} ${i + 1}`}
+                className={`shrink-0 w-20 h-20 object-cover rounded-lg cursor-pointer transition-opacity ${i === current ? "ring-2 ring-orange-400" : "hover:opacity-90"}`}
+                onClick={() => setCurrent(i)}
+              />
+            ))}
+          </div>
         </div>
       )}
 
