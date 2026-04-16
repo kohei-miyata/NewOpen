@@ -189,13 +189,17 @@ export default async function StoreDetailPage({ params }: Props) {
 
         {/* 営業時間 */}
         {store.hoursText && (
-          <div className="mt-4 flex items-center gap-2 text-sm text-gray-700">
-            <ClockIcon className="w-4 h-4 text-gray-400 shrink-0" />
-            <span>{store.hoursText}</span>
+          <div className="mt-4 flex items-start gap-2 text-sm text-gray-700">
+            <ClockIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+            <div>
+              <span>{store.hoursText}</span>
+              <p className="text-xs text-gray-400 mt-0.5">※ 営業時間・定休日は変更になる場合があります。事前に公式SNSや店舗へご確認ください。</p>
+            </div>
           </div>
         )}
 
         <p className="mt-5 text-gray-700 leading-relaxed whitespace-pre-line">{store.description}</p>
+        <p className="text-xs text-gray-400 mt-2">※ 掲載情報は登録時点のものです。最新情報は公式SNSや店舗へお問い合わせください。</p>
 
         {/* タグ */}
         {store.tags.length > 0 && (
