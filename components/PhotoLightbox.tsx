@@ -173,8 +173,8 @@ export default function PhotoGallery({
 
       {/* サムネイル */}
       {photos.length > 1 && (
-        <div className="flex justify-center mt-2 py-1 overflow-x-auto">
-          <div className="flex gap-2">
+        <div className="mt-2 pb-1 overflow-x-auto">
+          <div className="flex gap-2 w-max mx-auto">
             {photos.map((url, i) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
