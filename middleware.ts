@@ -27,9 +27,7 @@ function basicAuth(request: NextRequest): NextResponse | null {
 const COMING_SOON_OPEN_PATHS = [
   "/coming-soon",
   "/for-owners",
-  "/auth/signup",
-  "/auth/login",
-  "/auth/callback",
+  "/auth/",
   "/api/",
   "/_next/",
   "/favicon",
