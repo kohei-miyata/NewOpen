@@ -3,8 +3,11 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import {
   MegaphoneIcon, CameraIcon, TicketIcon, CalendarDaysIcon,
-  MapPinIcon, PencilSquareIcon,
+  MapPinIcon, PencilSquareIcon, ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
+
+// 代行DM先（Instagram プロフィール）
+const DM_URL = "https://www.instagram.com/newopen.site/";
 
 export const metadata: Metadata = {
   title: "オーナーの方へ | 無料で店舗を掲載",
@@ -43,14 +46,15 @@ export default async function ForOwnersPage() {
       <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <span className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 tracking-wide">
-            店舗オーナー様へ
+            開業〜3年以内のオーナー様へ
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
-            新規オープンを、<br className="sm:hidden" />もっと多くの人に届けよう
+          <h1 className="text-3xl sm:text-4xl font-extrabold mb-4 leading-snug">
+            お店の情報を、<br />地域のユーザーに届けよう
           </h1>
           <p className="text-gray-300 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-            NewOpenに掲載することで、エリアのユーザーにオープン情報をダイレクトに届けられます。
-            SNS投稿の埋め込みや写真ギャラリーで、お店の魅力を最大限アピール。
+            NewOpenは開業・オープン情報に特化した無料掲載サービスです。<br className="hidden sm:block" />
+            開業したてはもちろん、<span className="text-white font-semibold">開業から3年未満</span>であればすぐに掲載できます。<br className="hidden sm:block" />
+            クーポン発行・SNS連携・写真ギャラリーもすべて無料。
           </p>
           <div className="mt-10 flex gap-4 justify-center flex-wrap">
             <Link
@@ -67,6 +71,32 @@ export default async function ForOwnersPage() {
             </Link>
           </div>
           {!isOwner && <p className="mt-4 text-xs text-gray-500">クレジットカード不要・無料で始められます</p>}
+        </div>
+      </section>
+
+      {/* 代行登録バナー */}
+      <section className="bg-orange-50 border-y border-orange-100 py-10">
+        <div className="max-w-3xl mx-auto px-4 flex flex-col sm:flex-row items-center gap-6">
+          <div className="flex-shrink-0 bg-orange-100 rounded-2xl p-4">
+            <ChatBubbleLeftRightIcon className="w-10 h-10 text-orange-500" />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <p className="text-xs font-bold text-orange-500 mb-1 tracking-wide">登録が面倒な方へ</p>
+            <h2 className="text-lg sm:text-xl font-extrabold text-gray-900 mb-1">
+              情報を送るだけ。登録作業はこちらで代行します。
+            </h2>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              写真・店名・住所などをDMで送っていただければ、掲載まですべて対応します。登録作業は一切不要です。
+            </p>
+          </div>
+          <a
+            href={DM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-shrink-0 bg-orange-500 text-white font-bold px-8 py-3 rounded-full hover:bg-orange-600 transition-colors shadow text-sm whitespace-nowrap"
+          >
+            DMで相談する →
+          </a>
         </div>
       </section>
 
