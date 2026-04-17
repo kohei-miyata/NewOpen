@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LocalStorageConsentBanner from "@/components/LocalStorageConsentBanner";
 import AnnouncementModal from "@/components/AnnouncementModal";
+import AuthSessionWatcher from "@/components/AuthSessionWatcher";
 import "./globals.css";
 
 const GA_ID = "G-P9CDN7NB5B";
@@ -54,6 +55,7 @@ export default function RootLayout({
           gtag('js', new Date());
           gtag('config', '${GA_ID}');
         `}</Script>
+        <AuthSessionWatcher />
         <Navbar />
         {children}
         <Footer />

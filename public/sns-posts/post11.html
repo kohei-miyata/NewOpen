@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #d1d5db;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 32px 20px;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  .export-btn {
+    margin-bottom: 20px;
+    background: #1f2937; color: white;
+    border: none; border-radius: 10px;
+    padding: 12px 32px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .export-btn:hover { background: #374151; }
+
+  .card {
+    width: 1080px; height: 1080px;
+    background: linear-gradient(160deg, #111827 0%, #1e293b 60%, #0f172a 100%);
+    display: flex; flex-direction: column;
+    justify-content: center;
+    position: relative;
+    font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+    padding: 72px 80px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* 背景装飾 */
+  .card::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(circle at 80% 10%, rgba(249,115,22,0.12) 0%, transparent 50%),
+      radial-gradient(circle at 10% 90%, rgba(249,115,22,0.08) 0%, transparent 40%);
+  }
+
+  /* ロゴ */
+  .logo {
+    position: absolute; top: 52px; left: 72px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-circle {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(249,115,22,0.2); border: 2px solid rgba(249,115,22,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 900; color: #fb923c;
+    font-family: 'Arial Black', Arial, sans-serif;
+  }
+  .logo-text {
+    font-size: 26px; font-weight: 900; color: rgba(255,255,255,0.7); letter-spacing: 3px;
+    font-family: 'Arial Black', Arial, sans-serif;
+  }
+
+  /* バッジ */
+  .badge {
+    position: absolute; top: 52px; right: 72px;
+    background: rgba(249,115,22,0.15); border: 1.5px solid rgba(249,115,22,0.4);
+    color: #fb923c; border-radius: 50px; padding: 10px 22px;
+    font-size: 15px; font-weight: 900; letter-spacing: 1px;
+  }
+
+  /* 問いかけ */
+  .question {
+    font-size: 17px; font-weight: 700; color: #94a3b8; letter-spacing: 2px;
+    margin-bottom: 14px; text-transform: uppercase;
+  }
+
+  .headline {
+    font-size: 50px; font-weight: 900; color: white;
+    line-height: 1.25; letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .headline .highlight {
+    color: #fb923c;
+  }
+
+  .subline {
+    font-size: 18px; color: #64748b; font-weight: 500;
+    margin-bottom: 44px; line-height: 1.6;
+  }
+
+  /* 悩みリスト */
+  .pain-list {
+    display: flex; flex-direction: column; gap: 14px;
+    margin-bottom: 40px;
+  }
+  .pain-item {
+    display: flex; align-items: center; gap: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 3px solid #f97316;
+    border-radius: 14px; padding: 16px 24px;
+  }
+  .pain-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: rgba(249,115,22,0.12); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: #f97316;
+  }
+  .pain-text {
+    font-size: 20px; font-weight: 700; color: #e2e8f0; line-height: 1.4;
+  }
+  .pain-sub {
+    font-size: 13px; color: #64748b; margin-top: 3px; line-height: 1.5;
+  }
+
+  /* 解決 */
+  .solution {
+    background: linear-gradient(135deg, #f97316, #fbbf24);
+    border-radius: 20px; padding: 22px 30px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .solution-icon {
+    width: 48px; height: 48px; flex-shrink: 0;
+    background: rgba(255,255,255,0.25); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .solution-text { flex: 1; }
+  .solution-label { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.8); margin-bottom: 3px; }
+  .solution-title { font-size: 22px; font-weight: 900; color: white; line-height: 1.35; }
+  .solution-arrow {
+    font-size: 28px; color: white; font-weight: 900; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<button class="export-btn" onclick="exportImage()">画像として保存（PNG）</button>
+
+<div class="card" id="card">
+
+  <div class="logo">
+    <div class="logo-circle">N</div>
+    <div class="logo-text">EW OPEN</div>
+  </div>
+  <div class="badge">オーナー様へ</div>
+
+  <div class="question">こんなお悩みありませんか？</div>
+  <div class="headline">
+    開業当初の賑わいが<br /><span class="highlight">続いていない...</span>
+  </div>
+  <div class="subline">多くのオーナーが開業から数ヶ月で感じる、集客の壁。</div>
+
+  <div class="pain-list">
+
+    <div class="pain-item">
+      <div class="pain-icon">
+        <!-- trending down -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+          <polyline points="17 18 23 18 23 12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pain-text">売上がオープン当初より下がってきた</div>
+        <div class="pain-sub">口コミやSNSの反応が薄れ、新規客が来なくなってきた</div>
+      </div>
+    </div>
+
+    <div class="pain-item">
+      <div class="pain-icon">
+        <!-- credit card -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pain-text">集客を有料プラットフォーム頼みになっている</div>
+        <div class="pain-sub">毎月の掲載費がかさむのに、費用対効果が見えない</div>
+      </div>
+    </div>
+
+    <div class="pain-item">
+      <div class="pain-icon">
+        <!-- users -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pain-text">リピーターはいるが、新規客が増えない</div>
+        <div class="pain-sub">近くにいるはずのお客さんに、まだ知られていない</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 解決 -->
+  <div class="solution">
+    <div class="solution-icon">
+      <!-- sparkle / star -->
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </div>
+    <div class="solution-text">
+      <div class="solution-label">NewOpen が解決します</div>
+      <div class="solution-title">無料で掲載して、もう一度<br />新規のお客さんを呼び込もう</div>
+    </div>
+    <div class="solution-arrow">→</div>
+  </div>
+
+</div>
+
+<script>
+  async function exportImage() {
+    const card = document.getElementById('card');
+    const canvas = await html2canvas(card, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: null,
+    });
+    const link = document.createElement('a');
+    link.download = 'newopen_post11.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+</script>
+
+</body>
+</html>
