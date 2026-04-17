@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Store } from "@/types";
 import CardLikeButton from "@/components/CardLikeButton";
+import StoreCardSlider from "@/components/StoreCardSlider";
 
 interface Props {
   store: Store;
@@ -16,16 +17,16 @@ export default function StoreCard({ store, rank, isLoggedIn = false, initialLike
   const isNew = daysAgo >= 0 && daysAgo <= 30;
   const isComingSoon = daysAgo < 0;
 
+  const allPhotos = [
+    ...(store.imageUrl ? [store.imageUrl] : []),
+    ...store.photos,
+  ].slice(0, 5);
+
   return (
     <Link href={`/stores/${store.id}`} className="group block">
       <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
         <div className="relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={store.imageUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80"}
-            alt={store.name}
-            className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+          <StoreCardSlider photos={allPhotos} storeName={store.name} />
           <div className="absolute top-2 left-2 flex gap-1">
             {store.status === "closed" && (
               <span className="bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full">

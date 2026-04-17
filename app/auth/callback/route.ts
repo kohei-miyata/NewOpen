@@ -93,6 +93,11 @@ export async function GET(request: NextRequest) {
       role = assignedRole;
     }
 
+    // admin → 管理画面へ
+    if (role === "admin") {
+      redirectTo = `${origin}/admin`;
+    }
+
     // オーナーのメール確認完了 → 店舗登録へ
     if (role === "owner") {
       redirectTo = `${origin}/mypage/owner/stores/new?welcome=1`;

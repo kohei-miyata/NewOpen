@@ -60,13 +60,14 @@ export async function login(formData: FormData) {
   const next = (formData.get("next") as string | null)?.trim() || null;
   const supabase = await createSupabaseServerClient();
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
     const params = new URLSearchParams({ error: toJapaneseAuthError(error.message) });
     if (next) params.set("next", next);
     redirect(`/auth/login?${params.toString()}`);
   }
-  redirect(next ?? "/");
+  const isAdmin = data.user?.user_metadata?.role === "admin";
+  redirect(next ?? (isAdmin ? "/admin" : "/"));
 }
 
 export async function signup(formData: FormData) {
