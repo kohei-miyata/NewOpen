@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers, cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 function safeNext(next: string | null): string | null {
   if (!next) return null;
@@ -73,6 +74,18 @@ export async function login(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const next = (formData.get("next") as string | null)?.trim() || null;
+
+  const hdrs = await headers();
+  const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "unknown";
+  const rateLimitError = encodeURIComponent("ログイン試行回数が上限に達しました。15分後に再試行してください");
+
+  if (!checkRateLimit(`login:ip:${ip}`, 10, 15 * 60_000)) {
+    redirect(`/auth/login?error=${rateLimitError}`);
+  }
+  if (!checkRateLimit(`login:email:${email.toLowerCase()}`, 15, 15 * 60_000)) {
+    redirect(`/auth/login?error=${rateLimitError}`);
+  }
+
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
