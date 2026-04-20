@@ -136,10 +136,11 @@ export default function StoreForm({ serverError }: { serverError?: string }) {
       {/* 営業時間 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">営業時間</label>
-        <input
+        <textarea
           name="hoursText"
-          className={INPUT_NORMAL}
-          placeholder="例: 11:00〜22:00（水曜定休）"
+          className={`${INPUT_NORMAL} resize-none`}
+          rows={3}
+          placeholder={"月〜金 11:00〜22:00\n土日祝 10:00〜23:00\n水曜定休"}
         />
       </div>
 

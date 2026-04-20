@@ -249,9 +249,10 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
         {/* 営業時間 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">営業時間</label>
-          <input
+          <textarea
             name="hoursText" defaultValue={defaultValues?.hoursText ?? ""}
-            className={INPUT_NORMAL} placeholder="例: 11:00〜22:00（水曜定休）"
+            className={`${INPUT_NORMAL} resize-none`} rows={3}
+            placeholder={"例: 月〜金 11:00〜22:00\n土日祝 10:00〜23:00\n水曜定休"}
           />
         </div>
 
@@ -509,7 +510,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
                 {previewData.hoursText && (
                   <div className="flex gap-2">
                     <span className="text-gray-400 w-20 shrink-0">営業時間</span>
-                    <span>{previewData.hoursText}</span>
+                    <span className="whitespace-pre-line">{previewData.hoursText}</span>
                   </div>
                 )}
               </div>

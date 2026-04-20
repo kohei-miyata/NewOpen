@@ -192,7 +192,7 @@ export default async function StoreDetailPage({ params }: Props) {
           <div className="mt-4 flex items-start gap-2 text-sm text-gray-700">
             <ClockIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
             <div>
-              <span>{store.hoursText}</span>
+              <span className="whitespace-pre-line">{store.hoursText}</span>
               <p className="text-xs text-gray-400 mt-0.5">※ 営業時間・定休日は変更になる場合があります。事前に公式SNSや店舗へご確認ください。</p>
             </div>
           </div>
