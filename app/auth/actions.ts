@@ -1,9 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+
+function safeNext(next: string | null): string | null {
+  if (!next) return null;
+  if (next.startsWith("/") && !next.startsWith("//")) return next;
+  return null;
+}
 
 function toJapaneseAuthError(message: string): string {
   if (/invalid login credentials/i.test(message))
@@ -43,13 +49,22 @@ export async function signInWithGoogle(role: "user" | "owner" = "user") {
 export async function signInWithLine(role: "user" | "owner" = "user") {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const channelId = process.env.LINE_CHANNEL_ID ?? "";
+  const csrfToken = crypto.randomUUID();
+  const cookieStore = await cookies();
+  cookieStore.set("line_oauth_state", csrfToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 600,
+    path: "/",
+  });
   const params = new URLSearchParams({
     response_type: "code",
     client_id: channelId,
     redirect_uri: `${siteUrl}/api/auth/line/callback`,
-    state: `role:${role}`,
+    state: `${csrfToken}:role:${role}`,
     scope: "openid profile email",
-    nonce: Math.random().toString(36).slice(2),
+    nonce: crypto.randomUUID(),
   });
   redirect(`https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`);
 }
@@ -66,8 +81,8 @@ export async function login(formData: FormData) {
     if (next) params.set("next", next);
     redirect(`/auth/login?${params.toString()}`);
   }
-  const isAdmin = data.user?.user_metadata?.role === "admin";
-  redirect(next ?? (isAdmin ? "/admin" : "/"));
+  const isAdmin = data.user?.app_metadata?.role === "admin";
+  redirect(safeNext(next) ?? (isAdmin ? "/admin" : "/"));
 }
 
 export async function signup(formData: FormData) {

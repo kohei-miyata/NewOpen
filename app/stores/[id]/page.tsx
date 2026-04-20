@@ -85,9 +85,8 @@ export default async function StoreDetailPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // 未承認店舗はオーナー本人・管理者以外は404
-  const role = user?.user_metadata?.role as string | undefined;
   const isOwner = user?.id === store.ownerId;
-  const isAdmin = role === "admin";
+  const isAdmin = user?.app_metadata?.role === "admin";
   if (store.approvalStatus !== "approved" && !isOwner && !isAdmin) notFound();
 
   const [likedIds, coupons, usedCouponIds, relatedStores] = await Promise.all([
@@ -134,7 +133,7 @@ export default async function StoreDetailPage({ params }: Props) {
     <div className="bg-gray-50 min-h-screen">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/<\/script>/gi, "<\\/script>") }}
       />
       <ScrollToTop />
       <div className="max-w-3xl mx-auto px-4 py-8">

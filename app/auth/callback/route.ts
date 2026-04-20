@@ -93,8 +93,8 @@ export async function GET(request: NextRequest) {
       role = assignedRole;
     }
 
-    // admin → 管理画面へ
-    if (role === "admin") {
+    // admin → 管理画面へ（app_metadata で判定）
+    if (user?.app_metadata?.role === "admin") {
       redirectTo = `${origin}/admin`;
     }
 

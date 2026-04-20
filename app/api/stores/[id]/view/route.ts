@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import { checkRateLimit } from "@/lib/rate-limit";
 
-export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    ?? req.headers.get("x-real-ip")
+    ?? "unknown";
+  if (!checkRateLimit(`view:${ip}:${id}`, 5, 60_000)) {
+    return NextResponse.json({ ok: true });
+  }
 
   const supabase = getSupabaseClient();
   const { error } = await supabase.rpc("increment_views", { store_id: id });

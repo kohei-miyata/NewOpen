@@ -14,7 +14,18 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const role = state.startsWith("role:owner") ? "owner" : "user";
+  // CSRF 検証: state = `${csrfToken}:role:${role}`
+  const colonIdx = state.indexOf(":");
+  const receivedToken = colonIdx > 0 ? state.slice(0, colonIdx) : "";
+  const rolePart = colonIdx > 0 ? state.slice(colonIdx + 1) : state;
+  const storedToken = request.cookies.get("line_oauth_state")?.value;
+  if (!storedToken || !receivedToken || storedToken !== receivedToken) {
+    return NextResponse.redirect(
+      `${origin}/auth/login?error=${encodeURIComponent("不正なリクエストです")}`
+    );
+  }
+
+  const role = rolePart === "role:owner" ? "owner" : "user";
 
   // LINE のアクセストークンを取得
   const tokenRes = await fetch("https://api.line.me/oauth2/v2.1/token", {
