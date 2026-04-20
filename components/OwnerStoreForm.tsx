@@ -4,6 +4,7 @@ import { useState, useEffect, useActionState, useRef } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import SnsPostEmbed from "@/components/SnsPostEmbed";
 import DatePicker from "@/components/DatePicker";
+import TagInput from "@/components/TagInput";
 import type { Store } from "@/types";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -12,13 +13,13 @@ const INPUT_NORMAL = `${INPUT} border-gray-300 focus:border-orange-400`;
 const INPUT_ERROR  = `${INPUT} border-red-400 focus:border-red-400 bg-red-50`;
 
 const SNS_FIELDS = [
-  { name: "sns_website",     icon: "/icons/website.svg",   placeholder: "公式サイト URL" },
-  { name: "sns_reservation", icon: "/icons/website.svg",   placeholder: "予約サイト URL（食べログ・ホットペッパー等）" },
-  { name: "sns_instagram",   icon: "/icons/instagram.svg", placeholder: "Instagram URL" },
-  { name: "sns_twitter",     icon: "/icons/x.png",         placeholder: "X (Twitter) URL" },
-  { name: "sns_tiktok",      icon: "/icons/tiktok.png",    placeholder: "TikTok URL" },
-  { name: "sns_line",        icon: "/icons/LINE.png",      placeholder: "LINE 公式アカウント URL" },
-  { name: "sns_google_maps", icon: "/icons/maps.svg",      placeholder: "Google マップ URL" },
+  { name: "sns_website",     icon: "/icons/website.svg",   placeholder: "例: https://your-shop.com" },
+  { name: "sns_reservation", icon: "/icons/website.svg",   placeholder: "例: https://tabelog.com/... （食べログ・ホットペッパー等）" },
+  { name: "sns_instagram",   icon: "/icons/instagram.svg", placeholder: "例: https://www.instagram.com/your_shop/" },
+  { name: "sns_twitter",     icon: "/icons/x.png",         placeholder: "例: https://x.com/your_shop" },
+  { name: "sns_tiktok",      icon: "/icons/tiktok.png",    placeholder: "例: https://www.tiktok.com/@your_shop" },
+  { name: "sns_line",        icon: "/icons/LINE.png",      placeholder: "例: https://lin.ee/xxxxxxx" },
+  { name: "sns_google_maps", icon: "/icons/maps.svg",      placeholder: "例: https://maps.app.goo.gl/xxxxxxx" },
 ];
 
 type Errors = Partial<Record<"name" | "address" | "openDate" | "description" | "imageUrl", string>>;
@@ -212,7 +213,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
           </label>
           <input
             name="address" defaultValue={defaultValues?.address}
-            className={field("address")} placeholder="例: 東京都渋谷区〇〇1-2-3"
+            className={field("address")} placeholder="例: 東京都渋谷区神南1-2-3（番地まで入力するとマップに正確に表示されます）"
             onChange={() => setErrors((p) => ({ ...p, address: undefined }))}
           />
           {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
@@ -262,9 +263,9 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
             説明 <span className="text-red-500">*</span>
           </label>
           <textarea
-            name="description" rows={3} defaultValue={defaultValues?.description}
+            name="description" rows={6} defaultValue={defaultValues?.description}
             className={`${field("description")} resize-none`}
-            placeholder="お店の特徴や魅力を教えてください（10〜500文字）"
+            placeholder={"例: 地元の食材にこだわったイタリアン。パスタは毎日自家製で、季節ごとに変わるメニューが自慢です。\n開放的なテラス席でゆっくりお食事いただけます。ランチコースは3種類ご用意しています。\nお一人様・ファミリーどちらも歓迎です。"}
             onChange={() => setErrors((p) => ({ ...p, description: undefined }))}
           />
           {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
@@ -345,11 +346,7 @@ export default function OwnerStoreForm({ action, defaultValues, submitLabel = "�
         {/* タグ */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">タグ</label>
-          <input
-            name="tags" className={INPUT_NORMAL}
-            defaultValue={defaultValues?.tags?.join(", ")}
-            placeholder="例: ランチ, 個室, テラス席（カンマ区切り）"
-          />
+          <TagInput name="tags" defaultValue={defaultValues?.tags ?? []} />
         </div>
 
         {/* SNS */}

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getStores, getComingSoonStores, getRankedStores } from "@/lib/db";
+import { getStores, getComingSoonStores, getRankedStores, getUserLikedStoreIds } from "@/lib/db";
 import PageHeader from "@/components/PageHeader";
 import StoresFilter from "@/components/StoresFilter";
 import StoresWithLocation from "@/components/StoresWithLocation";
 import StoresLoadMore from "@/components/StoresLoadMore";
 import RecentlyViewedSection from "@/components/RecentlyViewedSection";
 import StoreCard from "@/components/StoreCard";
+import AiStoreSearch from "@/components/AiStoreSearch";
 import { CATEGORIES } from "@/lib/categories";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { Category } from "@/types";
 
 export const metadata: Metadata = {
@@ -28,9 +30,13 @@ export default async function StoresPage({
   const filterParam = sp.filter ?? "";
   const tagFilter = sp.tag?.trim() ?? "";
 
-  const [normalStores, comingSoonStores] = await Promise.all([
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const [normalStores, comingSoonStores, likedIds] = await Promise.all([
     getStores(),
     filterParam === "coming_soon" ? getComingSoonStores() : Promise.resolve([]),
+    user ? getUserLikedStoreIds(user.id) : Promise.resolve(new Set<string>()),
   ]);
 
   const hasFilter = !!(areaQuery || categoryFilter || tagFilter || filterParam);
@@ -64,6 +70,12 @@ export default async function StoresPage({
         <PageHeader
           title={title}
           description={`${stores.length}件のお店`}
+        />
+
+        <AiStoreSearch
+          allStores={normalStores}
+          isLoggedIn={!!user}
+          likedStoreIds={likedIds}
         />
 
         <StoresFilter
